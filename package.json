@@ -1,0 +1,20 @@
+{
+  "name": "local-markdown-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A local-first desktop Markdown reader and editor.",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "app": "electron .",
+    "package:mac": "electron-packager . \"Local Markdown Studio\" --platform=darwin --arch=$(node -p \"process.arch\") --out=dist --overwrite --ignore='^/docs' --ignore='^/test' --ignore='^/dist' && node scripts/prune-mac-package.cjs",
+    "package:win": "electron-packager . \"Local Markdown Studio\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore='^/docs' --ignore='^/test' --ignore='^/dist' && node scripts/prune-win-package.cjs",
+    "zip:mac": "cd dist && rm -f \"Local Markdown Studio-macOS.zip\" && zip -qry \"Local Markdown Studio-macOS.zip\" \"Local Markdown Studio.app\"",
+    "zip:win": "cd dist && rm -f \"Local Markdown Studio-win32-x64.zip\" && zip -qr \"Local Markdown Studio-win32-x64.zip\" \"Local Markdown Studio-win32-x64\"",
+    "test": "node test/markdown.test.mjs && node test/project.test.mjs && node test/app-source.test.mjs && node test/electron-source.test.mjs",
+    "check": "node --check src/app.js && node --check src/markdown.mjs && node --check src/project.mjs && node --check electron/main.cjs && node --check electron/preload.cjs"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.0.1",
+    "electron": "^31.7.7"
+  }
+}

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Markdown Studio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-mode="split">
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">M</span>
+        <div>
+          <h1>Local Markdown Studio</h1>
+          <p id="fileName">未命名文档</p>
+        </div>
+      </div>
+
+      <div class="toolbar" aria-label="文档操作">
+        <button class="tool-button" id="openButton" type="button" title="打开 Markdown 文件">打开</button>
+        <button class="tool-button" id="openProjectButton" type="button" title="打开整个项目文件夹">打开项目</button>
+        <button class="tool-button" id="scanSettingsButton" type="button" title="配置项目扫描规则">扫描设置</button>
+        <button class="tool-button" id="sampleButton" type="button" title="载入示例文档">示例</button>
+        <button class="tool-button" id="downloadButton" type="button" title="下载当前 Markdown">下载 MD</button>
+        <button class="tool-button" id="exportButton" type="button" title="导出渲染后的 HTML">导出 HTML</button>
+        <button class="icon-button" id="themeButton" type="button" title="切换深浅主题" aria-label="切换深浅主题">◐</button>
+      </div>
+    </header>
+
+    <section class="control-strip" aria-label="编辑视图控制">
+      <div class="segmented" role="group" aria-label="视图模式">
+        <button class="segment is-active" data-mode="split" type="button">分屏</button>
+        <button class="segment" data-mode="editor" type="button">编辑</button>
+        <button class="segment" data-mode="preview" type="button">预览</button>
+      </div>
+
+      <label class="search-box">
+        <span>搜索</span>
+        <input id="searchInput" type="search" placeholder="标题、正文、代码">
+      </label>
+
+      <div class="stats" id="stats" aria-live="polite"></div>
+    </section>
+
+    <main class="workspace">
+      <aside class="outline-pane" aria-label="项目与文档目录">
+        <section class="project-panel" aria-label="项目文件">
+          <div class="pane-heading">
+            <span>项目</span>
+            <span id="projectMeta" class="pane-meta">未打开</span>
+          </div>
+          <div class="scan-settings" aria-label="项目扫描设置">
+            <p id="scanSummary" class="scan-summary"></p>
+          </div>
+          <nav id="projectFiles" class="project-file-list"></nav>
+        </section>
+
+        <section class="document-panel" aria-label="当前文档目录">
+          <div class="pane-heading">
+            <span>目录</span>
+            <button class="ghost-button" id="clearDraftButton" type="button" title="清空本地草稿">清草稿</button>
+          </div>
+          <nav id="outline" class="outline-list"></nav>
+        </section>
+      </aside>
+
+      <section class="editor-pane" aria-label="Markdown 编辑器">
+        <textarea id="editor" spellcheck="false" aria-label="Markdown 源码"></textarea>
+      </section>
+
+      <section class="preview-pane" aria-label="Markdown 预览">
+        <article id="preview" class="markdown-body"></article>
+      </section>
+    </main>
+  </div>
+
+  <div id="dropOverlay" class="drop-overlay" aria-hidden="true">
+    <div>
+      <strong>松开以打开 Markdown</strong>
+      <span>支持 .md / .markdown / .txt</span>
+    </div>
+  </div>
+
+  <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
+    <div class="loading-panel" role="status" aria-live="polite">
+      <div class="loading-header">
+        <strong id="loadingTitle">正在加载项目</strong>
+        <span id="loadingPercent">0%</span>
+      </div>
+      <div class="loading-track" aria-hidden="true">
+        <div id="loadingBar" class="loading-bar"></div>
+      </div>
+      <p id="loadingMessage">准备读取 Markdown 文件</p>
+    </div>
+  </div>
+
+  <div id="scanSettingsDialog" class="scan-settings-dialog" aria-hidden="true">
+    <div class="scan-dialog-panel" role="dialog" aria-modal="true" aria-label="项目扫描设置">
+      <div class="scan-dialog-header">
+        <strong>扫描设置</strong>
+        <button class="icon-button" id="scanSettingsClose" type="button" aria-label="关闭扫描设置">×</button>
+      </div>
+
+      <div class="scan-dialog-body">
+        <section class="scan-config-section">
+          <div class="scan-config-title">
+            <span>扫描文件</span>
+            <small>默认只扫描 .md</small>
+          </div>
+          <div id="scanExtensionList" class="scan-option-list"></div>
+          <div class="scan-add-row">
+            <input id="scanExtensionInput" type="text" placeholder=".mdx">
+            <button class="ghost-button" id="addScanExtensionButton" type="button">新增</button>
+          </div>
+        </section>
+
+        <section class="scan-config-section">
+          <div class="scan-config-title">
+            <span>通用规则</span>
+            <small>支持 * 通配符</small>
+          </div>
+          <div id="generalRuleList" class="scan-option-list"></div>
+          <div class="scan-add-row">
+            <input id="generalRuleInput" type="text" placeholder=".cache 或 tmp-*">
+            <button class="ghost-button" id="addGeneralRuleButton" type="button">新增</button>
+          </div>
+        </section>
+
+        <section class="scan-config-section">
+          <div class="scan-config-title">
+            <span>不扫描目录</span>
+            <small>默认只跳过 node_modules</small>
+          </div>
+          <div id="ignoreDirectoryList" class="scan-option-list"></div>
+          <div class="scan-add-row">
+            <input id="ignoreDirectoryInput" type="text" placeholder="dist">
+            <button class="ghost-button" id="addIgnoreDirectoryButton" type="button">新增</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="scan-dialog-footer">
+        <button class="tool-button" id="scanSettingsApply" type="button">应用并重扫</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="diagramViewer" class="diagram-viewer" aria-hidden="true">
+    <div class="diagram-viewer-panel" role="dialog" aria-modal="true" aria-label="流程图放大查看">
+      <div class="diagram-viewer-header">
+        <strong>流程图</strong>
+        <div class="diagram-viewer-tools" aria-label="流程图缩放控制">
+          <button class="icon-button" id="diagramZoomOut" type="button" aria-label="缩小流程图">−</button>
+          <span id="diagramZoomLevel" class="diagram-zoom-level" aria-live="polite">100%</span>
+          <button class="icon-button" id="diagramZoomIn" type="button" aria-label="放大流程图">+</button>
+          <button class="tool-button" id="diagramZoomReset" type="button">重置</button>
+        </div>
+        <button class="icon-button" id="diagramViewerClose" type="button" aria-label="关闭流程图预览">×</button>
+      </div>
+      <div id="diagramViewerCanvas" class="diagram-viewer-canvas"></div>
+    </div>
+  </div>
+
+  <input id="fileInput" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
+  <input id="projectInput" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" webkitdirectory directory multiple hidden>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
