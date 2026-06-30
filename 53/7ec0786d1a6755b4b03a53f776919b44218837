@@ -1,0 +1,31 @@
+test/website-source.test.mjs
+  s_6a6531a0add332::t_e78804b35f8714 18
+  s_6a6531a0add332::t_7836ab530949a6 17,19
+website/styles.css
+  s_6a6531a0add332::t_e78804b35f8714 13,119,305
+  s_6a6531a0add332::t_34e90972d4214f 550
+  s_6a6531a0add332::t_f28c5a6999e474 509,556-558,561-562
+  s_6a6531a0add332::t_34437d588317fb 49,94,277-281,285-286,299-304,309,322-324,360-366,378,407,412-413,477
+docs/superpowers/specs/2026-06-30-local-markdown-studio-website-design.md
+  s_6a6531a0add332::t_248b5d23f3a612 23-24
+website/index.html
+  s_6a6531a0add332::t_431a5bc3e8a609 56-62,66-71,73-90,95-103,108-113,115-133,138-164
+docs/superpowers/plans/2026-06-30-local-markdown-studio-website.md
+  s_6a6531a0add332::t_248b5d23f3a612 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "537ec0786d1a6755b4b03a53f776919b44218837",
+  "prompts": {},
+  "sessions": {
+    "s_6a6531a0add332": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f179f-f3ae-7943-a8a9-47022fc4ea4d",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
