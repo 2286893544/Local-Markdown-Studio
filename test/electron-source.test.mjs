@@ -89,6 +89,9 @@ assert.ok(packageJson.devDependencies.electron);
 
 assert.match(dmgMac, /Local Markdown Studio-macOS\.dmg/);
 assert.match(dmgMac, /hdiutil/);
+assert.match(dmgMac, /run\('ditto', \[appPath, stagedAppPath\]\)/);
+assert.match(dmgMac, /function verifyElectronFramework\(appBundlePath\)/);
+assert.match(dmgMac, /path\.isAbsolute\(linkTarget\)/);
 assert.match(dmgMac, /fs\.symlinkSync\('\/Applications'/);
 assert.match(dmgMac, /fs\.rmSync\(path\.dirname\(appPath\), \{ recursive: true, force: true \}\)/);
 assert.match(zipMac, /Local Markdown Studio-macOS\.zip/);

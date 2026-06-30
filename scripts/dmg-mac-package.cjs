@@ -14,21 +14,24 @@ if (process.platform !== 'darwin') {
 }
 
 const appPath = findPackagedApp();
+const stagedAppPath = path.join(stagingDir, appName);
 
 fs.rmSync(dmgPath, { force: true });
 fs.rmSync(stagingDir, { recursive: true, force: true });
 fs.mkdirSync(stagingDir, { recursive: true });
-fs.cpSync(appPath, path.join(stagingDir, appName), { recursive: true });
+verifyElectronFramework(appPath);
+run('ditto', [appPath, stagedAppPath]);
+verifyElectronFramework(stagedAppPath);
 fs.symlinkSync('/Applications', path.join(stagingDir, 'Applications'));
 
-const result = spawnSync('hdiutil', [
+const result = run('hdiutil', [
   'create',
   '-volname', volumeName,
   '-srcfolder', stagingDir,
   '-ov',
   '-format', 'UDZO',
   dmgPath,
-], { stdio: 'inherit' });
+], { exitOnFailure: false });
 
 fs.rmSync(stagingDir, { recursive: true, force: true });
 
@@ -56,4 +59,34 @@ function findPackagedApp() {
   if (candidates.length) return candidates[0];
 
   throw new Error(`macOS app not found in ${distDir}. Run npm run package:mac first.`);
+}
+
+function verifyElectronFramework(appBundlePath) {
+  const frameworkLink = path.join(
+    appBundlePath,
+    'Contents',
+    'Frameworks',
+    'Electron Framework.framework',
+    'Electron Framework',
+  );
+
+  if (!fs.existsSync(frameworkLink)) {
+    throw new Error(`Electron Framework is missing from app bundle: ${frameworkLink}`);
+  }
+
+  const linkStats = fs.lstatSync(frameworkLink);
+  if (!linkStats.isSymbolicLink()) return;
+
+  const linkTarget = fs.readlinkSync(frameworkLink);
+  if (path.isAbsolute(linkTarget)) {
+    throw new Error(`Electron Framework symlink must be relative, got: ${linkTarget}`);
+  }
+}
+
+function run(command, args, options = {}) {
+  const result = spawnSync(command, args, { stdio: 'inherit' });
+  if (result.status !== 0 && options.exitOnFailure !== false) {
+    process.exit(result.status || 1);
+  }
+  return result;
 }
