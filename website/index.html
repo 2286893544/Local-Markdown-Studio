@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Markdown Studio - 本地 Markdown 阅读与编辑器</title>
+  <meta name="description" content="Local Markdown Studio 是一个本地优先的 macOS Markdown 阅读与编辑工具，支持实时预览、项目扫描、目录跳转、搜索高亮和 HTML 导出。">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Local Markdown Studio 首页">
+      <span class="brand-icon">M</span>
+      <span>Local Markdown Studio</span>
+    </a>
+    <nav class="site-nav" aria-label="官网导航">
+      <a href="#features">功能</a>
+      <a href="#install">安装</a>
+      <a href="#download">下载</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="Local Markdown Studio">
+      <img class="hero-preview" src="assets/app-preview.png" alt="Local Markdown Studio 的 Markdown 编辑和预览界面">
+      <div class="hero-copy">
+        <p class="eyebrow">macOS Markdown Studio</p>
+        <h1>Local Markdown Studio</h1>
+        <p class="hero-lead">本地优先的 Markdown 阅读与编辑器。打开文件夹，扫描文档，编辑、预览、搜索和导出都在你的电脑上完成。</p>
+        <div class="hero-actions">
+          <a class="primary-action" href="#download">选择下载版本</a>
+          <a class="secondary-action" href="#install">查看安装说明</a>
+        </div>
+        <p class="compatibility">适用于 Apple Silicon Mac：M1 / M2 / M3 / M4</p>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="产品定位">
+      <span>无需账号</span>
+      <span>本地文件</span>
+      <span>实时预览</span>
+      <span>项目扫描</span>
+      <span>HTML 导出</span>
+    </section>
+
+    <section id="features" class="section">
+      <div class="section-heading">
+        <p class="eyebrow">Workflow</p>
+        <h2>为本地文档工作流做减法</h2>
+        <p>它不是云笔记，也不是复杂知识库。它专注于把本机 Markdown 文件打开、组织、阅读和导出。</p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <h3>编辑与预览同步</h3>
+          <p>分屏、编辑、预览三种模式快速切换，写作时保持 Markdown 源码和渲染结果同步。</p>
+        </article>
+        <article class="feature-card">
+          <h3>项目级扫描</h3>
+          <p>选择一个文件夹后自动整理 Markdown 文档，适合项目说明、技术笔记和本地资料库。</p>
+        </article>
+        <article class="feature-card">
+          <h3>目录和搜索</h3>
+          <p>自动提取标题目录，支持层级折叠、平滑跳转和搜索高亮，长文档也能快速定位。</p>
+        </article>
+        <article class="feature-card">
+          <h3>导出 HTML</h3>
+          <p>把当前 Markdown 渲染为可分享的 HTML 文件，适合交付说明、评审材料和归档。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-split" aria-label="本地优先说明">
+      <div>
+        <p class="eyebrow">Local First</p>
+        <h2>文档留在本机</h2>
+      </div>
+      <div class="copy-column">
+        <p>Local Markdown Studio 不要求登录账号，不把文档上传到远端服务。你打开的 `.md` 文件和项目目录都在本机读取，适合处理私有文档、内部说明、学习笔记和离线资料。</p>
+        <p>它保留桌面应用应有的直接感：双击文件、打开项目、搜索内容、导出 HTML。功能边界清晰，启动后就是工作区。</p>
+      </div>
+    </section>
+
+    <section id="install" class="section install-section">
+      <div class="section-heading">
+        <p class="eyebrow">Install</p>
+        <h2>macOS 安装说明</h2>
+        <p>当前分发包未做 Apple Developer 签名和 notarize 公证，macOS 可能把通过飞书或浏览器下载的 App 标记为隔离。</p>
+      </div>
+
+      <div class="steps">
+        <article class="step-card">
+          <span class="step-number">01</span>
+          <h3>打开 DMG</h3>
+          <p>双击 `Local Markdown Studio-macOS.dmg`，把 `Local Markdown Studio.app` 拖入 `Applications`。</p>
+        </article>
+        <article class="step-card">
+          <span class="step-number">02</span>
+          <h3>解除下载隔离</h3>
+          <p>如果提示“已损坏，无法打开”，在终端执行下面的命令。</p>
+          <pre><code>xattr -dr com.apple.quarantine "/Applications/Local Markdown Studio.app"</code></pre>
+        </article>
+        <article class="step-card">
+          <span class="step-number">03</span>
+          <h3>启动应用</h3>
+          <p>从“应用程序”打开，或继续在终端执行启动命令。</p>
+          <pre><code>open "/Applications/Local Markdown Studio.app"</code></pre>
+        </article>
+      </div>
+    </section>
+
+    <section id="download" class="section download-section">
+      <div class="download-panel">
+        <div>
+          <p class="eyebrow">Download</p>
+          <h2>选择适合你电脑的版本</h2>
+          <p>不同芯片需要不同资源。Apple Silicon 选择 M 系列版本；Intel Mac 选择 x64 版本，避免下载后无法运行。</p>
+        </div>
+        <div class="download-cards" aria-label="下载资源">
+          <article class="download-card is-ready">
+            <span class="resource-tag">Apple Silicon</span>
+            <h3>M1 / M2 / M3 / M4</h3>
+            <p>适合“关于本机”里显示 Apple M 系列芯片的 Mac。</p>
+            <a class="primary-action" href="../dist/Local Markdown Studio-macOS.dmg" download>下载 arm64 DMG</a>
+          </article>
+          <article class="download-card">
+            <span class="resource-tag">Intel Mac</span>
+            <h3>x64 版本</h3>
+            <p>适合“关于本机”里显示 Intel 处理器的 Mac。资源文件独立，不要混用 M 系列包。</p>
+            <a class="secondary-action" href="../dist/Local Markdown Studio-macOS-x64.dmg" download>下载 x64 DMG</a>
+          </article>
+          <article class="download-card">
+            <span class="resource-tag">Source</span>
+            <h3>源码仓库</h3>
+            <p>需要自己打包或查看更新记录时，可以从 GitHub 获取项目源码。</p>
+            <a class="secondary-action" href="https://github.com/2286893544/Local-Markdown-Studio" rel="noreferrer">查看 GitHub</a>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Local Markdown Studio</span>
+    <span>本地 Markdown 阅读与编辑工具</span>
+  </footer>
+</body>
+</html>

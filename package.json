@@ -11,7 +11,7 @@
     "dmg:mac": "npm run package:mac && node scripts/dmg-mac-package.cjs",
     "zip:mac": "npm run package:mac && node scripts/zip-mac-package.cjs",
     "zip:win": "npm run package:win && node scripts/zip-win-package.cjs",
-    "test": "node test/markdown.test.mjs && node test/project.test.mjs && node test/app-source.test.mjs && node test/electron-source.test.mjs",
+    "test": "node test/markdown.test.mjs && node test/project.test.mjs && node test/app-source.test.mjs && node test/electron-source.test.mjs && node test/website-source.test.mjs",
     "check": "node --check src/app.js && node --check src/markdown.mjs && node --check src/project.mjs && node --check electron/main.cjs && node --check electron/preload.cjs"
   },
   "devDependencies": {

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <rect width="1600" height="1000" fill="#f7f8fb"/>
+  <rect x="110" y="80" width="1380" height="820" rx="34" fill="#ffffff" stroke="#d8dee8" stroke-width="2"/>
+  <rect x="110" y="80" width="1380" height="72" rx="34" fill="#f0f3f7"/>
+  <circle cx="155" cy="116" r="13" fill="#ff5f57"/>
+  <circle cx="197" cy="116" r="13" fill="#febc2e"/>
+  <circle cx="239" cy="116" r="13" fill="#28c840"/>
+  <text x="300" y="124" fill="#17191f" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="25" font-weight="700">Local Markdown Studio</text>
+  <rect x="146" y="182" width="260" height="670" rx="14" fill="#f8fafc" stroke="#e0e5ee"/>
+  <text x="178" y="228" fill="#626b7a" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" font-weight="700">项目</text>
+  <rect x="178" y="254" width="178" height="30" rx="8" fill="#eaf3f2"/>
+  <rect x="178" y="306" width="132" height="18" rx="6" fill="#cfd7e2"/>
+  <rect x="178" y="344" width="164" height="18" rx="6" fill="#cfd7e2"/>
+  <rect x="178" y="382" width="118" height="18" rx="6" fill="#cfd7e2"/>
+  <text x="178" y="468" fill="#626b7a" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" font-weight="700">目录</text>
+  <rect x="178" y="496" width="186" height="18" rx="6" fill="#b8c4d2"/>
+  <rect x="198" y="536" width="126" height="16" rx="6" fill="#d4dbe5"/>
+  <rect x="198" y="574" width="154" height="16" rx="6" fill="#d4dbe5"/>
+  <rect x="198" y="612" width="106" height="16" rx="6" fill="#d4dbe5"/>
+  <rect x="438" y="182" width="506" height="670" rx="14" fill="#fbfcfe" stroke="#e0e5ee"/>
+  <text x="476" y="236" fill="#17191f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="22" font-weight="700"># Product Notes</text>
+  <text x="476" y="298" fill="#285f9f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="19">## Install</text>
+  <rect x="476" y="328" width="350" height="16" rx="6" fill="#c9d2de"/>
+  <rect x="476" y="362" width="290" height="16" rx="6" fill="#d9dfe8"/>
+  <text x="476" y="430" fill="#166b63" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="19">- local files</text>
+  <text x="476" y="468" fill="#166b63" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="19">- live preview</text>
+  <text x="476" y="506" fill="#166b63" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="19">- HTML export</text>
+  <rect x="476" y="570" width="400" height="150" rx="12" fill="#17191f"/>
+  <text x="510" y="622" fill="#f5f7fb" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18">xattr -dr quarantine</text>
+  <text x="510" y="662" fill="#9fd6cc" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18">open Applications</text>
+  <rect x="976" y="182" width="478" height="670" rx="14" fill="#ffffff" stroke="#e0e5ee"/>
+  <text x="1026" y="252" fill="#17191f" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="42" font-weight="760">Product Notes</text>
+  <rect x="1026" y="300" width="344" height="18" rx="7" fill="#b8c4d2"/>
+  <rect x="1026" y="336" width="294" height="18" rx="7" fill="#d7dee8"/>
+  <rect x="1026" y="412" width="360" height="118" rx="16" fill="#eef7f6"/>
+  <circle cx="1068" cy="471" r="22" fill="#166b63"/>
+  <rect x="1110" y="448" width="218" height="18" rx="7" fill="#95c8c0"/>
+  <rect x="1110" y="484" width="176" height="18" rx="7" fill="#b7d8d3"/>
+  <rect x="1026" y="590" width="328" height="18" rx="7" fill="#d7dee8"/>
+  <rect x="1026" y="630" width="260" height="18" rx="7" fill="#d7dee8"/>
+  <rect x="1026" y="700" width="180" height="48" rx="8" fill="#166b63"/>
+  <text x="1066" y="731" fill="#ffffff" font-family="Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" font-weight="700">Export HTML</text>
+</svg>
