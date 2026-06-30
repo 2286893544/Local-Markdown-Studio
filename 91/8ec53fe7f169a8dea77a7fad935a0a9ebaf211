@@ -1,0 +1,19 @@
+.codegraph/.gitignore
+  s_909a4560bd47bc::t_a234a3646936c8 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "918ec53fe7f169a8dea77a7fad935a0a9ebaf211",
+  "prompts": {},
+  "sessions": {
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
