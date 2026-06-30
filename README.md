@@ -63,6 +63,14 @@ npm run zip:mac
 npm run zip:win
 ```
 
+macOS 推荐生成 DMG 分发包：
+
+```bash
+npm run dmg:mac
+```
+
+DMG 会包含 `Local Markdown Studio.app` 和 `Applications` 快捷入口，用户打开 DMG 后把 app 拖到 Applications 即可。
+
 ## 注册为系统默认打开程序
 
 ### Windows
@@ -85,13 +93,19 @@ dist\Local Markdown Studio-win32-x64\register-md-association.cmd
 
 ### macOS
 
-macOS 包内已声明 Markdown 文档类型。打包后把下面的应用拖到“应用程序”目录：
+`.zip` 解压后双击 `.app` 会直接运行，macOS 不会自动询问是否添加到“应用程序”。需要安装引导时请使用 DMG：
 
-```text
-dist/Local Markdown Studio-darwin-<arch>/Local Markdown Studio.app
+```bash
+npm run dmg:mac
 ```
 
-安装后在 `.md` 文件上右键选择“打开方式”即可看到 Local Markdown Studio。需要设为默认时，在文件“显示简介”里修改“打开方式”，然后选择“全部更改”。之后双击 `.md` / `.markdown` 文件会用 Local Markdown Studio 打开。
+生成后打开：
+
+```text
+dist/Local Markdown Studio-macOS.dmg
+```
+
+把 `Local Markdown Studio.app` 拖到 `Applications`。安装后在 `.md` 文件上右键选择“打开方式”即可看到 Local Markdown Studio。需要设为默认时，在文件“显示简介”里修改“打开方式”，然后选择“全部更改”。之后双击 `.md` / `.markdown` 文件会用 Local Markdown Studio 打开。
 
 ## 目录结构
 
