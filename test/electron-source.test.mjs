@@ -5,6 +5,8 @@ const main = await readFile(new URL('../electron/main.cjs', import.meta.url), 'u
 const preload = await readFile(new URL('../electron/preload.cjs', import.meta.url), 'utf8');
 const app = await readFile(new URL('../src/app.js', import.meta.url), 'utf8');
 const manifest = await readFile(new URL('../package.json', import.meta.url), 'utf8');
+const pruneWin = await readFile(new URL('../scripts/prune-win-package.cjs', import.meta.url), 'utf8');
+const macInfo = await readFile(new URL('../electron/mac-info.plist', import.meta.url), 'utf8');
 
 assert.match(main, /new BrowserWindow/);
 assert.match(main, /\{\s*app,\s*BrowserWindow,\s*dialog,\s*ipcMain,\s*Menu\s*\}/);
@@ -25,6 +27,15 @@ assert.match(main, /ipcMain\.handle\('native:open-file'/);
 assert.match(main, /ipcMain\.handle\('native:open-project'/);
 assert.match(main, /ipcMain\.handle\('native:rescan-project'/);
 assert.match(main, /scanMarkdownProject/);
+assert.match(main, /requestSingleInstanceLock/);
+assert.match(main, /app\.on\('second-instance'/);
+assert.match(main, /findMarkdownArgument\(process\.argv\)/);
+assert.match(main, /function findMarkdownArgument\(args = \[\]\)/);
+assert.match(main, /\\\.\(md\|markdown\)\$/);
+assert.match(main, /app\.on\('open-file'/);
+assert.match(main, /openMarkdownFileFromPath\(filePath\)/);
+assert.match(main, /mainWindow\.webContents\.send\('native:file-opened', file\)/);
+assert.match(main, /function readMarkdownFile\(filePath\)/);
 assert.match(main, /ignoredDirectoryNames/);
 assert.match(main, /defaultMarkdownExtensions = \['\.md'\]/);
 assert.match(main, /defaultIgnoredDirectoryNames = \['node_modules'\]/);
@@ -33,12 +44,16 @@ assert.match(main, /ignoredDirectoryPatterns/);
 
 assert.match(preload, /contextBridge\.exposeInMainWorld\('markdownNative'/);
 assert.match(preload, /openFile/);
+assert.match(preload, /onFileOpened/);
+assert.match(preload, /ipcRenderer\.on\('native:file-opened'/);
 assert.match(preload, /openProject/);
 assert.match(preload, /rescanProject/);
 assert.match(preload, /setTheme/);
 
 assert.match(app, /window\.markdownNative/);
 assert.match(app, /openNativeFile/);
+assert.match(app, /markdownNative\?\.onFileOpened/);
+assert.match(app, /loadNativeMarkdownFile\(file\)/);
 assert.match(app, /openNativeProject/);
 assert.match(app, /rescanNativeProject/);
 assert.match(app, /syncNativeTheme/);
@@ -49,6 +64,7 @@ const packageJson = JSON.parse(manifest);
 assert.equal(packageJson.main, 'electron/main.cjs');
 assert.equal(packageJson.scripts.app, 'electron .');
 assert.match(packageJson.scripts['package:mac'], /--platform=darwin/);
+assert.match(packageJson.scripts['package:mac'], /--extend-info=electron\/mac-info\.plist/);
 assert.match(packageJson.scripts['package:mac'], /scripts\/prune-mac-package\.cjs/);
 assert.match(packageJson.scripts['package:win'], /--platform=win32/);
 assert.match(packageJson.scripts['package:win'], /--arch=x64/);
@@ -56,5 +72,18 @@ assert.match(packageJson.scripts['package:win'], /scripts\/prune-win-package\.cj
 assert.match(packageJson.scripts['zip:mac'], /Local Markdown Studio-macOS\.zip/);
 assert.match(packageJson.scripts['zip:win'], /Local Markdown Studio-win32-x64\.zip/);
 assert.ok(packageJson.devDependencies.electron);
+
+assert.match(pruneWin, /register-md-association\.cmd/);
+assert.match(pruneWin, /HKCU\\Software\\Classes\\\.md/);
+assert.match(pruneWin, /HKCU\\Software\\Classes\\\.markdown/);
+assert.match(pruneWin, /LocalMarkdownStudio\.Markdown\\shell\\open\\command/);
+assert.match(pruneWin, /%%1/);
+
+assert.match(macInfo, /CFBundleDocumentTypes/);
+assert.match(macInfo, /net\.daringfireball\.markdown/);
+assert.match(macInfo, /<string>md<\/string>/);
+assert.match(macInfo, /<string>markdown<\/string>/);
+assert.doesNotMatch(macInfo, /<string>txt<\/string>/);
+assert.doesNotMatch(macInfo, /public\.plain-text/);
 
 console.log('electron source tests passed');

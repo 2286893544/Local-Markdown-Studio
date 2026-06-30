@@ -249,6 +249,9 @@ function bindEvents() {
   }, { passive: false });
   elements.previewPane.addEventListener('scroll', syncEditorScrollToPreview, { passive: true });
   elements.editor.addEventListener('scroll', syncPreviewScrollToEditor, { passive: true });
+  window.markdownNative?.onFileOpened?.((file) => {
+    loadNativeMarkdownFile(file);
+  });
   elements.diagramViewer.addEventListener('click', (event) => {
     if (event.target === elements.diagramViewer) closeDiagramViewer();
   });
@@ -519,6 +522,10 @@ async function openNativeFile() {
   const file = await window.markdownNative.openFile();
   if (!file) return;
 
+  loadNativeMarkdownFile(file);
+}
+
+function loadNativeMarkdownFile(file) {
   clearProjectState();
   state.fileName = file.name || stripNativePath(file.path) || '未命名文档';
   state.markdown = String(file.content || '');

@@ -1,14 +1,16 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const appPath = path.join(__dirname, '..', 'dist', 'Local Markdown Studio.app');
+const distDir = path.join(__dirname, '..', 'dist');
+const appName = 'Local Markdown Studio.app';
+const packagedAppPath = path.join(distDir, `Local Markdown Studio-darwin-${process.arch}`, appName);
 const keptLocaleDirectories = new Set(['en.lproj', 'zh_CN.lproj']);
 
-if (!fs.existsSync(appPath)) {
-  throw new Error(`macOS app not found: ${appPath}`);
+if (!fs.existsSync(packagedAppPath)) {
+  throw new Error(`macOS app not found: ${packagedAppPath}`);
 }
 
-for (const localeDir of findLocaleDirectories(appPath)) {
+for (const localeDir of findLocaleDirectories(packagedAppPath)) {
   const name = path.basename(localeDir);
   if (!keptLocaleDirectories.has(name)) {
     fs.rmSync(localeDir, { recursive: true, force: true });
@@ -16,6 +18,7 @@ for (const localeDir of findLocaleDirectories(appPath)) {
 }
 
 console.log(`Pruned macOS package locales. Kept: ${[...keptLocaleDirectories].join(', ')}`);
+console.log(`Prepared macOS app: ${packagedAppPath}`);
 
 function findLocaleDirectories(rootPath) {
   const result = [];

@@ -19,6 +19,12 @@ const titleBarThemes = {
 };
 
 let mainWindow;
+let pendingMarkdownFilePath = '';
+
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -40,16 +46,37 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
+  mainWindow.webContents.once('did-finish-load', () => {
+    if (pendingMarkdownFilePath) {
+      openMarkdownFileFromPath(pendingMarkdownFilePath);
+      pendingMarkdownFilePath = '';
+    }
+  });
 }
 
 app.whenReady().then(() => {
   configureApplicationMenu();
   registerNativeHandlers();
   createWindow();
+  openMarkdownFileFromPath(findMarkdownArgument(process.argv));
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+});
+
+app.on('second-instance', (_event, commandLine) => {
+  const filePath = findMarkdownArgument(commandLine);
+  if (filePath) openMarkdownFileFromPath(filePath);
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
+
+app.on('open-file', (event, filePath) => {
+  event.preventDefault();
+  openMarkdownFileFromPath(filePath);
 });
 
 function configureApplicationMenu() {
@@ -73,11 +100,7 @@ function registerNativeHandlers() {
     if (result.canceled || !result.filePaths[0]) return null;
 
     const filePath = result.filePaths[0];
-    return {
-      name: path.basename(filePath),
-      path: filePath,
-      content: await fs.readFile(filePath, 'utf8'),
-    };
+    return readMarkdownFile(filePath);
   });
 
   ipcMain.handle('native:open-project', async (_event, options = {}) => {
@@ -99,6 +122,29 @@ function registerNativeHandlers() {
     applyWindowTheme(theme);
     return true;
   });
+}
+
+async function openMarkdownFileFromPath(filePath) {
+  if (!filePath) return;
+  if (!mainWindow || mainWindow.webContents.isLoadingMainFrame()) {
+    pendingMarkdownFilePath = filePath;
+    return;
+  }
+
+  try {
+    const file = await readMarkdownFile(filePath);
+    mainWindow.webContents.send('native:file-opened', file);
+  } catch (error) {
+    console.error(`Failed to open Markdown file: ${filePath}`, error);
+  }
+}
+
+async function readMarkdownFile(filePath) {
+  return {
+    name: path.basename(filePath),
+    path: filePath,
+    content: await fs.readFile(filePath, 'utf8'),
+  };
 }
 
 function applyWindowTheme(theme) {
@@ -217,4 +263,11 @@ function getPriorityScore(filePath) {
 
 function normalizePath(filePath) {
   return String(filePath).replace(/\\/g, '/').replace(/^\/+/, '');
+}
+
+function findMarkdownArgument(args = []) {
+  return args.find((arg) => {
+    if (!arg || String(arg).startsWith('-')) return false;
+    return /\.(md|markdown)$/i.test(String(arg));
+  }) || '';
 }

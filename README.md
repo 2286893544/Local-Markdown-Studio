@@ -15,6 +15,7 @@ Local Markdown Studio 是一个本地优先的 Markdown 桌面阅读与编辑工
 - 深色/浅色主题切换
 - Markdown 下载与 HTML 导出
 - Mermaid flowchart 简易渲染、缩放与查看
+- 支持注册为系统 Markdown 打开程序，双击 `.md` / `.markdown` 可直接打开
 - macOS / Windows 桌面打包脚本
 
 ## 环境要求
@@ -61,6 +62,36 @@ npm run package:win
 npm run zip:mac
 npm run zip:win
 ```
+
+## 注册为系统默认打开程序
+
+### Windows
+
+先打包 Windows 版本：
+
+```bash
+npm run package:win
+```
+
+打包完成后，进入生成目录并双击运行：
+
+```text
+dist\Local Markdown Studio-win32-x64\register-md-association.cmd
+```
+
+这个脚本会把 `.md` 和 `.markdown` 注册到当前 Windows 用户的文件关联中，不需要管理员权限。注册后双击 Markdown 文件会使用 `Local Markdown Studio.exe` 打开。
+
+如果 Windows 仍然使用旧应用打开 Markdown 文件，请在任意 `.md` 文件上右键，选择“打开方式” -> “选择其他应用” -> “Local Markdown Studio”，并勾选“始终使用此应用打开 .md 文件”。
+
+### macOS
+
+macOS 包内已声明 Markdown 文档类型。打包后把下面的应用拖到“应用程序”目录：
+
+```text
+dist/Local Markdown Studio-darwin-<arch>/Local Markdown Studio.app
+```
+
+安装后在 `.md` 文件上右键选择“打开方式”即可看到 Local Markdown Studio。需要设为默认时，在文件“显示简介”里修改“打开方式”，然后选择“全部更改”。之后双击 `.md` / `.markdown` 文件会用 Local Markdown Studio 打开。
 
 ## 目录结构
 
