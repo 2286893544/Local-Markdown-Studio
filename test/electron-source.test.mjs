@@ -6,6 +6,8 @@ const preload = await readFile(new URL('../electron/preload.cjs', import.meta.ur
 const app = await readFile(new URL('../src/app.js', import.meta.url), 'utf8');
 const manifest = await readFile(new URL('../package.json', import.meta.url), 'utf8');
 const pruneWin = await readFile(new URL('../scripts/prune-win-package.cjs', import.meta.url), 'utf8');
+const zipMac = await readFile(new URL('../scripts/zip-mac-package.cjs', import.meta.url), 'utf8');
+const zipWin = await readFile(new URL('../scripts/zip-win-package.cjs', import.meta.url), 'utf8');
 const macInfo = await readFile(new URL('../electron/mac-info.plist', import.meta.url), 'utf8');
 
 assert.match(main, /new BrowserWindow/);
@@ -79,9 +81,16 @@ assert.match(packageJson.scripts['package:mac'], /scripts\/prune-mac-package\.cj
 assert.match(packageJson.scripts['package:win'], /--platform=win32/);
 assert.match(packageJson.scripts['package:win'], /--arch=x64/);
 assert.match(packageJson.scripts['package:win'], /scripts\/prune-win-package\.cjs/);
-assert.match(packageJson.scripts['zip:mac'], /Local Markdown Studio-macOS\.zip/);
-assert.match(packageJson.scripts['zip:win'], /Local Markdown Studio-win32-x64\.zip/);
+assert.equal(packageJson.scripts['zip:mac'], 'npm run package:mac && node scripts/zip-mac-package.cjs');
+assert.equal(packageJson.scripts['zip:win'], 'npm run package:win && node scripts/zip-win-package.cjs');
 assert.ok(packageJson.devDependencies.electron);
+
+assert.match(zipMac, /Local Markdown Studio-macOS\.zip/);
+assert.match(zipMac, /Run npm run package:mac first/);
+assert.match(zipMac, /fs\.rmSync\(path\.dirname\(appPath\), \{ recursive: true, force: true \}\)/);
+assert.match(zipWin, /Local Markdown Studio-win32-x64\.zip/);
+assert.match(zipWin, /Run npm run package:win first/);
+assert.match(zipWin, /fs\.rmSync\(packagePath, \{ recursive: true, force: true \}\)/);
 
 assert.match(pruneWin, /register-md-association\.cmd/);
 assert.match(pruneWin, /HKCU\\Software\\Classes\\\.md/);
