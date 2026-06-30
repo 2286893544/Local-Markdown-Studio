@@ -33,6 +33,7 @@
 - [x] Add restrained reveal, floating, and hover animations with reduced-motion handling.
 - [x] Revise the hero into a denser two-column layout for wide screens.
 - [x] Replace the green theme with graphite, cobalt blue, cool gray, and amber accents.
+- [x] Apply a global 1480px content container to all major sections.
 - [x] Add responsive CSS for desktop and mobile.
 - [x] Generate a bitmap app preview asset from the SVG source.
 
