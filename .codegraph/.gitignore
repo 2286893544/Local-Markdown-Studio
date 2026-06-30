@@ -1,0 +1,5 @@
+# CodeGraph data files are local to each machine.
+# Keep only this ignore file in Git; do not commit transient index databases,
+# daemon files, sockets, or logs.
+*
+!.gitignore
