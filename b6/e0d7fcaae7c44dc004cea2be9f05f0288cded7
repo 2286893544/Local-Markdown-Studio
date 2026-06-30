@@ -1,0 +1,25 @@
+scripts/dmg-mac-package.cjs
+  s_909a4560bd47bc::t_328db00454931c 1-59
+test/electron-source.test.mjs
+  s_909a4560bd47bc::t_aa4d035bec491f 9,85,90-93
+package.json
+  s_909a4560bd47bc::t_825576a012f861 11
+README.md
+  s_909a4560bd47bc::t_cc4ab45287d80f 66-73,96-102,105,108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "b6e0d7fcaae7c44dc004cea2be9f05f0288cded7",
+  "prompts": {},
+  "sessions": {
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
