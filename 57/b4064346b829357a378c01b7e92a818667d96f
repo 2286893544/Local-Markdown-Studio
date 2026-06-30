@@ -1,0 +1,19 @@
+AGENTS.md
+  s_909a4560bd47bc::t_fdb771771a2a14 1-136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "57b4064346b829357a378c01b7e92a818667d96f",
+  "prompts": {},
+  "sessions": {
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
