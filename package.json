@@ -6,8 +6,8 @@
   "main": "electron/main.cjs",
   "scripts": {
     "app": "electron .",
-    "package:mac": "electron-packager . \"Local Markdown Studio\" --platform=darwin --arch=$(node -p \"process.arch\") --out=dist --overwrite --extend-info=electron/mac-info.plist --ignore='^/docs' --ignore='^/test' --ignore='^/dist' && node scripts/prune-mac-package.cjs",
-    "package:win": "electron-packager . \"Local Markdown Studio\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore='^/docs' --ignore='^/test' --ignore='^/dist' && node scripts/prune-win-package.cjs",
+    "package:mac": "electron-packager . \"Local Markdown Studio\" --platform=darwin --arch=$(node -p \"process.arch\") --out=dist --overwrite --extend-info=electron/mac-info.plist --ignore='^/docs' --ignore='^/test' --ignore='^/dist' --ignore='^/.codegraph' && node scripts/prune-mac-package.cjs",
+    "package:win": "electron-packager . \"Local Markdown Studio\" --platform=win32 --arch=x64 --out=dist --overwrite --ignore='^/docs' --ignore='^/test' --ignore='^/dist' --ignore='^/.codegraph' && node scripts/prune-win-package.cjs",
     "dmg:mac": "npm run package:mac && node scripts/dmg-mac-package.cjs",
     "zip:mac": "npm run package:mac && node scripts/zip-mac-package.cjs",
     "zip:win": "npm run package:win && node scripts/zip-win-package.cjs",
