@@ -1,0 +1,43 @@
+app.js
+  s_909a4560bd47bc::t_33bca88f95a686 1-926
+main.cjs
+  s_909a4560bd47bc::t_260c7b78631eeb 1-220
+package-lock.json
+  s_8c86fd42e79cb2::t_098e867610837e 1-1509
+README.md
+  s_909a4560bd47bc::t_254b07562557ea 1
+src/markdown.mjs
+  s_909a4560bd47bc::t_6e6d7dacb2ea1d 1-585
+styles.css
+  s_909a4560bd47bc::t_e2ea027a89d82e 1-1124
+test/app-source.test.mjs
+  s_909a4560bd47bc::t_f7d5dc638c2eae 1-117
+test/electron-source.test.mjs
+  s_909a4560bd47bc::t_da771cc650151e 1-60
+test/markdown.test.mjs
+  s_909a4560bd47bc::t_849be47f3a1bef 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "a48be7ccdfe2966714fb2c6581e8d0ecc0bef71a",
+  "prompts": {},
+  "sessions": {
+    "s_8c86fd42e79cb2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f12f1-cabd-7551-b49d-91fc789eb9e4",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    },
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
