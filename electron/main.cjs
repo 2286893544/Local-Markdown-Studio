@@ -45,6 +45,10 @@ function createWindow() {
     },
   });
 
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+
   mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
 }
 
@@ -122,7 +126,12 @@ function registerNativeHandlers() {
 
 async function openMarkdownFileFromPath(filePath) {
   if (!filePath) return;
-  if (!mainWindow || mainWindow.webContents.isLoadingMainFrame()) {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    pendingMarkdownFilePath = filePath;
+    ensureWindowForPendingFile();
+    return;
+  }
+  if (mainWindow.webContents.isLoadingMainFrame()) {
     pendingMarkdownFilePath = filePath;
     return;
   }
@@ -147,6 +156,10 @@ async function consumePendingMarkdownFile() {
   const filePath = pendingMarkdownFilePath;
   pendingMarkdownFilePath = '';
   return filePath ? readMarkdownFile(filePath) : null;
+}
+
+function ensureWindowForPendingFile() {
+  if (app.isReady()) createWindow();
 }
 
 function applyWindowTheme(theme) {

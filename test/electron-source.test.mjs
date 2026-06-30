@@ -10,6 +10,8 @@ const macInfo = await readFile(new URL('../electron/mac-info.plist', import.meta
 
 assert.match(main, /new BrowserWindow/);
 assert.match(main, /\{\s*app,\s*BrowserWindow,\s*dialog,\s*ipcMain,\s*Menu\s*\}/);
+assert.match(main, /mainWindow\.on\('closed'/);
+assert.match(main, /mainWindow = null/);
 assert.match(main, /Menu\.setApplicationMenu\(null\)/);
 assert.match(main, /titleBarStyle:\s*isWindows\s*\?\s*'hidden'\s*:\s*'default'/);
 assert.match(main, /titleBarOverlay:\s*isWindows\s*\?\s*getTitleBarOverlay\('light'\)\s*:\s*false/);
@@ -35,6 +37,8 @@ assert.match(main, /\\\.\(md\|markdown\)\$/);
 assert.match(main, /app\.on\('open-file'/);
 assert.match(main, /openMarkdownFileFromPath\(filePath\)/);
 assert.match(main, /mainWindow\.webContents\.send\('native:file-opened', file\)/);
+assert.match(main, /function ensureWindowForPendingFile\(\)/);
+assert.match(main, /if \(app\.isReady\(\)\) createWindow\(\)/);
 assert.match(main, /ipcMain\.handle\('native:consume-pending-file'/);
 assert.match(main, /consumePendingMarkdownFile/);
 assert.match(main, /function readMarkdownFile\(filePath\)/);
