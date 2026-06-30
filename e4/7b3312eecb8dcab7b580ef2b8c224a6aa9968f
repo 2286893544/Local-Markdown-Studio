@@ -1,0 +1,46 @@
+test/electron-source.test.mjs
+  s_909a4560bd47bc::t_6b2965f948e9d4 34,86-87
+  s_909a4560bd47bc::t_26f494f7909af3 35-38,47-48,55-56,67
+  s_909a4560bd47bc::t_f95b1c12f82926 8-9,30-33,76-85
+  s_909a4560bd47bc::t_d8d1d35a922e87 88
+electron/main.cjs
+  s_909a4560bd47bc::t_024cce032fb04e 22,49-54,75-81,103,127-148,273
+  s_909a4560bd47bc::t_ca898e67f39339 24-27,61,68-74,267-270,272
+  s_909a4560bd47bc::t_8891b0f7efd327 271
+  s_909a4560bd47bc::t_69571bfbf197b8 23
+  s_909a4560bd47bc::t_0f38047756d79c 149
+electron/preload.cjs
+  s_909a4560bd47bc::t_fe934ce2c3f984 5-10
+package.json
+  s_909a4560bd47bc::t_a0eeb1ea93c277 11
+  s_909a4560bd47bc::t_e35a29e68b8f41 9
+README.md
+  s_909a4560bd47bc::t_a7d20ea87eb338 18,66-87
+  s_909a4560bd47bc::t_243af0746e699f 88-94
+  s_909a4560bd47bc::t_aeb1e37ea999ef 95
+electron/mac-info.plist
+  s_909a4560bd47bc::t_d33fa441eb39e5 1-26
+scripts/prune-mac-package.cjs
+  s_909a4560bd47bc::t_ebe899cd4642b9 9-10,13,21
+  s_909a4560bd47bc::t_1321c841c301d5 4-6
+src/app.js
+  s_909a4560bd47bc::t_d2ee2c48eb44f0 252-254,525-528
+scripts/prune-win-package.cjs
+  s_909a4560bd47bc::t_0f48110c28bd75 7,21-22,24-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "e47b3312eecb8dcab7b580ef2b8c224a6aa9968f",
+  "prompts": {},
+  "sessions": {
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
