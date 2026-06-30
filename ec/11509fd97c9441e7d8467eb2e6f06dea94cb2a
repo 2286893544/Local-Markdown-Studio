@@ -1,0 +1,28 @@
+docs/superpowers/plans/2026-06-30-local-markdown-studio-website.md
+  s_6a6531a0add332::t_5830a6c626a18b 34-35
+docs/superpowers/specs/2026-06-30-local-markdown-studio-website-design.md
+  s_6a6531a0add332::t_5830a6c626a18b 21-22,27
+test/website-source.test.mjs
+  s_6a6531a0add332::t_a33a8900c0877a 15-17
+website/styles.css
+  s_6a6531a0add332::t_6c4276a2acd2b2 469-470,474-482,486,517,520-521,524-531
+  s_6a6531a0add332::t_0380bed1e4061b 3-6,8-13,50,92-93,96-100,107,111-119,124,128-171,207,255-274,428-429
+website/index.html
+  s_6a6531a0add332::t_da7c25db4b2644 25-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "ec11509fd97c9441e7d8467eb2e6f06dea94cb2a",
+  "prompts": {},
+  "sessions": {
+    "s_6a6531a0add332": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f179f-f3ae-7943-a8a9-47022fc4ea4d",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
