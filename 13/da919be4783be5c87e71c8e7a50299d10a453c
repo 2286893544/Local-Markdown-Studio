@@ -1,0 +1,30 @@
+package.json
+  s_909a4560bd47bc::t_563bd72088f147 11-12
+scripts/zip-win-package.cjs
+  s_909a4560bd47bc::t_5ee4eb2ac6fa30 8
+  s_909a4560bd47bc::t_58810b68b892de 1-7,9-25,27
+  s_909a4560bd47bc::t_c5295fc0a4d171 26,28
+test/electron-source.test.mjs
+  s_909a4560bd47bc::t_1265f17879ea7b 84-85,90,93
+  s_909a4560bd47bc::t_660980ca23d448 9-10,88-89,91-92
+  s_909a4560bd47bc::t_b1fcdd07650fd2 94
+scripts/zip-mac-package.cjs
+  s_909a4560bd47bc::t_b5690715bbea5a 24,26
+  s_909a4560bd47bc::t_e9261844367564 1-23,25,27-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "13da919be4783be5c87e71c8e7a50299d10a453c",
+  "prompts": {},
+  "sessions": {
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
