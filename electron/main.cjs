@@ -46,12 +46,6 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
-  mainWindow.webContents.once('did-finish-load', () => {
-    if (pendingMarkdownFilePath) {
-      openMarkdownFileFromPath(pendingMarkdownFilePath);
-      pendingMarkdownFilePath = '';
-    }
-  });
 }
 
 app.whenReady().then(() => {
@@ -118,6 +112,8 @@ function registerNativeHandlers() {
     return scanMarkdownProject(directoryPath, options);
   });
 
+  ipcMain.handle('native:consume-pending-file', consumePendingMarkdownFile);
+
   ipcMain.handle('native:set-theme', (_event, theme) => {
     applyWindowTheme(theme);
     return true;
@@ -145,6 +141,12 @@ async function readMarkdownFile(filePath) {
     path: filePath,
     content: await fs.readFile(filePath, 'utf8'),
   };
+}
+
+async function consumePendingMarkdownFile() {
+  const filePath = pendingMarkdownFilePath;
+  pendingMarkdownFilePath = '';
+  return filePath ? readMarkdownFile(filePath) : null;
 }
 
 function applyWindowTheme(theme) {

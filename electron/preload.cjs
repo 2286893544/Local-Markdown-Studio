@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('markdownNative', {
   openFile: () => ipcRenderer.invoke('native:open-file'),
+  consumePendingFile: () => ipcRenderer.invoke('native:consume-pending-file'),
   onFileOpened: (callback) => {
     if (typeof callback !== 'function') return () => {};
     const listener = (_event, file) => callback(file);

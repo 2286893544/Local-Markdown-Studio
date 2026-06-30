@@ -252,6 +252,7 @@ function bindEvents() {
   window.markdownNative?.onFileOpened?.((file) => {
     loadNativeMarkdownFile(file);
   });
+  consumePendingNativeFile();
   elements.diagramViewer.addEventListener('click', (event) => {
     if (event.target === elements.diagramViewer) closeDiagramViewer();
   });
@@ -533,6 +534,11 @@ function loadNativeMarkdownFile(file) {
   persistDraft();
   setMode('split');
   render();
+}
+
+async function consumePendingNativeFile() {
+  const file = await window.markdownNative?.consumePendingFile?.();
+  if (file) loadNativeMarkdownFile(file);
 }
 
 async function openNativeProject() {
