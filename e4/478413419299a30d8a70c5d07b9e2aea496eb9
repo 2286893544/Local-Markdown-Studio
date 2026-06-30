@@ -1,0 +1,27 @@
+electron/preload.cjs
+  s_909a4560bd47bc::t_e113fa2695ce90 5
+test/electron-source.test.mjs
+  s_909a4560bd47bc::t_81de1c9cbf9647 38-39,50-51,60-61
+electron/main.cjs
+  s_909a4560bd47bc::t_0075636b49dcdd 115-116,146-149
+  s_909a4560bd47bc::t_aa03b898711008 150-151
+src/app.js
+  s_909a4560bd47bc::t_5b33f24d8c40d5 255,539-541
+  s_909a4560bd47bc::t_c72371e5f2ad91 542-543
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "e4478413419299a30d8a70c5d07b9e2aea496eb9",
+  "prompts": {},
+  "sessions": {
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
