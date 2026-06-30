@@ -1,0 +1,49 @@
+assets/app-icon.svg
+  s_6a6531a0add332::t_61f34308b579ac 1-37
+scripts/generate-icon-assets.cjs
+  s_6a6531a0add332::t_61f34308b579ac 1-100
+test/electron-source.test.mjs
+  s_6a6531a0add332::t_db329648427ab5 22,84,90
+  s_6a6531a0add332::t_fb547b85c78272 12,81,85,111-114
+package.json
+  s_6a6531a0add332::t_fb547b85c78272 10
+  s_6a6531a0add332::t_e7089aa034ee19 9,11
+styles.css
+  s_6a6531a0add332::t_f20d3a5694908d 96,100
+index.html
+  s_6a6531a0add332::t_290d11344ade82 7
+  s_6a6531a0add332::t_f20d3a5694908d 14
+test/website-source.test.mjs
+  s_6a6531a0add332::t_db329648427ab5 15-16
+website/assets/app-preview.svg
+  s_6a6531a0add332::t_f20d3a5694908d 8-12
+docs/superpowers/specs/2026-06-30-local-markdown-studio-website-design.md
+  s_6a6531a0add332::t_82b3fcd4a1a4a5 25-26
+website/styles.css
+  s_6a6531a0add332::t_e7089aa034ee19 70,74
+test/app-source.test.mjs
+  s_6a6531a0add332::t_290d11344ade82 13
+  s_6a6531a0add332::t_f20d3a5694908d 14
+docs/superpowers/plans/2026-06-30-local-markdown-studio-website.md
+  s_6a6531a0add332::t_82b3fcd4a1a4a5 37
+website/index.html
+  s_6a6531a0add332::t_e7089aa034ee19 8,14
+electron/main.cjs
+  s_6a6531a0add332::t_e7089aa034ee19 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "de28dcd2d619130b489dbc3f5823f0f3a2a4ba30",
+  "prompts": {},
+  "sessions": {
+    "s_6a6531a0add332": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f179f-f3ae-7943-a8a9-47022fc4ea4d",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
