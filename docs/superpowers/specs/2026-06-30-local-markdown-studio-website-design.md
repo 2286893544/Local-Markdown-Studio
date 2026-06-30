@@ -18,8 +18,10 @@ Create a static official website for Local Markdown Studio that can be opened lo
 
 The page is a single-page Mac app website with a product-name hero, a generated product preview image, concise workflow benefits, installation steps, and a final download section. The visual tone is restrained and product-led: light background, thin borders, compact cards, real app interface preview, and no decorative landing-page clutter.
 
+The hero uses a denser two-column layout on large screens so wide monitors do not show a large empty top area. The theme uses graphite, cobalt blue, cool gray, and a small amber support color instead of the earlier green accent.
+
 The download section presents three resource cards: Apple Silicon DMG for M1-M4 Macs, Intel x64 DMG for Intel Macs, and the GitHub source repository. The page uses small reveal, floating, and hover animations to make the site feel polished without changing the core reading flow.
 
 ## Verification
 
-Add a source-level website test that checks for the page title, DMG download links, Apple Silicon M1-M4 copy, Intel Mac copy, quarantine command, local-first positioning, app preview asset, animation keyframes, reduced-motion handling, responsive stylesheet rules, and the absence of negative letter spacing.
+Add a source-level website test that checks for the page title, DMG download links, Apple Silicon M1-M4 copy, Intel Mac copy, quarantine command, local-first positioning, app preview asset, dense hero layout hooks, cobalt accent color, animation keyframes, reduced-motion handling, responsive stylesheet rules, and the absence of negative letter spacing.

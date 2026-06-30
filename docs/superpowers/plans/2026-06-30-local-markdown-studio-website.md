@@ -31,6 +31,8 @@
 - [x] Build the product-led landing page with hero, feature, local-first, install, and download sections.
 - [x] Split download cards by Apple Silicon, Intel Mac, and source repository resources.
 - [x] Add restrained reveal, floating, and hover animations with reduced-motion handling.
+- [x] Revise the hero into a denser two-column layout for wide screens.
+- [x] Replace the green theme with graphite, cobalt blue, cool gray, and amber accents.
 - [x] Add responsive CSS for desktop and mobile.
 - [x] Generate a bitmap app preview asset from the SVG source.
 
