@@ -56,6 +56,7 @@ npm run zip:win
 - 搜索优先使用 `rg`。
 - 手动改文件使用 `apply_patch`。
 - 如果工作区里有无关改动，必须保留，不要擅自回滚或覆盖。
+- 所有 Git commit 信息必须使用中文，包括提交标题和提交正文。不要使用英文 commit message。
 
 ## 测试约定
 
