@@ -9,6 +9,7 @@ const pruneWin = await readFile(new URL('../scripts/prune-win-package.cjs', impo
 const dmgMac = await readFile(new URL('../scripts/dmg-mac-package.cjs', import.meta.url), 'utf8');
 const zipMac = await readFile(new URL('../scripts/zip-mac-package.cjs', import.meta.url), 'utf8');
 const zipWin = await readFile(new URL('../scripts/zip-win-package.cjs', import.meta.url), 'utf8');
+const generateIcons = await readFile(new URL('../scripts/generate-icon-assets.cjs', import.meta.url), 'utf8');
 const macInfo = await readFile(new URL('../electron/mac-info.plist', import.meta.url), 'utf8');
 
 assert.match(main, /new BrowserWindow/);
@@ -18,6 +19,7 @@ assert.match(main, /mainWindow = null/);
 assert.match(main, /Menu\.setApplicationMenu\(null\)/);
 assert.match(main, /titleBarStyle:\s*isWindows\s*\?\s*'hidden'\s*:\s*'default'/);
 assert.match(main, /titleBarOverlay:\s*isWindows\s*\?\s*getTitleBarOverlay\('light'\)\s*:\s*false/);
+assert.match(main, /icon:\s*path\.join\(__dirname,\s*'\.\.',\s*'assets',\s*'app-icon\.png'\)/);
 assert.match(main, /ipcMain\.handle\('native:set-theme'/);
 assert.match(main, /setTitleBarOverlay/);
 assert.match(main, /setBackgroundColor/);
@@ -76,12 +78,16 @@ assert.match(app, /entry\.content/);
 const packageJson = JSON.parse(manifest);
 assert.equal(packageJson.main, 'electron/main.cjs');
 assert.equal(packageJson.scripts.app, 'electron .');
+assert.equal(packageJson.scripts.icons, 'node scripts/generate-icon-assets.cjs');
 assert.match(packageJson.scripts['package:mac'], /--platform=darwin/);
 assert.match(packageJson.scripts['package:mac'], /--extend-info=electron\/mac-info\.plist/);
+assert.match(packageJson.scripts['package:mac'], /--icon=assets\/app-icon\.icns/);
+assert.match(packageJson.scripts['package:mac'], /--quiet/);
 assert.match(packageJson.scripts['package:mac'], /--ignore='\^\/\.codegraph'/);
 assert.match(packageJson.scripts['package:mac'], /scripts\/prune-mac-package\.cjs/);
 assert.match(packageJson.scripts['package:win'], /--platform=win32/);
 assert.match(packageJson.scripts['package:win'], /--arch=x64/);
+assert.match(packageJson.scripts['package:win'], /--icon=assets\/app-icon\.ico/);
 assert.match(packageJson.scripts['package:win'], /--ignore='\^\/\.codegraph'/);
 assert.match(packageJson.scripts['package:win'], /scripts\/prune-win-package\.cjs/);
 assert.equal(packageJson.scripts['dmg:mac'], 'npm run package:mac && node scripts/dmg-mac-package.cjs');
@@ -102,6 +108,10 @@ assert.match(zipMac, /fs\.rmSync\(path\.dirname\(appPath\), \{ recursive: true, 
 assert.match(zipWin, /Local Markdown Studio-win32-x64\.zip/);
 assert.match(zipWin, /Run npm run package:win first/);
 assert.match(zipWin, /fs\.rmSync\(packagePath, \{ recursive: true, force: true \}\)/);
+assert.match(generateIcons, /app-icon\.svg/);
+assert.match(generateIcons, /app-icon\.icns/);
+assert.match(generateIcons, /app-icon\.ico/);
+assert.match(generateIcons, /function createIco/);
 
 assert.match(pruneWin, /register-md-association\.cmd/);
 assert.match(pruneWin, /HKCU\\Software\\Classes\\\.md/);

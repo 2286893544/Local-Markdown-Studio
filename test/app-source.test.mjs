@@ -10,6 +10,8 @@ assert.match(
   /openProjectEntry\(button\.dataset\.fileId,\s*\{\s*showLoading:\s*false,\s*preserveMode:\s*true\s*\}\)/,
 );
 
+assert.match(html, /rel="icon" href="assets\/app-icon\.svg"/);
+assert.match(html, /src="assets\/app-icon\.svg"/);
 assert.match(source, /if \(!options\.preserveMode\) \{\s*setMode\('split'\);\s*\}/);
 assert.match(html, /id="diagramViewer"/);
 assert.match(source, /openDiagramViewer/);

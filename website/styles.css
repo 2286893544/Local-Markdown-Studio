@@ -67,13 +67,11 @@ a {
 }
 
 .brand-icon {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  background: var(--ink);
-  color: #fff;
+  box-shadow: 0 8px 18px rgba(23, 29, 45, 0.14);
 }
 
 .site-nav {

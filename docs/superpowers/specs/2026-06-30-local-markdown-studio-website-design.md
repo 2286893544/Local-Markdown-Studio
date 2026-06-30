@@ -22,6 +22,8 @@ The hero uses a denser two-column layout on large screens so wide monitors do no
 
 All major sections share a centered content container capped at 1480px. This keeps feature cards, local-first copy, install instructions, and download resources visually concentrated on wide monitors instead of stretching across the full viewport.
 
+The brand icon uses a custom document-style mark: a cobalt rounded square, a folded Markdown document, compact line details, and a small amber cursor accent. The same source icon is reused for the website header, favicon, desktop app header, Electron window icon, macOS `.icns`, and Windows `.ico`.
+
 The download section presents three resource cards: Apple Silicon DMG for M1-M4 Macs, Intel x64 DMG for Intel Macs, and the GitHub source repository. The page uses small reveal, floating, and hover animations to make the site feel polished without changing the core reading flow.
 
 ## Verification

@@ -37,6 +37,7 @@ function createWindow() {
     autoHideMenuBar: true,
     titleBarStyle: isWindows ? 'hidden' : 'default',
     titleBarOverlay: isWindows ? getTitleBarOverlay('light') : false,
+    icon: path.join(__dirname, '..', 'assets', 'app-icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,

@@ -12,6 +12,8 @@ assert.match(website, /Local Markdown Studio-macOS-x64\.dmg/);
 assert.match(website, /xattr -dr com\.apple\.quarantine/);
 assert.match(website, /本地优先/);
 assert.match(website, /assets\/app-preview\.png/);
+assert.match(website, /assets\/app-icon\.svg/);
+assert.match(website, /rel="icon"/);
 assert.match(website, /hero-inner/);
 assert.match(website, /hero-highlights/);
 assert.match(website, /section-inner/);
