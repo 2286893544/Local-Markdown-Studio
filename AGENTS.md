@@ -1,25 +1,25 @@
 # AGENTS.md
 
-This file gives coding agents the local rules for working in this repository.
+本文档用于约束后续 Agent 在本仓库中的协作方式、开发边界和验证要求。
 
-## Project Overview
+## 项目概览
 
-Local Markdown Studio is an Electron desktop app for local-first Markdown reading, editing, previewing, and exporting.
+Local Markdown Studio 是一个基于 Electron 的本地 Markdown 桌面阅读与编辑工具，支持 Markdown 编辑、实时预览、项目扫描、目录跳转、HTML 导出和桌面端打包。
 
-Main entry points:
+主要入口文件：
 
-- `electron/main.cjs`: Electron main process, native file dialogs, file association entry handling, window lifecycle, project scanning on native builds.
-- `electron/preload.cjs`: Safe IPC bridge exposed as `window.markdownNative`.
-- `src/app.js`: Browser-side application state, editor/preview rendering, outline, search, scroll sync, project UI, native file loading.
-- `src/markdown.mjs`: Markdown parser/renderer, headings, search highlight, document stats, HTML export, simple flowchart rendering.
-- `src/project.mjs`: Browser-side project file normalization and directory scanning helpers.
-- `styles.css`: Full app styling.
-- `scripts/`: Packaging, pruning, archive, and DMG helper scripts.
-- `test/`: Source-level regression tests.
+- `electron/main.cjs`：Electron 主进程，负责原生文件选择、文件关联入口、窗口生命周期、原生项目扫描。
+- `electron/preload.cjs`：安全 IPC 桥，向前端暴露 `window.markdownNative`。
+- `src/app.js`：前端应用状态、编辑器、预览、目录、搜索、滚动同步、项目 UI、原生文件加载。
+- `src/markdown.mjs`：Markdown 渲染、标题提取、搜索高亮、文档统计、HTML 导出、简易 flowchart 渲染。
+- `src/project.mjs`：浏览器侧项目文件归一化和目录扫描辅助逻辑。
+- `styles.css`：应用样式。
+- `scripts/`：打包、裁剪、压缩、DMG 生成脚本。
+- `test/`：源码级回归测试。
 
-## Commands
+## 常用命令
 
-Use these commands from the repository root:
+所有命令默认在仓库根目录执行：
 
 ```bash
 npm install
@@ -33,104 +33,115 @@ npm run zip:mac
 npm run zip:win
 ```
 
-Validation before finishing a code change:
+代码改动完成前至少执行：
 
 ```bash
 npm test
 npm run check
 ```
 
-For packaging changes, also run the relevant packaging command. For example:
+如果改动涉及打包、安装、文件关联或发布产物，还需要执行对应平台的打包命令。例如：
 
 ```bash
 npm run dmg:mac
 npm run zip:win
 ```
 
-## Repository Rules
+## 仓库规则
 
-- Do not commit `node_modules/`, `dist/`, `*.log`, or `.DS_Store`.
-- Keep release artifacts local under `dist/`; they are ignored by Git.
-- Use the existing plain JavaScript / ESM style. Do not introduce TypeScript, bundlers, or framework dependencies unless explicitly requested.
-- Keep changes scoped. Do not refactor unrelated Markdown parsing, Electron lifecycle, or styling while fixing a focused bug.
-- Prefer `rg` for searching.
-- Use `apply_patch` for manual edits.
-- If a working tree contains unrelated changes, preserve them.
+- 不要提交 `node_modules/`、`dist/`、`*.log`、`.DS_Store`。
+- 发布产物只保留在本地 `dist/` 下，`dist/` 已被 Git 忽略。
+- 继续使用当前的纯 JavaScript / ESM 风格。除非用户明确要求，不要引入 TypeScript、构建器或前端框架。
+- 改动保持聚焦，不要在修复单一问题时顺手重构无关的 Markdown 解析、Electron 生命周期或样式。
+- 搜索优先使用 `rg`。
+- 手动改文件使用 `apply_patch`。
+- 如果工作区里有无关改动，必须保留，不要擅自回滚或覆盖。
 
-## Testing Pattern
+## 测试约定
 
-Tests are lightweight source-level checks:
+当前测试是轻量源码级检查：
 
-- `test/markdown.test.mjs`: Markdown renderer, flowchart renderer, export HTML, headings, search, stats.
-- `test/project.test.mjs`: project file normalization and scan rules.
-- `test/app-source.test.mjs`: browser app source invariants and UI behavior hooks.
-- `test/electron-source.test.mjs`: Electron main/preload/package script invariants.
+- `test/markdown.test.mjs`：Markdown 渲染、flowchart、HTML 导出、标题、搜索、统计。
+- `test/project.test.mjs`：项目文件归一化和扫描规则。
+- `test/app-source.test.mjs`：前端源码约束和 UI 行为钩子。
+- `test/electron-source.test.mjs`：Electron 主进程、preload、打包脚本和平台能力约束。
 
-When adding a behavior, add or update the closest test first when practical. These tests intentionally inspect source strings for integration behavior such as IPC names, packaging scripts, and platform hooks.
+新增行为时，优先补充或更新最贴近的测试。这些测试会检查源码字符串，用于锁住 IPC 名称、打包脚本、平台钩子等集成行为。
 
-## Electron File Opening
+## Electron 文件打开流程
 
-The app supports opening Markdown documents by double-clicking `.md` / `.markdown` files after system association.
+应用支持系统文件关联后，通过双击 `.md` / `.markdown` 文件打开文档。
 
-Important flow:
+关键流程：
 
-1. `electron/main.cjs` receives file paths from macOS `open-file`, Windows command-line args, or second-instance events.
-2. If no window exists, `ensureWindowForPendingFile()` creates one and stores the path in `pendingMarkdownFilePath`.
-3. `electron/preload.cjs` exposes `consumePendingFile()`.
-4. `src/app.js` calls `consumePendingNativeFile()` after binding listeners, then loads the returned file via `loadNativeMarkdownFile(file)`.
+1. `electron/main.cjs` 从 macOS `open-file`、Windows 命令行参数或 `second-instance` 事件接收文件路径。
+2. 如果当前没有窗口，`ensureWindowForPendingFile()` 会创建窗口，并把路径暂存在 `pendingMarkdownFilePath`。
+3. `electron/preload.cjs` 暴露 `consumePendingFile()`。
+4. `src/app.js` 在绑定监听后调用 `consumePendingNativeFile()`，再通过 `loadNativeMarkdownFile(file)` 加载文件。
 
-Do not replace this with a fire-and-forget event during startup. The pull-based pending-file flow avoids losing the file-open event before the renderer has registered listeners.
+不要把这套流程改回“启动时直接发一次事件”。前端监听可能尚未注册，事件会丢失，导致页面继续显示上一次本地草稿。
 
-macOS window behavior:
+macOS 窗口行为：
 
-- Closing the window should keep the process alive.
-- `mainWindow` must be set to `null` on `closed`.
-- A later double-clicked Markdown file must recreate the window and open that file.
+- 点击红色关闭按钮后，进程可以继续保留，这是 macOS 常见行为。
+- 窗口 `closed` 时必须设置 `mainWindow = null`。
+- 后续再次双击 Markdown 文件时，必须重新创建窗口并打开新文件。
 
-## Packaging Rules
+## 打包规则
 
-macOS:
+macOS：
 
-- `npm run package:mac` creates the unpacked app under `dist/Local Markdown Studio-darwin-<arch>/Local Markdown Studio.app`.
-- `electron/mac-info.plist` declares `.md` / `.markdown` document types.
-- `npm run dmg:mac` is the preferred macOS distribution command. It creates `dist/Local Markdown Studio-macOS.dmg`, includes the app plus an `Applications` symlink, and removes the unpacked app directory afterward.
-- `npm run zip:mac` creates `dist/Local Markdown Studio-macOS.zip` and removes the unpacked app directory afterward. A zip does not provide a macOS install prompt; use DMG when installation guidance matters.
+- `npm run package:mac` 生成未压缩应用：
+  `dist/Local Markdown Studio-darwin-<arch>/Local Markdown Studio.app`
+- `electron/mac-info.plist` 声明 `.md` / `.markdown` 文档类型。
+- `npm run dmg:mac` 是推荐的 macOS 分发命令。它会生成：
+  `dist/Local Markdown Studio-macOS.dmg`
+- DMG 内包含 `Local Markdown Studio.app` 和 `Applications` 快捷入口，用户打开后把 app 拖入 Applications。
+- `npm run dmg:mac` 执行完后会删除未压缩的打包目录。
+- `npm run zip:mac` 会生成：
+  `dist/Local Markdown Studio-macOS.zip`
+  并删除未压缩的打包目录。
+- zip 不会触发 macOS 安装引导；如果需要引导用户安装到“应用程序”，使用 DMG。
 
-Windows:
+Windows：
 
-- `npm run package:win` creates the unpacked Windows app under `dist/Local Markdown Studio-win32-x64`.
-- `scripts/prune-win-package.cjs` writes `register-md-association.cmd` into the packaged folder.
-- The registration script registers `.md` and `.markdown` for the current Windows user under `HKCU\Software\Classes`.
-- `npm run zip:win` creates `dist/Local Markdown Studio-win32-x64.zip` and removes the unpacked Windows package directory afterward.
+- `npm run package:win` 生成未压缩应用：
+  `dist/Local Markdown Studio-win32-x64`
+- `scripts/prune-win-package.cjs` 会向打包目录写入 `register-md-association.cmd`。
+- 注册脚本会在当前 Windows 用户下通过 `HKCU\Software\Classes` 注册 `.md` 和 `.markdown` 文件关联。
+- `npm run zip:win` 会生成：
+  `dist/Local Markdown Studio-win32-x64.zip`
+  并删除未压缩的 Windows 打包目录。
 
-## UI Behavior To Preserve
+## 需要保持的 UI 行为
 
-- The native application menu is hidden.
-- Windows titlebar overlay follows the theme.
-- Search highlights matches and scrolls to the first match.
-- Split mode scroll sync is bidirectional.
-- Outline entries are hierarchical, collapsible, and clicking an entry scrolls both editor and preview smoothly.
-- Outline collapse should redraw only the outline, not rerender the preview.
-- The project panel is hidden when no project is open.
+- 原生应用菜单隐藏。
+- Windows 标题栏颜色跟随主题变化。
+- 搜索会高亮匹配项，并滚动到第一个匹配位置。
+- 分屏模式下编辑区和预览区双向滚动同步。
+- 目录支持层级折叠。
+- 点击目录项时，编辑区和预览区都要平滑滚动到对应位置。
+- 目录展开/收起只能重绘目录，不要重渲染预览区。
+- 未打开项目时，项目面板应隐藏。
 
-## Markdown Scope
+## Markdown 能力边界
 
-The renderer is intentionally small and local:
+当前 Markdown 渲染器保持轻量、本地化：
 
-- Markdown image syntax renders images.
-- Raw HTML passthrough is not a general feature.
-- Video/audio support is not currently enabled.
-- Flowchart support is a limited built-in renderer for simple Mermaid-style flowcharts.
+- Markdown 图片语法会渲染为图片。
+- 不支持通用原始 HTML passthrough。
+- 当前没有启用视频/音频播放器支持。
+- flowchart 是内置的简易 Mermaid 风格渲染，只覆盖简单流程图。
 
-Do not broaden Markdown semantics without tests in `test/markdown.test.mjs`.
+不要在没有测试的情况下扩大 Markdown 语义。涉及 Markdown 行为时，需要补充 `test/markdown.test.mjs`。
 
 ## CodeGraph
 
 <!-- CODEGRAPH_START -->
-If a future checkout has a `.codegraph/` directory at the repository root, use CodeGraph before grep/find or broad file reading when locating code:
+如果未来仓库根目录存在 `.codegraph/`，在定位代码前优先使用 CodeGraph，而不是直接 grep/find 或大范围读文件：
 
-- MCP tools when available: `codegraph_explore` and `codegraph_node`.
-- Shell fallback: `codegraph explore "<question or symbols>"` and `codegraph node <symbol-or-file>`.
+- MCP 工具可用时，优先使用 `codegraph_explore` 和 `codegraph_node`。
+- Shell 兜底命令：`codegraph explore "<问题或符号>"`、`codegraph node <符号或文件>`。
 
-If `.codegraph/` is absent, skip CodeGraph and use normal repository search.
+如果没有 `.codegraph/`，跳过 CodeGraph，正常使用仓库搜索。
 <!-- CODEGRAPH_END -->
