@@ -15,6 +15,7 @@ assert.match(website, /保存与另存为/);
 assert.match(website, /最近文件/);
 assert.match(website, /项目级搜索/);
 assert.match(website, /图片资产管理/);
+assert.match(website, /真实相对路径/);
 assert.match(website, /反向链接/);
 assert.match(website, /失效链接/);
 assert.match(website, /快速打开/);

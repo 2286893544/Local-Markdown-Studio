@@ -17,6 +17,18 @@ import {
   resolveMarkdownLinkPath,
 } from './knowledge.mjs';
 import { buildProjectHealth } from './project-health.mjs';
+import {
+  buildImageSnippet,
+  formatMarkdownRelativePath,
+  resolveDroppedImageReference,
+  sanitizeImageFileName,
+} from './image-assets.mjs';
+import {
+  ensureMarkdownFilePath,
+  normalizeCreatePath,
+} from './project-actions.mjs';
+import { collectSearchMatches } from './editor-search.mjs';
+import { buildOutlineEntries } from './outline.mjs';
 
 const draftKey = 'local-markdown-studio:draft';
 const fileNameKey = 'local-markdown-studio:file-name';
@@ -564,26 +576,6 @@ function scrollEditorToCharacter(characterIndex) {
   scrollEditorToLine(lineIndex);
 }
 
-function collectSearchMatches(markdown = '', query = '') {
-  const term = String(query).trim();
-  if (!term) return [];
-
-  const text = String(markdown);
-  const lowerText = text.toLocaleLowerCase();
-  const lowerTerm = term.toLocaleLowerCase();
-  const matches = [];
-  let cursor = 0;
-
-  while (cursor < text.length) {
-    const index = lowerText.indexOf(lowerTerm, cursor);
-    if (index === -1) break;
-    matches.push({ start: index, end: index + term.length });
-    cursor = index + term.length;
-  }
-
-  return matches;
-}
-
 function runNativeFindInPage({ forward = true, findNext = false } = {}) {
   const term = state.query.trim();
   if (!window.markdownNative?.findInPage) return;
@@ -969,7 +961,10 @@ function renderOutline() {
     return;
   }
 
-  const entries = buildOutlineEntries(headings);
+  const entries = buildOutlineEntries(headings, {
+    collapsedOutlineIds: state.collapsedOutlineIds,
+    expandedOutlineIds: state.expandedOutlineIds,
+  });
   elements.outline.innerHTML = entries
     .map((entry) => {
       const hiddenClass = entry.hidden ? ' is-hidden' : '';
@@ -1129,14 +1124,22 @@ function insertImageFile(file) {
 async function insertImageAssetFromFile(file) {
   const activeEntry = state.projectFiles.find((entry) => entry.id === state.activeProjectFileId);
   const documentPath = activeEntry?.absolutePath || state.currentNativePath;
+  const projectPath = state.projectSource?.type === 'native-directory' ? state.projectSource.path : '';
+  const sourcePath = getNativeFilePath(file);
+  const existingProjectImagePath = resolveDroppedImageReference({ documentPath, projectPath, sourcePath });
   const fileName = sanitizeImageFileName(file.name || 'image.png');
+
+  if (existingProjectImagePath) {
+    insertImageSnippet(existingProjectImagePath, fileName);
+    return;
+  }
 
   if (documentPath && window.markdownNative?.saveImageAsset) {
     try {
       const buffer = await file.arrayBuffer();
       const asset = await window.markdownNative.saveImageAsset({ documentPath, fileName, buffer });
       if (asset?.relativePath) {
-        insertImageSnippet(asset.relativePath, asset.fileName || fileName);
+        insertImageSnippet(formatMarkdownRelativePath(asset.relativePath), asset.fileName || fileName);
         return;
       }
     } catch {
@@ -1148,8 +1151,7 @@ async function insertImageAssetFromFile(file) {
 }
 
 function insertImageSnippet(relativePath, fileName = '') {
-  const safeName = fileName || stripNativePath(relativePath) || 'image.png';
-  const snippet = `![${stripExtension(safeName)}](${relativePath})`;
+  const snippet = buildImageSnippet(relativePath, fileName);
   const start = elements.editor.selectionStart;
   const end = elements.editor.selectionEnd;
   state.markdown = `${state.markdown.slice(0, start)}${snippet}${state.markdown.slice(end)}`;
@@ -1161,54 +1163,8 @@ function insertImageSnippet(relativePath, fileName = '') {
   render();
 }
 
-function sanitizeImageFileName(value = 'image.png') {
-  return String(value || 'image.png')
-    .replace(/[\\/:\0]/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/^-+/, '') || 'image.png';
-}
-
-function buildOutlineEntries(headings) {
-  const baseLevel = Math.min(...headings.map((heading) => heading.level));
-  const stack = [];
-
-  return headings.map((heading, index) => {
-    while (stack.length && stack[stack.length - 1].level >= heading.level) {
-      stack.pop();
-    }
-
-    const outlineId = `${heading.id}-${index}`;
-    const hasChildren = hasOutlineChildren(headings, index);
-    const defaultCollapsed = heading.level > baseLevel && hasChildren;
-    const collapsed = isOutlineEntryCollapsed({ outlineId, hasChildren, defaultCollapsed });
-    const hidden = stack.some((entry) => entry.collapsed);
-    const entry = {
-      ...heading,
-      outlineId,
-      hasChildren,
-      collapsed,
-      hidden,
-    };
-
-    stack.push({ level: heading.level, collapsed });
-    return entry;
-  });
-}
-
-function hasOutlineChildren(headings, index) {
-  const level = headings[index].level;
-  for (let cursor = index + 1; cursor < headings.length; cursor += 1) {
-    if (headings[cursor].level <= level) return false;
-    if (headings[cursor].level > level) return true;
-  }
-  return false;
-}
-
-function isOutlineEntryCollapsed(entry) {
-  if (!entry.hasChildren) return false;
-  if (state.collapsedOutlineIds.has(entry.outlineId)) return true;
-  if (state.expandedOutlineIds.has(entry.outlineId)) return false;
-  return entry.defaultCollapsed;
+function getNativeFilePath(file) {
+  return window.markdownNative?.getFilePath?.(file) || file?.path || '';
 }
 
 function toggleOutlineEntry(outlineId) {
@@ -1491,19 +1447,6 @@ async function getNestedDirectoryHandle(rootHandle, relativePath, options = {}) 
     current = await current.getDirectoryHandle(part, options);
   }
   return current;
-}
-
-function ensureMarkdownFilePath(relativePath) {
-  if (!relativePath) return '';
-  return /\.(md|markdown|txt)$/i.test(relativePath) ? relativePath : `${relativePath}.md`;
-}
-
-function normalizeCreatePath(value = '') {
-  const rawPath = String(value).trim().replace(/\\/g, '/');
-  if (rawPath.startsWith('/') || /^[a-z]:\//i.test(rawPath)) return '';
-  const path = rawPath.replace(/\/+$/g, '');
-  if (!path || path.split('/').some((part) => !part || part === '.' || part === '..')) return '';
-  return path;
 }
 
 async function hydrateProjectEntries(entries) {

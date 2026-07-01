@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('markdownNative', {
   openFile: () => ipcRenderer.invoke('native:open-file'),
@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('markdownNative', {
   saveFile: (filePath, content) => ipcRenderer.invoke('native:save-file', filePath, content),
   saveFileAs: (suggestedName, content) => ipcRenderer.invoke('native:save-file-as', suggestedName, content),
   saveImageAsset: (payload) => ipcRenderer.invoke('native:save-image-asset', payload),
+  getFilePath: (file) => webUtils.getPathForFile(file),
   createProjectFile: (directoryPath, relativePath, content, options) => ipcRenderer.invoke('native:create-project-file', directoryPath, relativePath, content, options),
   createProjectFolder: (directoryPath, relativePath, options) => ipcRenderer.invoke('native:create-project-folder', directoryPath, relativePath, options),
   setTheme: (theme) => ipcRenderer.invoke('native:set-theme', theme),
