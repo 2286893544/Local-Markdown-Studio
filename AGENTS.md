@@ -57,6 +57,7 @@ pnpm run zip:win
 - 手动改文件使用 `apply_patch`。
 - 如果工作区里有无关改动，必须保留，不要擅自回滚或覆盖。
 - 所有 Git commit 信息必须使用中文，包括提交标题和提交正文。不要使用英文 commit message。
+- 如果本次任务创建了 Git commit，提交成功后必须继续 push 到对应远端分支，除非用户明确要求不要 push。
 
 ## 测试约定
 
