@@ -1,0 +1,46 @@
+src/app.js
+  s_2b3e65cfadc3db::t_cf2aff12f52b22 727
+  s_2b3e65cfadc3db::t_f201e548104e1c 724-726
+  s_2b3e65cfadc3db::t_4fbbc0198a4e7f 728-730
+  s_2b3e65cfadc3db::t_753c69e0e77cd6 13-16,106-107,110,143,270-280,308,362-367,422-427,439,441,711-723,731-789,1020-1024,1076-1102,1114-1120,1306,1308,1396,1399
+website/index.html
+  s_2b3e65cfadc3db::t_30ed700920f390 7,30,40-41,60-61,77,80-81,84-85,88-89,100-101,119
+README.md
+  s_2b3e65cfadc3db::t_cb9ff9bbc1c8c8 13-14,16
+electron/main.cjs
+  s_2b3e65cfadc3db::t_78b35af3df3006 158-174,258-287
+electron/preload.cjs
+  s_2b3e65cfadc3db::t_46fab4a9d53e34 18
+index.html
+  s_2b3e65cfadc3db::t_109c49e59f80d2 83-86,92
+package.json
+  s_2b3e65cfadc3db::t_c6373763d3e121 15-16
+src/knowledge.mjs
+  s_2b3e65cfadc3db::t_76722465e6b563 1-83
+styles.css
+  s_2b3e65cfadc3db::t_ea24473bab8454 380-381,386-387,397-398,406-408,421-426,428-434,440-455,457-466
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_6872b3f7637115 82-85,88-89,126-128
+test/electron-source.test.mjs
+  s_2b3e65cfadc3db::t_c4a966fe51ef56 44-45,75
+test/knowledge.test.mjs
+  s_2b3e65cfadc3db::t_a359553b1de7ed 1-47
+test/website-source.test.mjs
+  s_2b3e65cfadc3db::t_b8bd580d6f4ac3 17-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "c14e0734696b68060016b6e7790eb7cca6dee10f",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
