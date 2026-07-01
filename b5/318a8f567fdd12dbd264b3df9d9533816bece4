@@ -1,0 +1,27 @@
+AGENTS.md
+  s_909a4560bd47bc::t_95ae4e67004f45 96,101,104
+scripts/dmg-mac-package.cjs
+  s_909a4560bd47bc::t_b93e7ad4c8f57c 42,44,47
+scripts/prune-mac-package.cjs
+  s_909a4560bd47bc::t_07ab99b260005e 8,23-24,28-34
+scripts/zip-mac-package.cjs
+  s_909a4560bd47bc::t_aff5d7032e0f21 14,16,24-28,30,33
+test/electron-source.test.mjs
+  s_909a4560bd47bc::t_f042b59e33dda5 114-115,118-119,135-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "b5318a8f567fdd12dbd264b3df9d9533816bece4",
+  "prompts": {},
+  "sessions": {
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "unknown"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
