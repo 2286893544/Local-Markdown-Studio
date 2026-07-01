@@ -17,6 +17,10 @@ assert.match(
 
 assert.match(html, /rel="icon" href="assets\/app-icon\.svg"/);
 assert.match(html, /src="assets\/app-icon\.svg"/);
+assert.doesNotMatch(html, /<script\s+type="module"\s+src="src\/app\.js"><\/script>/);
+assert.match(html, /location\.protocol === 'file:' && !window\.markdownNative/);
+assert.match(html, /script\.type = 'module'/);
+assert.match(html, /script\.src = 'src\/app\.js'/);
 assert.match(source, /if \(!options\.preserveMode\) \{\s*setMode\('split'\);\s*\}/);
 assert.match(html, /id="diagramViewer"/);
 assert.match(source, /from '\.\/diagram-controller\.mjs'/);

@@ -226,6 +226,32 @@
   <input id="projectInput" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" webkitdirectory directory multiple hidden>
   <input id="imageInput" type="file" accept="image/*" hidden>
 
-  <script type="module" src="src/app.js"></script>
+  <div id="fileProtocolNotice" class="file-protocol-notice" hidden>
+    <div class="file-protocol-card">
+      <img class="brand-mark" src="assets/app-icon.svg" alt="" aria-hidden="true">
+      <h2>不能直接双击打开应用页</h2>
+      <p>当前页面使用 ES Module。普通浏览器通过 file:// 打开时会拦截 src/app.js，导致 CORS 报错。</p>
+      <div class="file-protocol-actions">
+        <code>pnpm run app</code>
+        <code>python3 -m http.server 4173</code>
+      </div>
+      <p>如果你只是想看官网，请打开 <a href="website/index.html">website/index.html</a>。</p>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      if (location.protocol === 'file:' && !window.markdownNative) {
+        document.body.dataset.fileProtocol = 'true';
+        document.getElementById('fileProtocolNotice')?.removeAttribute('hidden');
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'src/app.js';
+      document.body.appendChild(script);
+    })();
+  </script>
 </body>
 </html>

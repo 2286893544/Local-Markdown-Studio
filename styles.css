@@ -48,6 +48,10 @@ body {
   overflow: hidden;
 }
 
+body[data-file-protocol="true"] {
+  overflow: auto;
+}
+
 button,
 input,
 textarea {
@@ -63,6 +67,60 @@ button {
   grid-template-rows: auto auto 1fr;
   height: 100vh;
   min-height: 0;
+}
+
+body[data-file-protocol="true"] .app-shell {
+  display: none;
+}
+
+.file-protocol-notice {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 28px;
+}
+
+.file-protocol-card {
+  display: grid;
+  gap: 16px;
+  width: min(560px, 100%);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+.file-protocol-card h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.file-protocol-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.file-protocol-card a {
+  color: var(--accent);
+  font-weight: 760;
+}
+
+.file-protocol-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.file-protocol-actions code {
+  display: block;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--text);
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 13px;
 }
 
 .topbar {
