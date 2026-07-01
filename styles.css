@@ -364,6 +364,14 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
+.project-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
 .scan-settings {
   padding: 9px 12px;
   border-bottom: 1px solid var(--border);
@@ -464,6 +472,62 @@ textarea:focus-visible {
   border: 1px dashed var(--border);
   border-radius: 8px;
   font-size: 12px;
+}
+
+.project-health {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-health-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.project-health-header span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.health-group h3 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.health-group ul {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.health-group li {
+  display: grid;
+  gap: 2px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 7px 8px;
+  font-size: 12px;
+}
+
+.health-group li span,
+.health-group li small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-group li small {
+  color: var(--muted);
 }
 
 .scan-settings-dialog {

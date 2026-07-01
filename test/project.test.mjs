@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import {
+  collectProjectAssetsFromDirectoryHandle,
   collectMarkdownEntriesFromDirectoryHandle,
   getProjectLoadingPercent,
   isMarkdownProjectFile,
+  normalizeProjectAssets,
   normalizeProjectFiles,
 } from '../src/project.mjs';
 
@@ -36,6 +38,18 @@ assert.deepEqual(files[0], {
   file: { name: 'README.md', webkitRelativePath: 'README.md' },
 });
 
+const assets = normalizeProjectAssets([
+  { name: 'logo.png', webkitRelativePath: 'assets/logo.png' },
+  { name: 'photo.webp', webkitRelativePath: 'docs/images/photo.webp' },
+  { name: 'icon.svg', webkitRelativePath: 'node_modules/pkg/icon.svg' },
+  { name: 'notes.md', webkitRelativePath: 'notes.md' },
+]);
+
+assert.deepEqual(
+  assets.map((asset) => asset.path),
+  ['assets/logo.png', 'docs/images/photo.webp'],
+);
+
 assert.equal(getProjectLoadingPercent(0, 10, 20, 70), 20);
 assert.equal(getProjectLoadingPercent(5, 10, 20, 70), 45);
 assert.equal(getProjectLoadingPercent(10, 10, 20, 70), 70);
@@ -47,6 +61,12 @@ const scanned = await collectMarkdownEntriesFromDirectoryHandle(
     'README.md': fakeFile('README.md'),
     docs: fakeDirectory({
       'guide.md': fakeFile('guide.md'),
+      images: fakeDirectory({
+        'photo.webp': fakeFile('photo.webp'),
+      }),
+    }),
+    assets: fakeDirectory({
+      'logo.png': fakeFile('logo.png'),
     }),
     node_modules: fakeDirectory({
       package: fakeDirectory({
@@ -70,6 +90,17 @@ assert.deepEqual(
   scanned.map((entry) => entry.path),
   ['README.md', 'docs/guide.md'],
 );
+
+const scannedAssets = await collectProjectAssetsFromDirectoryHandle(
+  fakeDirectory({
+    'README.md': fakeFile('README.md'),
+    assets: fakeDirectory({
+      'logo.png': fakeFile('logo.png'),
+    }),
+  }),
+);
+
+assert.deepEqual(scannedAssets.map((asset) => asset.path), ['assets/logo.png']);
 
 const markdownAndTxt = normalizeProjectFiles(
   [

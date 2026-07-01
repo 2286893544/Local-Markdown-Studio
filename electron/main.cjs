@@ -172,6 +172,29 @@ function registerNativeHandlers() {
     };
   });
 
+  ipcMain.handle('native:create-project-file', async (_event, directoryPath, relativePath, content = '', options = {}) => {
+    const targetPath = resolveProjectPath(directoryPath, relativePath);
+    await fs.mkdir(path.dirname(targetPath), { recursive: true });
+    try {
+      await fs.writeFile(targetPath, content, { encoding: 'utf8', flag: 'wx' });
+    } catch (error) {
+      if (error?.code === 'EEXIST') throw new Error('同名文档已存在');
+      throw error;
+    }
+    return scanMarkdownProject(directoryPath, options);
+  });
+
+  ipcMain.handle('native:create-project-folder', async (_event, directoryPath, relativePath, options = {}) => {
+    const targetPath = resolveProjectPath(directoryPath, relativePath);
+    try {
+      await fs.mkdir(targetPath, { recursive: true });
+    } catch (error) {
+      if (error?.code === 'EEXIST') throw new Error('同名文件已存在，无法创建文件夹');
+      throw error;
+    }
+    return scanMarkdownProject(directoryPath, options);
+  });
+
   ipcMain.handle('native:set-theme', (_event, theme) => {
     applyWindowTheme(theme);
     return true;
@@ -288,9 +311,11 @@ async function pathExists(filePath) {
 async function scanMarkdownProject(directoryPath, options = {}) {
   const rootName = path.basename(directoryPath);
   const entries = [];
+  const assets = [];
   const counters = { visited: 0, markdown: 0 };
-  await collectProjectEntries(directoryPath, directoryPath, entries, counters, options);
+  await collectProjectEntries(directoryPath, directoryPath, entries, assets, counters, options);
   entries.sort(compareProjectEntries);
+  assets.sort(compareProjectEntries);
 
   return {
     type: 'native-directory',
@@ -298,10 +323,11 @@ async function scanMarkdownProject(directoryPath, options = {}) {
     path: directoryPath,
     visited: counters.visited,
     entries,
+    assets,
   };
 }
 
-async function collectProjectEntries(rootPath, currentPath, entries, counters, options) {
+async function collectProjectEntries(rootPath, currentPath, entries, assets, counters, options) {
   const children = await fs.readdir(currentPath, { withFileTypes: true });
 
   for (const child of children) {
@@ -312,11 +338,22 @@ async function collectProjectEntries(rootPath, currentPath, entries, counters, o
     counters.visited += 1;
 
     if (child.isDirectory()) {
-      await collectProjectEntries(rootPath, absolutePath, entries, counters, options);
+      await collectProjectEntries(rootPath, absolutePath, entries, assets, counters, options);
       continue;
     }
 
-    if (!child.isFile() || !isMarkdownProjectFile(relativePath, options)) continue;
+    if (!child.isFile()) continue;
+
+    if (isImageProjectAsset(relativePath)) {
+      assets.push({
+        id: relativePath,
+        name: child.name,
+        path: relativePath,
+        absolutePath,
+      });
+    }
+
+    if (!isMarkdownProjectFile(relativePath, options)) continue;
 
     counters.markdown += 1;
     entries.push({
@@ -329,9 +366,36 @@ async function collectProjectEntries(rootPath, currentPath, entries, counters, o
   }
 }
 
+function resolveProjectPath(directoryPath, relativePath) {
+  const rawRootPath = String(directoryPath || '');
+  if (!rawRootPath) throw new Error('Invalid project path');
+  const rootPath = path.resolve(rawRootPath);
+  const normalizedRelativePath = normalizeCreatableProjectPath(relativePath);
+  if (!rootPath || !normalizedRelativePath) {
+    throw new Error('Invalid project path');
+  }
+  const targetPath = path.resolve(rootPath, normalizedRelativePath);
+  if (targetPath !== rootPath && !targetPath.startsWith(`${rootPath}${path.sep}`)) {
+    throw new Error('Project path escapes root');
+  }
+  return targetPath;
+}
+
+function normalizeCreatableProjectPath(relativePath = '') {
+  const rawPath = String(relativePath || '').trim().replace(/\\/g, '/');
+  if (rawPath.startsWith('/') || /^[a-z]:\//i.test(rawPath)) return '';
+  const normalized = normalizePath(rawPath).replace(/\/+$/g, '');
+  if (!normalized || normalized.split('/').some((part) => !part || part === '.' || part === '..')) return '';
+  return normalized;
+}
+
 function isMarkdownProjectFile(filePath, options = {}) {
   const lowerPath = normalizePath(filePath).toLowerCase();
   return getMarkdownExtensions(options).some((extension) => lowerPath.endsWith(extension));
+}
+
+function isImageProjectAsset(filePath) {
+  return /\.(apng|avif|gif|jpe?g|png|svg|webp)$/i.test(normalizePath(filePath));
 }
 
 function isIgnoredDirectoryName(name, options = {}) {

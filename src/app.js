@@ -6,14 +6,17 @@ import {
   renderMarkdown,
 } from './markdown.mjs';
 import {
+  collectProjectAssetsFromDirectoryHandle,
   collectMarkdownEntriesFromDirectoryHandle,
   getProjectLoadingPercent,
+  normalizeProjectAssets,
   normalizeProjectFiles,
 } from './project.mjs';
 import {
   buildProjectKnowledge,
   resolveMarkdownLinkPath,
 } from './knowledge.mjs';
+import { buildProjectHealth } from './project-health.mjs';
 
 const draftKey = 'local-markdown-studio:draft';
 const fileNameKey = 'local-markdown-studio:file-name';
@@ -101,12 +104,15 @@ const elements = {
   diagramZoomLevel: document.querySelector('#diagramZoomLevel'),
   outlinePane: document.querySelector('.outline-pane'),
   projectPanel: document.querySelector('.project-panel'),
+  newFileButton: document.querySelector('#newFileButton'),
+  newFolderButton: document.querySelector('#newFolderButton'),
   projectFiles: document.querySelector('#projectFiles'),
   projectMeta: document.querySelector('#projectMeta'),
   quickOpenInput: document.querySelector('#quickOpenInput'),
   quickOpenResults: document.querySelector('#quickOpenResults'),
   projectSearchInput: document.querySelector('#projectSearchInput'),
   projectSearchResults: document.querySelector('#projectSearchResults'),
+  projectHealth: document.querySelector('#projectHealth'),
   documentRelations: document.querySelector('#documentRelations'),
   scanSummary: document.querySelector('#scanSummary'),
   scanSettingsButton: document.querySelector('#scanSettingsButton'),
@@ -138,6 +144,7 @@ const state = {
   nativeSearchResult: null,
   projectName: '',
   projectFiles: [],
+  projectAssets: [],
   activeProjectFileId: '',
   projectSource: null,
   quickOpenQuery: '',
@@ -210,6 +217,8 @@ function bindEvents() {
     openProjectFromFiles(event.target.files || [], getProjectNameFromFiles(event.target.files) || '本地项目');
     event.target.value = '';
   });
+  elements.newFileButton.addEventListener('click', createProjectFile);
+  elements.newFolderButton.addEventListener('click', createProjectFolder);
 
   elements.editor.addEventListener('input', () => {
     state.markdown = elements.editor.value;
@@ -438,6 +447,7 @@ function render({ scrollToSearchMatch = false, focusEditorMatch = false } = {}) 
   renderProjectFiles();
   renderQuickOpenResults();
   renderProjectSearchResults();
+  renderProjectHealth();
   renderDocumentRelations();
   renderOutline();
   renderStats();
@@ -645,7 +655,7 @@ async function openRecentProject(projectPath) {
 
     state.projectSource = { type: 'native-directory', path: project.path, name: project.name };
     rememberRecentProject(project.path, project.name);
-    await openProjectEntries(project.entries || [], project.name || stripNativePath(project.path) || '本地项目', { showLoading: false });
+    await openProjectEntries(project.entries || [], project.name || stripNativePath(project.path) || '本地项目', { showLoading: false, assets: project.assets || [] });
   } catch {
     forgetRecentItem(recentProjectsKey, state.recentProjects, projectPath);
     window.alert?.('这个项目已经无法打开，已从最近项目中移除。');
@@ -780,6 +790,44 @@ function renderDocumentRelations() {
   });
 }
 
+function renderProjectHealth() {
+  if (!state.projectSource) {
+    elements.projectHealth.innerHTML = '';
+    return;
+  }
+
+  const health = buildProjectHealth({
+    entries: getProjectKnowledgeEntries(),
+    assets: state.projectAssets,
+  });
+  const groups = [
+    ['缺失图片', health.missingImageAssets],
+    ['未引用图片', health.unusedImageAssets],
+    ['绝对路径图片', health.absoluteImagePaths],
+    ['重复标题', health.duplicateHeadingSlugs],
+    ['失效文档链接', health.unresolvedMarkdownLinks],
+  ];
+  const total = groups.reduce((sum, [, items]) => sum + items.length, 0);
+  elements.projectHealth.innerHTML = `
+    <div class="project-health-header">
+      <strong>项目检查</strong>
+      <span>${total ? `${total} 个问题` : '未发现问题'}</span>
+    </div>
+    ${groups.map(([label, items]) => renderHealthGroup(label, items)).join('')}
+  `;
+}
+
+function renderHealthGroup(label, items) {
+  const details = items.slice(0, 4).map((item) => `<li>
+    <span>${escapeHtml(item.filePath || item.path || item.slug || item.href)}</span>
+    <small>${escapeHtml(item.resolvedPath || item.href || item.name || item.headings?.join(' / ') || '')}</small>
+  </li>`).join('');
+  return `<section class="health-group">
+    <h3>${escapeHtml(label)} <span>${items.length}</span></h3>
+    ${items.length ? `<ul>${details}</ul>` : '<p class="empty-outline">无</p>'}
+  </section>`;
+}
+
 function getProjectKnowledgeEntries() {
   return state.projectFiles.map((entry) => ({
     ...entry,
@@ -883,6 +931,8 @@ function renderProjectFiles() {
   const hasProject = Boolean(state.projectSource);
   elements.projectPanel.classList.toggle('is-hidden', !hasProject);
   elements.outlinePane.classList.toggle('without-project', !hasProject);
+  elements.newFileButton.disabled = !hasProject;
+  elements.newFolderButton.disabled = !hasProject;
 
   if (!hasProject) {
     elements.projectMeta.textContent = '未打开';
@@ -1214,9 +1264,10 @@ async function openProject() {
         const progress = Math.min(60, 8 + visited * 2);
         updateGlobalLoading(`已扫描 ${visited} 项，找到 ${markdown} 篇 Markdown`, progress);
       });
+      const assets = await collectProjectAssetsFromDirectoryHandle(directoryHandle, getProjectScanOptions());
       updateGlobalLoading(`已找到 ${files.length} 篇 Markdown，正在建立索引`, 72);
       await yieldToBrowser();
-      await openProjectEntries(files, directoryHandle.name, { showLoading: false });
+      await openProjectEntries(files, directoryHandle.name, { showLoading: false, assets });
       updateGlobalLoading('项目加载完成', 100);
       await delay(180);
       return;
@@ -1268,7 +1319,7 @@ async function openNativeProject() {
     await yieldToBrowser();
     state.projectSource = { type: 'native-directory', path: project.path, name: project.name };
     rememberRecentProject(project.path, project.name);
-    await openProjectEntries(project.entries || [], project.name || stripNativePath(project.path) || '本地项目', { showLoading: false });
+    await openProjectEntries(project.entries || [], project.name || stripNativePath(project.path) || '本地项目', { showLoading: false, assets: project.assets || [] });
     updateGlobalLoading('项目加载完成', 100);
     await delay(180);
   } finally {
@@ -1285,9 +1336,10 @@ async function openProjectFromFiles(files, projectName) {
   try {
     await yieldToBrowser();
     const entries = normalizeProjectFiles(fileList, getProjectScanOptions());
+    const assets = normalizeProjectAssets(fileList, getProjectScanOptions());
     updateGlobalLoading(`找到 ${entries.length} 篇 Markdown，正在建立项目列表`, getProjectLoadingPercent(entries.length, fileList.length, 20, 70));
     await yieldToBrowser();
-    await openProjectEntries(entries, projectName, { showLoading: false });
+    await openProjectEntries(entries, projectName, { showLoading: false, assets });
     updateGlobalLoading('项目加载完成', 100);
     await delay(180);
   } finally {
@@ -1302,6 +1354,7 @@ async function openProjectEntries(entries, projectName, options = {}) {
   const hydratedEntries = await hydrateProjectEntries(entries);
   state.projectName = projectName;
   state.projectFiles = hydratedEntries;
+  state.projectAssets = options.assets || [];
   state.activeProjectFileId = '';
   state.quickOpenQuery = '';
   state.projectSearchQuery = '';
@@ -1320,14 +1373,137 @@ async function openProjectEntries(entries, projectName, options = {}) {
     return;
   }
 
-  updateGlobalLoading(`正在打开 ${entries[0].path}`, 88);
+  const firstEntry = options.openPath
+    ? hydratedEntries.find((entry) => entry.path === options.openPath) || hydratedEntries[0]
+    : hydratedEntries[0];
+  updateGlobalLoading(`正在打开 ${firstEntry.path}`, 88);
   await yieldToBrowser();
-  await openProjectEntry(entries[0].id, { showLoading: false });
+  await openProjectEntry(firstEntry.id, { showLoading: false });
   if (options.showLoading !== false) {
     updateGlobalLoading('项目加载完成', 100);
     await delay(180);
     hideGlobalLoading();
   }
+}
+
+async function createProjectFile() {
+  if (!state.projectSource) return;
+  const rawPath = window.prompt?.('输入新文档路径', 'untitled.md');
+  if (!rawPath) return;
+
+  const relativePath = ensureMarkdownFilePath(normalizeCreatePath(rawPath));
+  if (!relativePath) {
+    window.alert?.('文档路径不能是绝对路径，也不能包含 ..');
+    return;
+  }
+
+  try {
+    if (state.projectSource.type === 'native-directory' && window.markdownNative?.createProjectFile) {
+      const project = await window.markdownNative.createProjectFile(
+        state.projectSource.path,
+        relativePath,
+        `# ${stripExtension(stripNativePath(relativePath))}\n`,
+        getProjectScanOptions(),
+      );
+      if (!project) return;
+      state.projectSource = { type: 'native-directory', path: project.path, name: project.name };
+      await openProjectEntries(project.entries || [], project.name || state.projectName, {
+        showLoading: false,
+        assets: project.assets || [],
+        openPath: relativePath,
+      });
+      return;
+    }
+
+    if (state.projectSource.type === 'directory') {
+      await createFileInDirectoryHandle(state.projectSource.handle, relativePath, `# ${stripExtension(stripNativePath(relativePath))}\n`);
+      await refreshDirectoryProject(relativePath);
+      return;
+    }
+  } catch (error) {
+    window.alert?.(error?.message || '新建文档失败');
+    return;
+  }
+
+  window.alert?.('当前项目打开方式不支持直接新建文档，请用“打开项目”选择本地文件夹。');
+}
+
+async function createProjectFolder() {
+  if (!state.projectSource) return;
+  const relativePath = normalizeCreatePath(window.prompt?.('输入新文件夹路径', 'docs') || '');
+  if (!relativePath) {
+    window.alert?.('文件夹路径不能是绝对路径，也不能包含 ..');
+    return;
+  }
+
+  try {
+    if (state.projectSource.type === 'native-directory' && window.markdownNative?.createProjectFolder) {
+      const project = await window.markdownNative.createProjectFolder(state.projectSource.path, relativePath, getProjectScanOptions());
+      if (!project) return;
+      state.projectSource = { type: 'native-directory', path: project.path, name: project.name };
+      await openProjectEntries(project.entries || [], project.name || state.projectName, {
+        showLoading: false,
+        assets: project.assets || [],
+      });
+      return;
+    }
+
+    if (state.projectSource.type === 'directory') {
+      await getNestedDirectoryHandle(state.projectSource.handle, relativePath, { create: true });
+      await refreshDirectoryProject();
+      return;
+    }
+  } catch (error) {
+    window.alert?.(error?.message || '新建文件夹失败');
+    return;
+  }
+
+  window.alert?.('当前项目打开方式不支持直接新建文件夹，请用“打开项目”选择本地文件夹。');
+}
+
+async function refreshDirectoryProject(openPath = '') {
+  const { handle, name } = state.projectSource;
+  const files = await collectMarkdownEntriesFromDirectoryHandle(handle, getProjectScanOptions());
+  const assets = await collectProjectAssetsFromDirectoryHandle(handle, getProjectScanOptions());
+  await openProjectEntries(files, name, { showLoading: false, assets, openPath });
+}
+
+async function createFileInDirectoryHandle(rootHandle, relativePath, content) {
+  const parts = relativePath.split('/').filter(Boolean);
+  const fileName = parts.pop();
+  const directoryHandle = await getNestedDirectoryHandle(rootHandle, parts.join('/'), { create: true });
+  try {
+    await directoryHandle.getFileHandle(fileName);
+    throw new Error('同名文档已存在');
+  } catch (error) {
+    if (error?.message === '同名文档已存在') throw error;
+    if (error?.name && error.name !== 'NotFoundError') throw error;
+  }
+  const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(content);
+  await writable.close();
+}
+
+async function getNestedDirectoryHandle(rootHandle, relativePath, options = {}) {
+  let current = rootHandle;
+  for (const part of relativePath.split('/').filter(Boolean)) {
+    current = await current.getDirectoryHandle(part, options);
+  }
+  return current;
+}
+
+function ensureMarkdownFilePath(relativePath) {
+  if (!relativePath) return '';
+  return /\.(md|markdown|txt)$/i.test(relativePath) ? relativePath : `${relativePath}.md`;
+}
+
+function normalizeCreatePath(value = '') {
+  const rawPath = String(value).trim().replace(/\\/g, '/');
+  if (rawPath.startsWith('/') || /^[a-z]:\//i.test(rawPath)) return '';
+  const path = rawPath.replace(/\/+$/g, '');
+  if (!path || path.split('/').some((part) => !part || part === '.' || part === '..')) return '';
+  return path;
 }
 
 async function hydrateProjectEntries(entries) {
@@ -1391,6 +1567,7 @@ async function openProjectEntry(fileId, options = {}) {
 function clearProjectState() {
   state.projectName = '';
   state.projectFiles = [];
+  state.projectAssets = [];
   state.activeProjectFileId = '';
   state.projectSource = null;
   state.quickOpenQuery = '';
@@ -1747,9 +1924,10 @@ async function rescanCurrentProject() {
       const progress = Math.min(70, 8 + visited * 2);
       updateGlobalLoading(`已扫描 ${visited} 项，找到 ${markdown} 篇 Markdown`, progress);
     });
+    const assets = await collectProjectAssetsFromDirectoryHandle(handle, getProjectScanOptions());
     updateGlobalLoading(`已找到 ${files.length} 篇 Markdown，正在更新列表`, 82);
     await yieldToBrowser();
-    await openProjectEntries(files, name, { showLoading: false });
+    await openProjectEntries(files, name, { showLoading: false, assets });
     updateGlobalLoading('重新扫描完成', 100);
     await delay(160);
   } finally {
@@ -1768,7 +1946,7 @@ async function rescanNativeProject() {
     updateGlobalLoading(`已扫描 ${project.visited || 0} 项，找到 ${project.entries?.length || 0} 篇 Markdown`, 82);
     await yieldToBrowser();
     state.projectSource = { type: 'native-directory', path: project.path || directoryPath, name: project.name || name };
-    await openProjectEntries(project.entries || [], project.name || name || '本地项目', { showLoading: false });
+    await openProjectEntries(project.entries || [], project.name || name || '本地项目', { showLoading: false, assets: project.assets || [] });
     updateGlobalLoading('重新扫描完成', 100);
     await delay(160);
   } finally {

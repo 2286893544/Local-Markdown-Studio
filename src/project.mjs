@@ -1,5 +1,6 @@
 const defaultMarkdownExtensions = ['.md'];
 const defaultIgnoredDirectoryNames = ['node_modules'];
+const imageAssetExtensionPattern = /\.(apng|avif|gif|jpe?g|png|svg|webp)$/i;
 
 export function isMarkdownProjectFile(path = '', options = {}) {
   const lowerPath = String(path).toLowerCase();
@@ -21,12 +22,33 @@ export function normalizeProjectFiles(files = [], options = {}) {
     .sort(compareProjectEntries);
 }
 
+export function normalizeProjectAssets(files = [], options = {}) {
+  return Array.from(files)
+    .map((file) => {
+      const path = normalizePath(file.webkitRelativePath || file.path || file.name || '');
+      return {
+        id: path,
+        name: path.split('/').pop() || file.name || path,
+        path,
+        file,
+      };
+    })
+    .filter((entry) => entry.path && isImageProjectAsset(entry.path) && !isIgnoredProjectPath(entry.path, options))
+    .sort(compareProjectEntries);
+}
+
 export function getProjectLoadingPercent(current, total, start = 0, end = 100) {
   const safeStart = clampPercent(start);
   const safeEnd = clampPercent(end);
   if (!total || total <= 0) return safeEnd;
   const ratio = Math.min(Math.max(current / total, 0), 1);
   return Math.round(safeStart + (safeEnd - safeStart) * ratio);
+}
+
+export async function collectProjectAssetsFromDirectoryHandle(directoryHandle, options = {}) {
+  const assets = [];
+  await collectAssetEntries(directoryHandle, '', assets, options);
+  return assets.sort(compareProjectEntries);
 }
 
 export async function collectMarkdownEntriesFromDirectoryHandle(directoryHandle, options = {}, onProgress) {
@@ -36,6 +58,25 @@ export async function collectMarkdownEntriesFromDirectoryHandle(directoryHandle,
   const counters = { visited: 0, markdown: 0 };
   await collectDirectoryEntries(directoryHandle, '', entries, counters, scanOptions, progressCallback);
   return entries.sort(compareProjectEntries);
+}
+
+async function collectAssetEntries(directoryHandle, prefix, assets, options) {
+  for await (const [name, handle] of directoryHandle.entries()) {
+    const path = normalizePath(prefix ? `${prefix}/${name}` : name);
+    if (handle.kind === 'directory' && isIgnoredDirectoryName(name, options)) continue;
+    if (handle.kind === 'directory') {
+      await collectAssetEntries(handle, path, assets, options);
+      continue;
+    }
+    if (handle.kind === 'file' && isImageProjectAsset(path)) {
+      assets.push({
+        id: path,
+        name,
+        path,
+        handle,
+      });
+    }
+  }
 }
 
 async function collectDirectoryEntries(directoryHandle, prefix, entries, counters, options, onProgress) {
@@ -61,6 +102,10 @@ async function collectDirectoryEntries(directoryHandle, prefix, entries, counter
     }
     onProgress?.({ ...counters, path, kind: handle.kind });
   }
+}
+
+function isImageProjectAsset(path = '') {
+  return imageAssetExtensionPattern.test(String(path).toLowerCase());
 }
 
 function compareProjectEntries(left, right) {

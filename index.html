@@ -77,6 +77,10 @@
             <span>项目</span>
             <span id="projectMeta" class="pane-meta">未打开</span>
           </div>
+          <div class="project-actions" aria-label="项目文件操作">
+            <button class="ghost-button" id="newFileButton" type="button">新建文档</button>
+            <button class="ghost-button" id="newFolderButton" type="button">新建文件夹</button>
+          </div>
           <div class="scan-settings" aria-label="项目扫描设置">
             <p id="scanSummary" class="scan-summary"></p>
           </div>
@@ -89,6 +93,7 @@
             <div id="projectSearchResults" class="project-search-results"></div>
           </div>
           <nav id="projectFiles" class="project-file-list"></nav>
+          <div id="projectHealth" class="project-health" aria-label="项目健康检查"></div>
           <div id="documentRelations" class="document-relations" aria-label="文档关系"></div>
         </section>
 
