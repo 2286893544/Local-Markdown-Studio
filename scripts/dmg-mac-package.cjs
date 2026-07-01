@@ -39,12 +39,12 @@ if (result.status !== 0) {
   process.exit(result.status || 1);
 }
 
-fs.rmSync(path.dirname(appPath), { recursive: true, force: true });
+fs.rmSync(appPath, { recursive: true, force: true });
 console.log(`Wrote macOS DMG: ${dmgPath}`);
-console.log(`Removed macOS package directory: ${path.dirname(appPath)}`);
+console.log(`Removed macOS app bundle: ${appPath}`);
 
 function findPackagedApp() {
-  const preferredPath = path.join(distDir, `Local Markdown Studio-darwin-${process.arch}`, appName);
+  const preferredPath = path.join(distDir, appName);
   if (fs.existsSync(preferredPath)) return preferredPath;
 
   if (!fs.existsSync(distDir)) {

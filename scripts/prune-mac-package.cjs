@@ -5,6 +5,7 @@ const distDir = path.join(__dirname, '..', 'dist');
 const appName = 'Local Markdown Studio.app';
 const packageDir = path.join(distDir, `Local Markdown Studio-darwin-${process.arch}`);
 const packagedAppPath = path.join(packageDir, appName);
+const finalAppPath = path.join(distDir, appName);
 const keptLocaleDirectories = new Set(['en.lproj', 'zh_CN.lproj']);
 
 if (!fs.existsSync(packagedAppPath)) {
@@ -19,10 +20,18 @@ for (const localeDir of findLocaleDirectories(packagedAppPath)) {
 }
 
 removePackageSiblings(packageDir, appName);
+moveAppToDistRoot(packagedAppPath, finalAppPath);
+fs.rmSync(path.join(distDir, '.DS_Store'), { force: true });
 
 console.log(`Pruned macOS package locales. Kept: ${[...keptLocaleDirectories].join(', ')}`);
 console.log(`Removed macOS package metadata outside app bundle.`);
-console.log(`Prepared macOS app: ${packagedAppPath}`);
+console.log(`Prepared macOS app: ${finalAppPath}`);
+
+function moveAppToDistRoot(sourcePath, targetPath) {
+  fs.rmSync(targetPath, { recursive: true, force: true });
+  fs.renameSync(sourcePath, targetPath);
+  fs.rmSync(packageDir, { recursive: true, force: true });
+}
 
 function removePackageSiblings(rootPath, keptEntryName) {
   for (const entry of fs.readdirSync(rootPath)) {

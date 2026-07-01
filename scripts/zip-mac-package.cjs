@@ -11,8 +11,9 @@ const appPath = findPackagedApp();
 
 fs.rmSync(zipPath, { force: true });
 
+const appParentDir = path.dirname(appPath);
 const result = spawnSync('zip', ['-qry', zipName, appName], {
-  cwd: path.dirname(appPath),
+  cwd: appParentDir,
   stdio: 'inherit',
 });
 
@@ -20,13 +21,16 @@ if (result.status !== 0) {
   process.exit(result.status || 1);
 }
 
-fs.renameSync(path.join(path.dirname(appPath), zipName), zipPath);
-fs.rmSync(path.dirname(appPath), { recursive: true, force: true });
+const generatedZipPath = path.join(appParentDir, zipName);
+if (generatedZipPath !== zipPath) {
+  fs.renameSync(generatedZipPath, zipPath);
+}
+fs.rmSync(appPath, { recursive: true, force: true });
 console.log(`Wrote macOS zip: ${zipPath}`);
-console.log(`Removed macOS package directory: ${path.dirname(appPath)}`);
+console.log(`Removed macOS app bundle: ${appPath}`);
 
 function findPackagedApp() {
-  const preferredPath = path.join(distDir, `Local Markdown Studio-darwin-${process.arch}`, appName);
+  const preferredPath = path.join(distDir, appName);
   if (fs.existsSync(preferredPath)) return preferredPath;
 
   if (!fs.existsSync(distDir)) {

@@ -93,15 +93,15 @@ macOS 窗口行为：
 macOS：
 
 - `npm run package:mac` 生成未压缩应用：
-  `dist/Local Markdown Studio-darwin-<arch>/Local Markdown Studio.app`
+  `dist/Local Markdown Studio.app`
 - `electron/mac-info.plist` 声明 `.md` / `.markdown` 文档类型。
 - `npm run dmg:mac` 是推荐的 macOS 分发命令。它会生成：
   `dist/Local Markdown Studio-macOS.dmg`
 - DMG 内包含 `Local Markdown Studio.app` 和 `Applications` 快捷入口，用户打开后把 app 拖入 Applications。
-- `npm run dmg:mac` 执行完后会删除未压缩的打包目录。
+- `npm run dmg:mac` 执行完后会删除未压缩的 `dist/Local Markdown Studio.app`。
 - `npm run zip:mac` 会生成：
   `dist/Local Markdown Studio-macOS.zip`
-  并删除未压缩的打包目录。
+  并删除未压缩的 `dist/Local Markdown Studio.app`。
 - zip 不会触发 macOS 安装引导；如果需要引导用户安装到“应用程序”，使用 DMG。
 
 Windows：
