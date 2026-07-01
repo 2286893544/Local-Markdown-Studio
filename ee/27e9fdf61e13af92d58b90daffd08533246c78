@@ -1,0 +1,40 @@
+scripts/dmg-mac-package.cjs
+  s_2b3e65cfadc3db::t_406b2472b7ab44 51,61
+AGENTS.md
+  s_2b3e65cfadc3db::t_eab54a69c0828e 25-33,39-40,46-47,95,98,101-102,109,113
+package.json
+  s_2b3e65cfadc3db::t_46e1b4944d83ae 6
+  s_2b3e65cfadc3db::t_112b347c0088ce 13-15
+scripts/zip-win-package.cjs
+  s_2b3e65cfadc3db::t_d77f067cd44d83 12
+scripts/zip-mac-package.cjs
+  s_2b3e65cfadc3db::t_2c6e179d48c26d 37,47
+pnpm-workspace.yaml
+  s_2b3e65cfadc3db::t_d081bd7974d113 1
+  s_2b3e65cfadc3db::t_ece896602181bd 2
+test/electron-source.test.mjs
+  s_2b3e65cfadc3db::t_1dcc2591bd7c29 8,121
+  s_2b3e65cfadc3db::t_904e5d4a12a3d0 120
+  s_2b3e65cfadc3db::t_cfa1492edc14c7 122-124,136,140
+README.md
+  s_2b3e65cfadc3db::t_585924180a586d 34
+  s_2b3e65cfadc3db::t_eab54a69c0828e 39,45,51-52,60,66,72-73,79,91,109
+pnpm-lock.yaml
+  s_2b3e65cfadc3db::t_deef17672d2457 1-932
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "ee27e9fdf61e13af92d58b90daffd08533246c78",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
