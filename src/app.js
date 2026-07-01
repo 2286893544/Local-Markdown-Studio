@@ -10,6 +10,10 @@ import {
   getProjectLoadingPercent,
   normalizeProjectFiles,
 } from './project.mjs';
+import {
+  buildProjectKnowledge,
+  resolveMarkdownLinkPath,
+} from './knowledge.mjs';
 
 const draftKey = 'local-markdown-studio:draft';
 const fileNameKey = 'local-markdown-studio:file-name';
@@ -99,8 +103,11 @@ const elements = {
   projectPanel: document.querySelector('.project-panel'),
   projectFiles: document.querySelector('#projectFiles'),
   projectMeta: document.querySelector('#projectMeta'),
+  quickOpenInput: document.querySelector('#quickOpenInput'),
+  quickOpenResults: document.querySelector('#quickOpenResults'),
   projectSearchInput: document.querySelector('#projectSearchInput'),
   projectSearchResults: document.querySelector('#projectSearchResults'),
+  documentRelations: document.querySelector('#documentRelations'),
   scanSummary: document.querySelector('#scanSummary'),
   scanSettingsButton: document.querySelector('#scanSettingsButton'),
   scanSettingsDialog: document.querySelector('#scanSettingsDialog'),
@@ -133,6 +140,7 @@ const state = {
   projectFiles: [],
   activeProjectFileId: '',
   projectSource: null,
+  quickOpenQuery: '',
   projectSearchQuery: '',
   recentFiles: readStoredList(recentFilesKey),
   recentProjects: readStoredList(recentProjectsKey),
@@ -259,6 +267,17 @@ function bindEvents() {
   elements.searchNextButton.addEventListener('click', () => stepSearchMatch(1));
   elements.replaceButton.addEventListener('click', replaceCurrentMatch);
   elements.replaceAllButton.addEventListener('click', replaceAllMatches);
+  elements.quickOpenInput.addEventListener('input', () => {
+    state.quickOpenQuery = elements.quickOpenInput.value;
+    renderQuickOpenResults();
+  });
+  elements.quickOpenInput.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter') return;
+    const [firstResult] = getQuickOpenResults();
+    if (!firstResult) return;
+    event.preventDefault();
+    openQuickOpenResult(firstResult.id);
+  });
   elements.projectSearchInput.addEventListener('input', () => {
     state.projectSearchQuery = elements.projectSearchInput.value;
     renderProjectSearchResults();
@@ -286,7 +305,7 @@ function bindEvents() {
   });
   elements.imageInput.addEventListener('change', (event) => {
     const [file] = event.target.files || [];
-    if (file) insertImageFile(file);
+    if (file) insertImageAssetFromFile(file);
     event.target.value = '';
   });
   elements.focusButton.addEventListener('click', () => setFocusMode(!state.focusMode));
@@ -340,6 +359,12 @@ function bindEvents() {
     updateActiveOutlineFromScroll();
   }, { passive: true });
   elements.editor.addEventListener('scroll', syncPreviewScrollToEditor, { passive: true });
+  elements.editor.addEventListener('paste', (event) => {
+    const image = [...(event.clipboardData?.files || [])].find((file) => file.type.startsWith('image/'));
+    if (!image) return;
+    event.preventDefault();
+    insertImageAssetFromFile(image);
+  });
   window.markdownNative?.onFileOpened?.((file) => {
     loadNativeMarkdownFile(file);
   });
@@ -394,7 +419,12 @@ function bindEvents() {
     event.preventDefault();
     hideDropOverlay();
     const [file] = event.dataTransfer.files || [];
-    if (file) openFile(file);
+    if (!file) return;
+    if (file.type.startsWith('image/')) {
+      insertImageAssetFromFile(file);
+      return;
+    }
+    openFile(file);
   });
 }
 
@@ -406,7 +436,9 @@ function render({ scrollToSearchMatch = false, focusEditorMatch = false } = {}) 
   if (!useNativeFind) highlightCurrentPreviewMatch();
   fitDiagramsToContainers();
   renderProjectFiles();
+  renderQuickOpenResults();
   renderProjectSearchResults();
+  renderDocumentRelations();
   renderOutline();
   renderStats();
   renderSearchStatus();
@@ -676,6 +708,85 @@ function renderProjectSearchResults() {
   });
 }
 
+function renderQuickOpenResults() {
+  if (!state.projectSource || !state.quickOpenQuery.trim()) {
+    elements.quickOpenResults.innerHTML = '';
+    return;
+  }
+
+  const results = getQuickOpenResults();
+  elements.quickOpenResults.innerHTML = results.length
+    ? results.slice(0, 12).map((entry) => `<button class="quick-open-result" type="button" data-quick-open-id="${escapeHtml(entry.id)}">
+      <span>${escapeHtml(entry.name)}</span>
+      <small>${escapeHtml(entry.path)}</small>
+    </button>`).join('')
+    : '<p class="empty-outline">没有匹配文件</p>';
+
+  elements.quickOpenResults.querySelectorAll('[data-quick-open-id]').forEach((button) => {
+    button.addEventListener('click', () => openQuickOpenResult(button.dataset.quickOpenId));
+  });
+}
+
+function getQuickOpenResults() {
+  const query = state.quickOpenQuery.trim().toLocaleLowerCase();
+  if (!query) return [];
+
+  return state.projectFiles
+    .filter((entry) => `${entry.name} ${entry.path}`.toLocaleLowerCase().includes(query))
+    .sort((a, b) => a.path.length - b.path.length || a.path.localeCompare(b.path));
+}
+
+async function openQuickOpenResult(fileId) {
+  if (!fileId) return;
+  state.quickOpenQuery = '';
+  elements.quickOpenInput.value = '';
+  elements.quickOpenResults.innerHTML = '';
+  await openProjectEntry(fileId, { showLoading: false, preserveMode: true });
+}
+
+function renderDocumentRelations() {
+  if (!state.projectSource || !state.activeProjectFileId) {
+    elements.documentRelations.innerHTML = '';
+    return;
+  }
+
+  const { backlinks, unresolvedLinks } = buildProjectKnowledge(getProjectKnowledgeEntries(), state.activeProjectFileId);
+  const backlinksHtml = backlinks.length
+    ? backlinks.slice(0, 12).map((link) => `<button class="relation-link" type="button" data-relation-file-id="${escapeHtml(link.id)}">
+      <span>${escapeHtml(link.name)}</span>
+      <small>${escapeHtml(link.label || link.path)}</small>
+    </button>`).join('')
+    : '<p class="empty-outline">暂无反向链接</p>';
+  const unresolvedHtml = unresolvedLinks.length
+    ? unresolvedLinks.slice(0, 12).map((link) => `<div class="relation-missing">
+      <span>${escapeHtml(link.label || link.href)}</span>
+      <small>${escapeHtml(link.resolvedPath)}</small>
+    </div>`).join('')
+    : '<p class="empty-outline">没有失效链接</p>';
+
+  elements.documentRelations.innerHTML = `
+    <section>
+      <h3>反向链接</h3>
+      ${backlinksHtml}
+    </section>
+    <section>
+      <h3>失效链接</h3>
+      ${unresolvedHtml}
+    </section>
+  `;
+
+  elements.documentRelations.querySelectorAll('[data-relation-file-id]').forEach((button) => {
+    button.addEventListener('click', () => openProjectEntry(button.dataset.relationFileId, { showLoading: false, preserveMode: true }));
+  });
+}
+
+function getProjectKnowledgeEntries() {
+  return state.projectFiles.map((entry) => ({
+    ...entry,
+    content: entry.id === state.activeProjectFileId ? state.markdown : String(entry.draft ?? entry.content ?? ''),
+  }));
+}
+
 async function openProjectSearchResult(fileId) {
   const query = state.projectSearchQuery.trim();
   if (!fileId || !query) return;
@@ -906,18 +1017,11 @@ function openMarkdownLink(link) {
     return true;
   }
 
-  const targetPath = normalizeRelativePath(rawPath);
-  if (!targetPath) return false;
-  const currentDir = state.activeProjectFileId.includes('/')
-    ? state.activeProjectFileId.split('/').slice(0, -1).join('/')
-    : '';
-  const candidates = [
-    normalizeRelativePath(`${currentDir}/${targetPath}`),
-    targetPath,
-    `${targetPath}.md`,
-    `${targetPath}.markdown`,
-  ];
-  const entry = state.projectFiles.find((file) => candidates.includes(normalizeRelativePath(file.path)));
+  const activeEntry = state.projectFiles.find((file) => file.id === state.activeProjectFileId);
+  if (!activeEntry) return false;
+  const targetPath = resolveMarkdownLinkPath(activeEntry.path, rawPath);
+  const candidates = [targetPath, `${targetPath}.md`, `${targetPath}.markdown`];
+  const entry = state.projectFiles.find((file) => candidates.includes(file.path));
   if (!entry) return false;
 
   openProjectEntry(entry.id, { showLoading: false, preserveMode: true }).then(() => {
@@ -969,8 +1073,33 @@ function insertMarkdownSnippet(action) {
 }
 
 function insertImageFile(file) {
-  const safeName = String(file.name || 'image.png').replace(/\s+/g, '-');
-  const snippet = `![${stripExtension(safeName)}](./assets/${safeName})`;
+  insertImageSnippet(`./assets/${sanitizeImageFileName(file.name || 'image.png')}`);
+}
+
+async function insertImageAssetFromFile(file) {
+  const activeEntry = state.projectFiles.find((entry) => entry.id === state.activeProjectFileId);
+  const documentPath = activeEntry?.absolutePath || state.currentNativePath;
+  const fileName = sanitizeImageFileName(file.name || 'image.png');
+
+  if (documentPath && window.markdownNative?.saveImageAsset) {
+    try {
+      const buffer = await file.arrayBuffer();
+      const asset = await window.markdownNative.saveImageAsset({ documentPath, fileName, buffer });
+      if (asset?.relativePath) {
+        insertImageSnippet(asset.relativePath, asset.fileName || fileName);
+        return;
+      }
+    } catch {
+      window.alert?.('图片复制到 assets 目录失败，已改为插入相对路径占位。');
+    }
+  }
+
+  insertImageSnippet(`./assets/${fileName}`, fileName);
+}
+
+function insertImageSnippet(relativePath, fileName = '') {
+  const safeName = fileName || stripNativePath(relativePath) || 'image.png';
+  const snippet = `![${stripExtension(safeName)}](${relativePath})`;
   const start = elements.editor.selectionStart;
   const end = elements.editor.selectionEnd;
   state.markdown = `${state.markdown.slice(0, start)}${snippet}${state.markdown.slice(end)}`;
@@ -980,6 +1109,13 @@ function insertImageFile(file) {
   persistActiveProjectDraft();
   persistDraft();
   render();
+}
+
+function sanitizeImageFileName(value = 'image.png') {
+  return String(value || 'image.png')
+    .replace(/[\\/:\0]/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/^-+/, '') || 'image.png';
 }
 
 function buildOutlineEntries(headings) {
@@ -1167,7 +1303,9 @@ async function openProjectEntries(entries, projectName, options = {}) {
   state.projectName = projectName;
   state.projectFiles = hydratedEntries;
   state.activeProjectFileId = '';
+  state.quickOpenQuery = '';
   state.projectSearchQuery = '';
+  elements.quickOpenInput.value = '';
   elements.projectSearchInput.value = '';
 
   if (!entries.length) {
@@ -1255,8 +1393,10 @@ function clearProjectState() {
   state.projectFiles = [];
   state.activeProjectFileId = '';
   state.projectSource = null;
+  state.quickOpenQuery = '';
   state.projectSearchQuery = '';
   state.currentNativePath = '';
+  if (elements.quickOpenInput) elements.quickOpenInput.value = '';
   if (elements.projectSearchInput) elements.projectSearchInput.value = '';
 }
 

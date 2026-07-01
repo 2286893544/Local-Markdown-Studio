@@ -377,12 +377,14 @@ textarea:focus-visible {
   line-height: 1.45;
 }
 
-.project-search {
+.project-search,
+.quick-open {
   padding: 10px 12px;
   border-bottom: 1px solid var(--border);
 }
 
-.project-search input {
+.project-search input,
+.quick-open input {
   width: 100%;
   min-height: 32px;
   padding: 0 10px;
@@ -392,7 +394,8 @@ textarea:focus-visible {
   color: var(--text);
 }
 
-.project-search-results {
+.project-search-results,
+.quick-open-results {
   display: grid;
   gap: 6px;
   max-height: 180px;
@@ -400,7 +403,9 @@ textarea:focus-visible {
   margin-top: 8px;
 }
 
-.project-search-result {
+.project-search-result,
+.quick-open-result,
+.relation-link {
   display: grid;
   gap: 3px;
   width: 100%;
@@ -413,15 +418,52 @@ textarea:focus-visible {
   text-align: left;
 }
 
+.project-search-result:hover,
+.quick-open-result:hover,
+.relation-link:hover {
+  border-color: var(--accent);
+}
+
 .project-search-result span,
-.project-search-result small {
+.project-search-result small,
+.quick-open-result span,
+.quick-open-result small,
+.relation-link span,
+.relation-link small,
+.relation-missing span,
+.relation-missing small {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.project-search-result small {
+.project-search-result small,
+.quick-open-result small,
+.relation-link small,
+.relation-missing small {
   color: var(--muted);
+}
+
+.document-relations {
+  display: grid;
+  gap: 14px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.document-relations h3 {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.relation-missing {
+  display: grid;
+  gap: 3px;
+  padding: 8px 9px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  font-size: 12px;
 }
 
 .scan-settings-dialog {

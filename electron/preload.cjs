@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('markdownNative', {
   rescanProject: (directoryPath, options) => ipcRenderer.invoke('native:rescan-project', directoryPath, options),
   saveFile: (filePath, content) => ipcRenderer.invoke('native:save-file', filePath, content),
   saveFileAs: (suggestedName, content) => ipcRenderer.invoke('native:save-file-as', suggestedName, content),
+  saveImageAsset: (payload) => ipcRenderer.invoke('native:save-image-asset', payload),
   setTheme: (theme) => ipcRenderer.invoke('native:set-theme', theme),
   findInPage: (query, options) => ipcRenderer.invoke('native:find-in-page', query, options),
   stopFindInPage: () => ipcRenderer.invoke('native:stop-find-in-page'),

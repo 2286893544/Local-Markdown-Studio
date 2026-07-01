@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Local Markdown Studio - 本地 Markdown 阅读与编辑器</title>
-  <meta name="description" content="Local Markdown Studio 是一个本地优先的 macOS Markdown 阅读与编辑工具，支持保存与另存为、最近文件、项目搜索、实时预览、专注写作和 HTML 导出。">
+  <meta name="description" content="Local Markdown Studio 是一个本地优先的 macOS Markdown 阅读与编辑工具，支持图片资产管理、反向链接、快速打开、项目搜索、实时预览、专注写作和 HTML 导出。">
   <link rel="icon" href="../assets/app-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -27,7 +27,7 @@
         <div class="hero-copy">
           <p class="eyebrow">macOS Markdown Studio</p>
           <h1>Local Markdown Studio</h1>
-          <p class="hero-lead">本地优先的 Markdown 阅读与编辑器。打开文件夹，扫描文档，保存、搜索、跳转、专注写作和导出都在你的电脑上完成。</p>
+          <p class="hero-lead">本地优先的 Markdown 阅读与编辑器。打开文件夹，扫描文档，保存图片资产、追踪链接关系、快速打开、搜索和导出都在你的电脑上完成。</p>
           <div class="hero-actions">
             <a class="primary-action" href="#download">选择下载版本</a>
             <a class="secondary-action" href="#install">查看安装说明</a>
@@ -37,8 +37,8 @@
           <div class="hero-highlights" aria-label="核心能力">
             <span>无需账号</span>
             <span>本地保存</span>
-            <span>项目搜索</span>
-            <span>专注写作</span>
+            <span>反向链接</span>
+            <span>图片资产</span>
           </div>
         </div>
 
@@ -57,8 +57,8 @@
       <div class="section-inner">
         <span>无需账号</span>
         <span>保存 / 另存为</span>
-        <span>最近文件</span>
-        <span>项目扫描</span>
+        <span>快速打开</span>
+        <span>图片资产管理</span>
         <span>项目搜索</span>
       </div>
     </section>
@@ -74,19 +74,19 @@
         <div class="feature-grid">
           <article class="feature-card">
             <h3>可靠保存</h3>
-            <p>支持保存、另存为、未保存变更提醒，以及 Cmd/Ctrl + S 快捷键，降低桌面写作时误丢内容的风险。</p>
+            <p>支持保存与另存为、未保存变更提醒，以及 Cmd/Ctrl + S 快捷键，降低桌面写作时误丢内容的风险。</p>
           </article>
           <article class="feature-card">
-            <h3>最近文件与项目</h3>
-            <p>常用文档和项目目录会保留在最近记录中，重新进入工作流不需要反复从系统文件夹里查找。</p>
+            <h3>图片资产管理</h3>
+            <p>粘贴或拖入图片时，桌面模式会把图片复制到当前文档旁的 assets 目录，并插入稳定的相对路径。</p>
           </article>
           <article class="feature-card">
-            <h3>项目级搜索</h3>
-            <p>打开文件夹后可以跨 Markdown 文档搜索内容，直接跳转到命中文档，适合本地资料库和项目说明。</p>
+            <h3>快速打开</h3>
+            <p>项目中可以按文件名或路径快速筛选并打开文档，频繁切换项目说明、会议记录和章节资料时更直接。</p>
           </article>
           <article class="feature-card">
-            <h3>编辑与预览同步</h3>
-            <p>分屏、编辑、预览三种模式快速切换，目录会跟随当前位置高亮，长文档阅读更稳定。</p>
+            <h3>反向链接和失效链接</h3>
+            <p>当前文档会展示哪些项目文档链接到它，也会提示当前文档中无法解析的本地 Markdown 链接；预览区支持本地链接跳转。</p>
           </article>
           <article class="feature-card">
             <h3>写作工具栏</h3>
@@ -97,8 +97,8 @@
             <p>专注模式隐藏旁侧面板，保留纯写作空间；完成后可把当前 Markdown 导出为可分享的 HTML 文件。</p>
           </article>
           <article class="feature-card">
-            <h3>本地链接跳转</h3>
-            <p>预览区支持相对 Markdown 链接跳转，适合在项目文档、索引页和章节资料之间快速切换。</p>
+            <h3>项目级搜索</h3>
+            <p>打开文件夹后可以跨 Markdown 文档搜索内容，直接跳转到命中文档，适合本地资料库和项目说明。</p>
           </article>
           <article class="feature-card">
             <h3>项目级扫描</h3>
@@ -116,7 +116,7 @@
         </div>
         <div class="copy-column">
           <p>Local Markdown Studio 不要求登录账号，不把文档上传到远端服务。你打开的 `.md` 文件和项目目录都在本机读取，适合处理私有文档、内部说明、学习笔记和离线资料。</p>
-          <p>它保留桌面应用应有的直接感：双击文件、打开项目、保存修改、搜索内容、跳转文档、导出 HTML。功能边界清晰，启动后就是工作区。</p>
+          <p>它保留桌面应用应有的直接感：双击文件、打开项目、打开最近文件、保存修改、管理图片、追踪链接、搜索内容、跳转文档、导出 HTML。功能边界清晰，启动后就是工作区。</p>
         </div>
       </div>
     </section>

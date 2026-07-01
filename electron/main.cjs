@@ -155,6 +155,23 @@ function registerNativeHandlers() {
     return readMarkdownFile(filePath);
   });
 
+  ipcMain.handle('native:save-image-asset', async (_event, payload = {}) => {
+    const documentPath = String(payload.documentPath || '');
+    if (!documentPath) return null;
+
+    const assetDirectory = path.join(path.dirname(documentPath), 'assets');
+    await fs.mkdir(assetDirectory, { recursive: true });
+
+    const fileName = await getAvailableAssetFileName(assetDirectory, sanitizeAssetFileName(payload.fileName || 'image.png'));
+    const filePath = path.join(assetDirectory, fileName);
+    await fs.writeFile(filePath, Buffer.from(payload.buffer || []));
+    return {
+      fileName,
+      path: filePath,
+      relativePath: normalizePath(path.relative(path.dirname(documentPath), filePath)),
+    };
+  });
+
   ipcMain.handle('native:set-theme', (_event, theme) => {
     applyWindowTheme(theme);
     return true;
@@ -236,6 +253,36 @@ function getTitleBarOverlay(theme) {
     symbolColor: colors.symbolColor,
     height: 70,
   };
+}
+
+async function getAvailableAssetFileName(assetDirectory, fileName) {
+  const extension = path.extname(fileName);
+  const baseName = path.basename(fileName, extension) || 'image';
+  let candidate = `${baseName}${extension || '.png'}`;
+  let index = 1;
+
+  while (await pathExists(path.join(assetDirectory, candidate))) {
+    candidate = `${baseName}-${index}${extension || '.png'}`;
+    index += 1;
+  }
+
+  return candidate;
+}
+
+function sanitizeAssetFileName(fileName = 'image.png') {
+  return String(fileName || 'image.png')
+    .replace(/[\\/:\0]/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/^-+/, '') || 'image.png';
+}
+
+async function pathExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function scanMarkdownProject(directoryPath, options = {}) {
