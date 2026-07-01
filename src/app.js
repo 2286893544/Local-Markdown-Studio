@@ -29,6 +29,34 @@ import {
 } from './project-actions.mjs';
 import { collectSearchMatches } from './editor-search.mjs';
 import { buildOutlineEntries } from './outline.mjs';
+import {
+  forgetRecentItem as forgetRecentListItem,
+  readStoredList,
+  rememberRecentItem as rememberRecentListItem,
+  renderRecentItems,
+} from './recent-items.mjs';
+import {
+  buildScanSummaryText,
+  normalizeDirectoryName,
+  normalizeGeneralRulePattern,
+  normalizeScanExtension,
+  renderScanOption,
+} from './scan-settings.mjs';
+import {
+  buildDocumentRelationsHtml,
+  buildProjectHealthHtml,
+  getQuickOpenResults as getQuickOpenResultsForEntries,
+  renderProjectFiles as renderProjectFilesHtml,
+  renderProjectSearchResults as renderProjectSearchResultsHtml,
+  renderQuickOpenResults as renderQuickOpenResultsHtml,
+} from './project-sidebar.mjs';
+import {
+  escapeHtml,
+  escapeRegExp,
+  stripExtension,
+  stripNativePath,
+} from './text-utils.mjs';
+import { createDiagramController } from './diagram-controller.mjs';
 
 const draftKey = 'local-markdown-studio:draft';
 const fileNameKey = 'local-markdown-studio:file-name';
@@ -182,6 +210,8 @@ const state = {
     ignoreDotDirectories: true,
   },
 };
+
+const diagrams = createDiagramController({ elements, state });
 
 initialize();
 
@@ -358,7 +388,7 @@ function bindEvents() {
   elements.preview.addEventListener('click', (event) => {
     const actionButton = event.target.closest('[data-diagram-action]');
     if (actionButton) {
-      handleDiagramAction(actionButton);
+      diagrams.handleDiagramAction(actionButton);
       return;
     }
 
@@ -369,11 +399,11 @@ function bindEvents() {
     }
 
     const diagram = event.target.closest('.diagram-flowchart');
-    if (diagram) openDiagramViewer(diagram);
+    if (diagram) diagrams.openDiagramViewer(diagram);
   });
   elements.preview.addEventListener('wheel', (event) => {
     const diagram = event.target.closest('.diagram-flowchart');
-    if (diagram) handleDiagramWheel(event, diagram, false);
+    if (diagram) diagrams.handleDiagramWheel(event, diagram, false);
   }, { passive: false });
   elements.previewPane.addEventListener('scroll', () => {
     syncEditorScrollToPreview();
@@ -394,15 +424,15 @@ function bindEvents() {
   });
   consumePendingNativeFile();
   elements.diagramViewer.addEventListener('click', (event) => {
-    if (event.target === elements.diagramViewer) closeDiagramViewer();
+    if (event.target === elements.diagramViewer) diagrams.closeDiagramViewer();
   });
-  elements.diagramViewerClose.addEventListener('click', closeDiagramViewer);
-  elements.diagramZoomOut.addEventListener('click', () => zoomDiagram(-0.15));
-  elements.diagramZoomIn.addEventListener('click', () => zoomDiagram(0.15));
-  elements.diagramZoomReset.addEventListener('click', () => setDiagramZoom(1));
+  elements.diagramViewerClose.addEventListener('click', diagrams.closeDiagramViewer);
+  elements.diagramZoomOut.addEventListener('click', () => diagrams.zoomDiagram(-0.15));
+  elements.diagramZoomIn.addEventListener('click', () => diagrams.zoomDiagram(0.15));
+  elements.diagramZoomReset.addEventListener('click', () => diagrams.setDiagramZoom(1));
   elements.diagramViewerCanvas.addEventListener('wheel', (event) => {
     if (!elements.diagramViewer.classList.contains('is-visible')) return;
-    handleDiagramWheel(event, elements.diagramViewerCanvas, true);
+    diagrams.handleDiagramWheel(event, elements.diagramViewerCanvas, true);
   }, { passive: false });
   window.addEventListener('keydown', (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
@@ -416,7 +446,7 @@ function bindEvents() {
     }
 
     if (event.key === 'Escape') {
-      closeDiagramViewer();
+      diagrams.closeDiagramViewer();
       closeScanSettingsDialog();
       closeRecentPanel();
     }
@@ -426,7 +456,7 @@ function bindEvents() {
     event.preventDefault();
     event.returnValue = '';
   });
-  window.addEventListener('resize', fitDiagramsToContainers);
+  window.addEventListener('resize', diagrams.fitDiagramsToContainers);
 
   window.addEventListener('dragenter', showDropOverlay);
   window.addEventListener('dragover', (event) => {
@@ -455,7 +485,7 @@ function render({ scrollToSearchMatch = false, focusEditorMatch = false } = {}) 
   refreshSearchMatches();
   elements.preview.innerHTML = useNativeFind ? rendered : highlightSearch(rendered, state.query);
   if (!useNativeFind) highlightCurrentPreviewMatch();
-  fitDiagramsToContainers();
+  diagrams.fitDiagramsToContainers();
   renderProjectFiles();
   renderQuickOpenResults();
   renderProjectSearchResults();
@@ -588,17 +618,8 @@ function runNativeFindInPage({ forward = true, findNext = false } = {}) {
 }
 
 function renderRecentPanel() {
-  const renderItem = (item, dataName) => `<button class="recent-item" type="button" ${dataName}="${escapeHtml(item.path)}">
-    <span>${escapeHtml(item.name || stripNativePath(item.path) || item.path)}</span>
-    <small>${escapeHtml(item.path)}</small>
-  </button>`;
-
-  elements.recentFiles.innerHTML = state.recentFiles.length
-    ? state.recentFiles.map((item) => renderItem(item, 'data-recent-file')).join('')
-    : '<p class="empty-outline">还没有最近文件</p>';
-  elements.recentProjects.innerHTML = state.recentProjects.length
-    ? state.recentProjects.map((item) => renderItem(item, 'data-recent-project')).join('')
-    : '<p class="empty-outline">还没有最近项目</p>';
+  elements.recentFiles.innerHTML = renderRecentItems(state.recentFiles, 'data-recent-file', '还没有最近文件');
+  elements.recentProjects.innerHTML = renderRecentItems(state.recentProjects, 'data-recent-project', '还没有最近项目');
 }
 
 function openRecentPanel() {
@@ -658,52 +679,27 @@ async function openRecentProject(projectPath) {
 
 function rememberRecentFile(filePath, name) {
   if (!filePath) return;
-  state.recentFiles = rememberRecentItem(recentFilesKey, state.recentFiles, { path: filePath, name });
+  state.recentFiles = rememberRecentListItem(recentFilesKey, state.recentFiles, { path: filePath, name });
 }
 
 function rememberRecentProject(projectPath, name) {
   if (!projectPath) return;
-  state.recentProjects = rememberRecentItem(recentProjectsKey, state.recentProjects, { path: projectPath, name });
-}
-
-function rememberRecentItem(storageKey, list, item) {
-  const next = [
-    { path: item.path, name: item.name || stripNativePath(item.path) },
-    ...list.filter((entry) => entry.path !== item.path),
-  ].slice(0, 10);
-  localStorage.setItem(storageKey, JSON.stringify(next));
-  return next;
+  state.recentProjects = rememberRecentListItem(recentProjectsKey, state.recentProjects, { path: projectPath, name });
 }
 
 function forgetRecentItem(storageKey, list, itemPath) {
-  const next = list.filter((entry) => entry.path !== itemPath);
+  const next = forgetRecentListItem(storageKey, list, itemPath);
   list.splice(0, list.length, ...next);
-  localStorage.setItem(storageKey, JSON.stringify(next));
 }
 
 function renderProjectSearchResults() {
-  const query = state.projectSearchQuery.trim().toLocaleLowerCase();
+  const query = state.projectSearchQuery.trim();
   if (!state.projectSource || !query) {
     elements.projectSearchResults.innerHTML = '';
     return;
   }
 
-  const results = [];
-  for (const entry of state.projectFiles) {
-    const text = String(entry.draft ?? entry.content ?? '');
-    const index = text.toLocaleLowerCase().indexOf(query);
-    if (index === -1 && !entry.path.toLocaleLowerCase().includes(query)) continue;
-    const start = Math.max(0, index - 28);
-    const excerpt = index >= 0 ? text.slice(start, index + query.length + 48).replace(/\s+/g, ' ') : entry.path;
-    results.push({ entry, excerpt, index });
-  }
-
-  elements.projectSearchResults.innerHTML = results.length
-    ? results.slice(0, 20).map(({ entry, excerpt }) => `<button class="project-search-result" type="button" data-project-search-id="${escapeHtml(entry.id)}">
-      <span>${escapeHtml(entry.name)}</span>
-      <small>${escapeHtml(excerpt)}</small>
-    </button>`).join('')
-    : '<p class="empty-outline">项目中没有匹配内容</p>';
+  elements.projectSearchResults.innerHTML = renderProjectSearchResultsHtml(state.projectFiles, query);
 
   elements.projectSearchResults.querySelectorAll('[data-project-search-id]').forEach((button) => {
     button.addEventListener('click', () => openProjectSearchResult(button.dataset.projectSearchId));
@@ -716,13 +712,7 @@ function renderQuickOpenResults() {
     return;
   }
 
-  const results = getQuickOpenResults();
-  elements.quickOpenResults.innerHTML = results.length
-    ? results.slice(0, 12).map((entry) => `<button class="quick-open-result" type="button" data-quick-open-id="${escapeHtml(entry.id)}">
-      <span>${escapeHtml(entry.name)}</span>
-      <small>${escapeHtml(entry.path)}</small>
-    </button>`).join('')
-    : '<p class="empty-outline">没有匹配文件</p>';
+  elements.quickOpenResults.innerHTML = renderQuickOpenResultsHtml(state.projectFiles, state.quickOpenQuery);
 
   elements.quickOpenResults.querySelectorAll('[data-quick-open-id]').forEach((button) => {
     button.addEventListener('click', () => openQuickOpenResult(button.dataset.quickOpenId));
@@ -730,12 +720,7 @@ function renderQuickOpenResults() {
 }
 
 function getQuickOpenResults() {
-  const query = state.quickOpenQuery.trim().toLocaleLowerCase();
-  if (!query) return [];
-
-  return state.projectFiles
-    .filter((entry) => `${entry.name} ${entry.path}`.toLocaleLowerCase().includes(query))
-    .sort((a, b) => a.path.length - b.path.length || a.path.localeCompare(b.path));
+  return getQuickOpenResultsForEntries(state.projectFiles, state.quickOpenQuery);
 }
 
 async function openQuickOpenResult(fileId) {
@@ -752,30 +737,9 @@ function renderDocumentRelations() {
     return;
   }
 
-  const { backlinks, unresolvedLinks } = buildProjectKnowledge(getProjectKnowledgeEntries(), state.activeProjectFileId);
-  const backlinksHtml = backlinks.length
-    ? backlinks.slice(0, 12).map((link) => `<button class="relation-link" type="button" data-relation-file-id="${escapeHtml(link.id)}">
-      <span>${escapeHtml(link.name)}</span>
-      <small>${escapeHtml(link.label || link.path)}</small>
-    </button>`).join('')
-    : '<p class="empty-outline">暂无反向链接</p>';
-  const unresolvedHtml = unresolvedLinks.length
-    ? unresolvedLinks.slice(0, 12).map((link) => `<div class="relation-missing">
-      <span>${escapeHtml(link.label || link.href)}</span>
-      <small>${escapeHtml(link.resolvedPath)}</small>
-    </div>`).join('')
-    : '<p class="empty-outline">没有失效链接</p>';
-
-  elements.documentRelations.innerHTML = `
-    <section>
-      <h3>反向链接</h3>
-      ${backlinksHtml}
-    </section>
-    <section>
-      <h3>失效链接</h3>
-      ${unresolvedHtml}
-    </section>
-  `;
+  elements.documentRelations.innerHTML = buildDocumentRelationsHtml(
+    buildProjectKnowledge(getProjectKnowledgeEntries(), state.activeProjectFileId),
+  );
 
   elements.documentRelations.querySelectorAll('[data-relation-file-id]').forEach((button) => {
     button.addEventListener('click', () => openProjectEntry(button.dataset.relationFileId, { showLoading: false, preserveMode: true }));
@@ -792,32 +756,7 @@ function renderProjectHealth() {
     entries: getProjectKnowledgeEntries(),
     assets: state.projectAssets,
   });
-  const groups = [
-    ['缺失图片', health.missingImageAssets],
-    ['未引用图片', health.unusedImageAssets],
-    ['绝对路径图片', health.absoluteImagePaths],
-    ['重复标题', health.duplicateHeadingSlugs],
-    ['失效文档链接', health.unresolvedMarkdownLinks],
-  ];
-  const total = groups.reduce((sum, [, items]) => sum + items.length, 0);
-  elements.projectHealth.innerHTML = `
-    <div class="project-health-header">
-      <strong>项目检查</strong>
-      <span>${total ? `${total} 个问题` : '未发现问题'}</span>
-    </div>
-    ${groups.map(([label, items]) => renderHealthGroup(label, items)).join('')}
-  `;
-}
-
-function renderHealthGroup(label, items) {
-  const details = items.slice(0, 4).map((item) => `<li>
-    <span>${escapeHtml(item.filePath || item.path || item.slug || item.href)}</span>
-    <small>${escapeHtml(item.resolvedPath || item.href || item.name || item.headings?.join(' / ') || '')}</small>
-  </li>`).join('');
-  return `<section class="health-group">
-    <h3>${escapeHtml(label)} <span>${items.length}</span></h3>
-    ${items.length ? `<ul>${details}</ul>` : '<p class="empty-outline">无</p>'}
-  </section>`;
+  elements.projectHealth.innerHTML = buildProjectHealthHtml(health);
 }
 
 function getProjectKnowledgeEntries() {
@@ -939,15 +878,7 @@ function renderProjectFiles() {
   }
 
   elements.projectMeta.textContent = `${state.projectName || '项目'} · ${state.projectFiles.length} 篇`;
-  elements.projectFiles.innerHTML = state.projectFiles
-    .map((entry) => {
-      const activeClass = entry.id === state.activeProjectFileId ? ' is-active' : '';
-      return `<button class="project-file${activeClass}" type="button" data-file-id="${escapeHtml(entry.id)}">
-        <span class="project-file-name">${escapeHtml(entry.name)}</span>
-        <span class="project-file-path">${escapeHtml(entry.path)}</span>
-      </button>`;
-    })
-    .join('');
+  elements.projectFiles.innerHTML = renderProjectFilesHtml(state.projectFiles, state.activeProjectFileId);
 
   elements.projectFiles.querySelectorAll('[data-file-id]').forEach((button) => {
     button.addEventListener('click', () => openProjectEntry(button.dataset.fileId, { showLoading: false, preserveMode: true }));
@@ -1574,126 +1505,6 @@ function hideDropOverlay() {
   elements.dropOverlay.classList.remove('is-visible');
 }
 
-function openDiagramViewer(diagram) {
-  const source = diagram.querySelector('.diagram-stage') || diagram.querySelector('svg');
-  if (!source) return;
-
-  elements.diagramViewerCanvas.innerHTML = '';
-  elements.diagramViewerCanvas.append(source.cloneNode(true));
-  setDiagramZoom(1);
-  elements.diagramViewer.classList.add('is-visible');
-  elements.diagramViewer.setAttribute('aria-hidden', 'false');
-  elements.diagramViewerClose.focus();
-}
-
-function closeDiagramViewer() {
-  if (!elements.diagramViewer.classList.contains('is-visible')) return;
-
-  elements.diagramViewer.classList.remove('is-visible');
-  elements.diagramViewer.setAttribute('aria-hidden', 'true');
-  elements.diagramViewerCanvas.innerHTML = '';
-  setDiagramZoom(1);
-}
-
-function zoomDiagram(delta) {
-  setDiagramZoom(state.diagramZoom + delta);
-}
-
-function setDiagramZoom(value) {
-  state.diagramZoom = Math.min(Math.max(Number(value) || 1, 0.45), 3);
-  const percent = Math.round(state.diagramZoom * 100);
-
-  applyDiagramZoom(elements.diagramViewerCanvas, state.diagramZoom);
-  centerDiagramScroll(elements.diagramViewerCanvas);
-  elements.diagramZoomLevel.textContent = `${percent}%`;
-}
-
-function handleDiagramAction(button) {
-  const diagram = button.closest('.diagram-flowchart');
-  if (!diagram) return;
-
-  const action = button.dataset.diagramAction;
-  if (action === 'open') {
-    openDiagramViewer(diagram);
-    return;
-  }
-
-  if (action === 'zoom-in') zoomInlineDiagram(diagram, 0.15);
-  if (action === 'zoom-out') zoomInlineDiagram(diagram, -0.15);
-  if (action === 'zoom-reset') setInlineDiagramZoom(diagram, 1);
-}
-
-function zoomInlineDiagram(diagram, delta) {
-  setInlineDiagramZoom(diagram, Number(diagram.dataset.zoom || 1) + delta);
-}
-
-function handleDiagramWheel(event, container, isViewer) {
-  if (!(event.ctrlKey || event.metaKey)) return;
-
-  event.preventDefault();
-  const currentZoom = isViewer ? state.diagramZoom : Number(container.dataset.zoom || 1);
-  const nextZoom = currentZoom * Math.exp(-event.deltaY * 0.002);
-
-  cancelAnimationFrame(state.pendingDiagramZoomFrame);
-  state.pendingDiagramZoomFrame = requestAnimationFrame(() => {
-    if (isViewer) {
-      setDiagramZoom(nextZoom);
-      return;
-    }
-    setInlineDiagramZoom(container, nextZoom);
-  });
-}
-
-function setInlineDiagramZoom(diagram, value) {
-  const zoom = Math.min(Math.max(Number(value) || 1, 0.35), 2.5);
-  const percent = Math.round(zoom * 100);
-  const label = diagram.querySelector('[data-diagram-zoom]');
-
-  diagram.dataset.zoom = String(zoom);
-  applyDiagramZoom(diagram, zoom);
-  centerDiagramScroll(diagram);
-  if (label) label.textContent = `${percent}%`;
-}
-
-function applyDiagramZoom(container, zoom) {
-  const stage = container.querySelector('.diagram-stage');
-  const svg = container.querySelector('svg');
-  if (!stage || !svg) return;
-
-  const baseWidth = Number(stage.dataset.baseWidth) || Number(svg.getAttribute('width')) || 960;
-  const baseHeight = Number(stage.dataset.baseHeight) || Number(svg.getAttribute('height')) || 560;
-  stage.style.setProperty('--diagram-zoom', String(zoom));
-  stage.style.width = `${Math.ceil(baseWidth * zoom)}px`;
-  stage.style.height = `${Math.ceil(baseHeight * zoom)}px`;
-}
-
-function fitDiagramsToContainers() {
-  requestAnimationFrame(() => {
-    elements.preview.querySelectorAll('.diagram-flowchart').forEach(fitDiagramToContainer);
-  });
-}
-
-function fitDiagramToContainer(diagram) {
-  const stage = diagram.querySelector('.diagram-stage');
-  if (!stage) return;
-
-  const baseWidth = Number(stage.dataset.baseWidth) || 0;
-  if (!baseWidth) return;
-
-  const styles = getComputedStyle(diagram);
-  const horizontalPadding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
-  const availableWidth = Math.max(1, diagram.clientWidth - horizontalPadding);
-  const zoom = Math.min(1, Math.max(0.35, availableWidth / baseWidth));
-  setInlineDiagramZoom(diagram, zoom);
-}
-
-function centerDiagramScroll(container) {
-  const extraWidth = container.scrollWidth - container.clientWidth;
-  if (extraWidth > 0) {
-    container.scrollLeft = extraWidth / 2;
-  }
-}
-
 function renderScanSettings() {
   elements.scanExtensionList.innerHTML = state.scan.extensionOptions
     .map((extension) => renderScanOption('extension', extension, state.scan.markdownExtensions.includes(extension)))
@@ -1719,25 +1530,6 @@ function updateScanSettingsFromInputs() {
     .map((input) => input.dataset.ignoreDir);
   state.scan.ignoreDotDirectories = state.scan.ignoredDirectoryPatterns.includes('.*');
   renderScanSummary();
-}
-
-function renderScanOption(type, value, checked) {
-  const dataName = {
-    extension: 'data-scan-extension',
-    rule: 'data-general-rule',
-    directory: 'data-ignore-dir',
-  }[type];
-  const label = escapeHtml(value);
-  const text = type === 'rule' ? escapeHtml(formatGeneralRuleLabel(value)) : label;
-  return `
-    <div class="scan-option-row">
-      <label>
-        <input type="checkbox" ${dataName}="${label}" ${checked ? 'checked' : ''}>
-        <span>${text}</span>
-      </label>
-      <button class="scan-remove-button" type="button" data-scan-remove="${type}" data-value="${label}" aria-label="删除 ${label}">×</button>
-    </div>
-  `;
 }
 
 function openScanSettingsDialog() {
@@ -1811,33 +1603,8 @@ function removeScanOption(event) {
   renderScanSettings();
 }
 
-function normalizeScanExtension(value) {
-  const trimmed = value.trim().toLowerCase();
-  if (!trimmed) return '';
-  const withoutWildcard = trimmed.replace(/^\*+/, '');
-  return withoutWildcard.startsWith('.') ? withoutWildcard : `.${withoutWildcard}`;
-}
-
-function normalizeGeneralRulePattern(value) {
-  return value.trim().replace(/^\/+|\/+$/g, '').toLowerCase();
-}
-
-function normalizeDirectoryName(value) {
-  return value.trim().replace(/^\/+|\/+$/g, '');
-}
-
-function formatGeneralRuleLabel(pattern) {
-  if (pattern === '.*') return '不扫描 .xxxx 目录';
-  return `不扫描 ${pattern} 目录`;
-}
-
 function renderScanSummary() {
-  const scanTypes = state.scan.markdownExtensions.length ? state.scan.markdownExtensions.join(' / ') : '未选择文件类型';
-  const ignored = state.scan.ignoredDirectoryNames.length ? state.scan.ignoredDirectoryNames.join('、') : '不跳过目录';
-  const rules = state.scan.ignoredDirectoryPatterns.length
-    ? state.scan.ignoredDirectoryPatterns.map(formatGeneralRuleLabel).join('、')
-    : '无通用规则';
-  elements.scanSummary.textContent = `将扫描 ${scanTypes}；${rules}；跳过 ${ignored}`;
+  elements.scanSummary.textContent = buildScanSummaryText(state.scan);
 }
 
 async function rescanCurrentProject() {
@@ -1931,19 +1698,6 @@ function getProjectNameFromFiles(files) {
   return firstFile?.webkitRelativePath?.split('/')?.[0] || '';
 }
 
-function readStoredList(storageKey) {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter((item) => item && item.path)
-      .map((item) => ({ path: String(item.path), name: String(item.name || stripNativePath(item.path)) }))
-      .slice(0, 10);
-  } catch {
-    return [];
-  }
-}
-
 function normalizeRelativePath(value = '') {
   return decodeURIComponent(String(value))
     .replace(/\\/g, '/')
@@ -1985,25 +1739,4 @@ function downloadFile(fileName, content, type) {
 function getDocumentTitle() {
   const [firstHeading] = extractHeadings(state.markdown);
   return firstHeading?.text || stripExtension(state.fileName) || 'Markdown Document';
-}
-
-function stripExtension(value) {
-  return String(value || 'Markdown Document').replace(/\.[^.]+$/, '') || 'Markdown Document';
-}
-
-function stripNativePath(value = '') {
-  return String(value).split(/[\\/]/).filter(Boolean).pop() || '';
-}
-
-function escapeHtml(value = '') {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function escapeRegExp(value = '') {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
