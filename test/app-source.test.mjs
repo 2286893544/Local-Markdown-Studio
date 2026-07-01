@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const source = await readFile(new URL('../src/app.js', import.meta.url), 'utf8');
+const appSource = await readFile(new URL('../src/app.js', import.meta.url), 'utf8');
+const appEvents = await readFile(new URL('../src/app-events.mjs', import.meta.url), 'utf8');
+const appScanSettings = await readFile(new URL('../src/app-scan-settings.mjs', import.meta.url), 'utf8');
+const source = `${appSource}\n${appEvents}\n${appScanSettings}`;
 const diagramController = await readFile(new URL('../src/diagram-controller.mjs', import.meta.url), 'utf8');
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const styles = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
@@ -40,8 +43,8 @@ assert.match(source, /window\.addEventListener\('resize', diagrams\.fitDiagramsT
 assert.match(source, /syncNativeTheme\(\)/);
 assert.match(source, /markdownNative\?\.setTheme\?\.\(state\.theme\)/);
 assert.match(source, /previewPane:\s*document\.querySelector\('\.preview-pane'\)/);
-assert.match(source, /elements\.previewPane\.addEventListener\('scroll', \(\) => \{\s*syncEditorScrollToPreview\(\);\s*updateActiveOutlineFromScroll\(\);\s*\},\s*\{\s*passive:\s*true\s*\}\)/);
-assert.match(source, /elements\.editor\.addEventListener\('scroll', syncPreviewScrollToEditor,\s*\{\s*passive:\s*true\s*\}\)/);
+assert.match(source, /elements\.previewPane\.addEventListener\('scroll', \(\) => \{\s*actions\.syncEditorScrollToPreview\(\);\s*actions\.updateActiveOutlineFromScroll\(\);\s*\},\s*\{\s*passive:\s*true\s*\}\)/);
+assert.match(source, /elements\.editor\.addEventListener\('scroll', actions\.syncPreviewScrollToEditor,\s*\{\s*passive:\s*true\s*\}\)/);
 assert.match(source, /render\(\{\s*scrollToSearchMatch:\s*true\s*\}\)/);
 assert.match(source, /function render\(\{\s*scrollToSearchMatch = false,\s*focusEditorMatch = false\s*\} = \{\}\)/);
 assert.match(source, /function scrollToSearchMatchElement\(\{\s*focusEditorMatch = false\s*\} = \{\}\)/);

@@ -1,5 +1,4 @@
 import {
-  buildExportHtml,
   extractHeadings,
   getDocumentStats,
   highlightSearch,
@@ -36,13 +35,6 @@ import {
   renderRecentItems,
 } from './recent-items.mjs';
 import {
-  buildScanSummaryText,
-  normalizeDirectoryName,
-  normalizeGeneralRulePattern,
-  normalizeScanExtension,
-  renderScanOption,
-} from './scan-settings.mjs';
-import {
   buildDocumentRelationsHtml,
   buildProjectHealthHtml,
   getQuickOpenResults as getQuickOpenResultsForEntries,
@@ -57,6 +49,9 @@ import {
   stripNativePath,
 } from './text-utils.mjs';
 import { createDiagramController } from './diagram-controller.mjs';
+import { bindAppEvents } from './app-events.mjs';
+import { createScanSettingsController } from './app-scan-settings.mjs';
+import { sampleMarkdown } from './sample-document.mjs';
 
 const draftKey = 'local-markdown-studio:draft';
 const fileNameKey = 'local-markdown-studio:file-name';
@@ -68,34 +63,6 @@ const defaultIgnoredDirectories = ['node_modules'];
 const defaultScanExtensionOptions = ['.md', '.markdown', '.txt'];
 const defaultIgnoredDirectoryOptions = ['node_modules', 'dist', 'build', 'coverage', 'out'];
 const defaultGeneralRuleOptions = ['.*'];
-
-const sampleMarkdown = `# 我的 Markdown 工作台
-
-这是一个本地优先的 Markdown 阅读与编辑器。你可以直接打开本地 \`.md\` 文件，也可以把文件拖进窗口。
-
-## 常用能力
-
-- [x] 打开 Markdown 文件
-- [x] 分屏编辑与实时预览
-- [x] 自动保存本地草稿
-- [x] 目录导航与搜索高亮
-- [ ] 继续写你的下一篇文档
-
-## 写作片段
-
-> 好的写作工具应该安静、稳定，并且把注意力留给内容本身。
-
-| 功能 | 状态 |
-| --- | --- |
-| Markdown 渲染 | 可用 |
-| HTML 导出 | 可用 |
-| 深浅主题 | 可用 |
-
-\`\`\`js
-const note = 'Keep it local and focused.';
-console.log(note);
-\`\`\`
-`;
 
 const elements = {
   body: document.body,
@@ -212,6 +179,7 @@ const state = {
 };
 
 const diagrams = createDiagramController({ elements, state });
+const scanSettings = createScanSettingsController({ elements, state });
 
 initialize();
 
@@ -220,263 +188,35 @@ function initialize() {
   elements.fileName.textContent = state.fileName;
   document.documentElement.dataset.theme = state.theme;
   syncNativeTheme();
-  bindEvents();
-  renderScanSettings();
+  bindAppEvents({
+    elements,
+    state,
+    diagrams,
+    sampleMarkdown,
+    draftKey,
+    fileNameKey,
+    themeKey,
+    actions: {
+      addGeneralRule: scanSettings.addGeneralRule,
+      addIgnoredDirectory: scanSettings.addIgnoredDirectory,
+      addScanExtension: scanSettings.addScanExtension,
+      removeScanOption: scanSettings.removeScanOption,
+      rescanCurrentProject,
+      updateScanSettingsFromInputs: scanSettings.updateScanSettingsFromInputs,
+      clearProjectState, confirmDiscardChanges, consumePendingNativeFile, markDirty, persistActiveProjectDraft, persistDraft,
+      closeRecentPanel, openRecentFile, openRecentPanel, openRecentProject,
+      createProjectFile, createProjectFolder, getProjectNameFromFiles, getQuickOpenResults, openProject, openProjectFromFiles, openQuickOpenResult,
+      downloadFile, getDocumentTitle, render, renderProjectSearchResults, renderQuickOpenResults,
+      hideDropOverlay, insertImageAssetFromFile, insertMarkdownSnippet, openFile, showDropOverlay,
+      loadNativeMarkdownFile, openMarkdownLink, openNativeFile, replaceAllMatches, replaceCurrentMatch, runNativeFindInPage,
+      saveCurrentDocument, saveCurrentDocumentAs, setDocumentContent, setFocusMode, setMode, stepSearchMatch,
+      closeScanSettingsDialog: scanSettings.closeScanSettingsDialog,
+      openScanSettingsDialog: scanSettings.openScanSettingsDialog,
+      syncEditorScrollToPreview, syncNativeTheme, syncPreviewScrollToEditor, updateActiveOutlineFromScroll,
+    },
+  });
+  scanSettings.renderScanSettings();
   render();
-}
-
-function bindEvents() {
-  elements.openButton.addEventListener('click', () => {
-    if (!confirmDiscardChanges()) return;
-    if (window.markdownNative) {
-      openNativeFile();
-      return;
-    }
-    elements.fileInput.click();
-  });
-  elements.openProjectButton.addEventListener('click', () => {
-    if (confirmDiscardChanges()) openProject();
-  });
-  elements.recentButton.addEventListener('click', openRecentPanel);
-  elements.recentClose.addEventListener('click', closeRecentPanel);
-  elements.recentPanel.addEventListener('click', (event) => {
-    if (event.target === elements.recentPanel) closeRecentPanel();
-  });
-  elements.recentFiles.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-recent-file]');
-    if (button) openRecentFile(button.dataset.recentFile);
-  });
-  elements.recentProjects.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-recent-project]');
-    if (button) openRecentProject(button.dataset.recentProject);
-  });
-  elements.fileInput.addEventListener('change', (event) => {
-    const [file] = event.target.files || [];
-    if (file) openFile(file);
-    event.target.value = '';
-  });
-  elements.projectInput.addEventListener('change', (event) => {
-    openProjectFromFiles(event.target.files || [], getProjectNameFromFiles(event.target.files) || '本地项目');
-    event.target.value = '';
-  });
-  elements.newFileButton.addEventListener('click', createProjectFile);
-  elements.newFolderButton.addEventListener('click', createProjectFolder);
-
-  elements.editor.addEventListener('input', () => {
-    state.markdown = elements.editor.value;
-    markDirty();
-    persistActiveProjectDraft();
-    persistDraft();
-    render();
-    runNativeFindInPage({ forward: true, findNext: false });
-  });
-
-  elements.sampleButton.addEventListener('click', () => {
-    if (!confirmDiscardChanges()) return;
-    clearProjectState();
-    setDocumentContent({
-      fileName: '示例文档.md',
-      markdown: sampleMarkdown,
-      nativePath: '',
-      dirty: false,
-    });
-    render();
-  });
-
-  elements.saveButton.addEventListener('click', saveCurrentDocument);
-  elements.saveAsButton.addEventListener('click', saveCurrentDocumentAs);
-
-  elements.exportButton.addEventListener('click', () => {
-    const rendered = renderMarkdown(state.markdown);
-    const title = getDocumentTitle();
-    downloadFile(`${stripExtension(title)}.html`, buildExportHtml(title, rendered), 'text/html');
-  });
-
-  elements.themeButton.addEventListener('click', () => {
-    state.theme = state.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = state.theme;
-    localStorage.setItem(themeKey, state.theme);
-    syncNativeTheme();
-  });
-
-  elements.searchInput.addEventListener('input', () => {
-    state.query = elements.searchInput.value;
-    state.searchMatchIndex = state.query.trim() ? 0 : -1;
-    render({ scrollToSearchMatch: true });
-    runNativeFindInPage({ forward: true, findNext: false });
-  });
-  elements.searchInput.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter') return;
-
-    event.preventDefault();
-    stepSearchMatch(event.shiftKey ? -1 : 1);
-  });
-  elements.replaceInput.addEventListener('input', () => {
-    state.replaceText = elements.replaceInput.value;
-  });
-  elements.searchPrevButton.addEventListener('click', () => stepSearchMatch(-1));
-  elements.searchNextButton.addEventListener('click', () => stepSearchMatch(1));
-  elements.replaceButton.addEventListener('click', replaceCurrentMatch);
-  elements.replaceAllButton.addEventListener('click', replaceAllMatches);
-  elements.quickOpenInput.addEventListener('input', () => {
-    state.quickOpenQuery = elements.quickOpenInput.value;
-    renderQuickOpenResults();
-  });
-  elements.quickOpenInput.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter') return;
-    const [firstResult] = getQuickOpenResults();
-    if (!firstResult) return;
-    event.preventDefault();
-    openQuickOpenResult(firstResult.id);
-  });
-  elements.projectSearchInput.addEventListener('input', () => {
-    state.projectSearchQuery = elements.projectSearchInput.value;
-    renderProjectSearchResults();
-  });
-
-  elements.clearDraftButton.addEventListener('click', () => {
-    if (!confirmDiscardChanges()) return;
-    localStorage.removeItem(draftKey);
-    localStorage.removeItem(fileNameKey);
-    clearProjectState();
-    setDocumentContent({
-      fileName: '未命名文档',
-      markdown: '',
-      nativePath: '',
-      dirty: false,
-    });
-    render();
-  });
-
-  elements.modeButtons.forEach((button) => {
-    button.addEventListener('click', () => setMode(button.dataset.mode));
-  });
-  elements.formatButtons.forEach((button) => {
-    button.addEventListener('click', () => insertMarkdownSnippet(button.dataset.formatAction));
-  });
-  elements.imageInput.addEventListener('change', (event) => {
-    const [file] = event.target.files || [];
-    if (file) insertImageAssetFromFile(file);
-    event.target.value = '';
-  });
-  elements.focusButton.addEventListener('click', () => setFocusMode(!state.focusMode));
-
-  elements.scanSettingsButton.addEventListener('click', openScanSettingsDialog);
-  elements.scanSettingsClose.addEventListener('click', closeScanSettingsDialog);
-  elements.scanSettingsApply.addEventListener('click', rescanCurrentProject);
-  elements.scanSettingsDialog.addEventListener('click', (event) => {
-    if (event.target === elements.scanSettingsDialog) closeScanSettingsDialog();
-  });
-  elements.scanExtensionList.addEventListener('change', updateScanSettingsFromInputs);
-  elements.generalRuleList.addEventListener('change', updateScanSettingsFromInputs);
-  elements.ignoreDirectoryList.addEventListener('change', updateScanSettingsFromInputs);
-  elements.scanExtensionList.addEventListener('click', removeScanOption);
-  elements.generalRuleList.addEventListener('click', removeScanOption);
-  elements.ignoreDirectoryList.addEventListener('click', removeScanOption);
-  elements.addScanExtensionButton.addEventListener('click', addScanExtension);
-  elements.addGeneralRuleButton.addEventListener('click', addGeneralRule);
-  elements.addIgnoreDirectoryButton.addEventListener('click', addIgnoredDirectory);
-  elements.scanExtensionInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') addScanExtension();
-  });
-  elements.generalRuleInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') addGeneralRule();
-  });
-  elements.ignoreDirectoryInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') addIgnoredDirectory();
-  });
-  elements.preview.addEventListener('click', (event) => {
-    const actionButton = event.target.closest('[data-diagram-action]');
-    if (actionButton) {
-      diagrams.handleDiagramAction(actionButton);
-      return;
-    }
-
-    const link = event.target.closest('a');
-    if (link && openMarkdownLink(link)) {
-      event.preventDefault();
-      return;
-    }
-
-    const diagram = event.target.closest('.diagram-flowchart');
-    if (diagram) diagrams.openDiagramViewer(diagram);
-  });
-  elements.preview.addEventListener('wheel', (event) => {
-    const diagram = event.target.closest('.diagram-flowchart');
-    if (diagram) diagrams.handleDiagramWheel(event, diagram, false);
-  }, { passive: false });
-  elements.previewPane.addEventListener('scroll', () => {
-    syncEditorScrollToPreview();
-    updateActiveOutlineFromScroll();
-  }, { passive: true });
-  elements.editor.addEventListener('scroll', syncPreviewScrollToEditor, { passive: true });
-  elements.editor.addEventListener('paste', (event) => {
-    const image = [...(event.clipboardData?.files || [])].find((file) => file.type.startsWith('image/'));
-    if (!image) return;
-    event.preventDefault();
-    insertImageAssetFromFile(image);
-  });
-  window.markdownNative?.onFileOpened?.((file) => {
-    loadNativeMarkdownFile(file);
-  });
-  window.markdownNative?.onFoundInPage?.((result) => {
-    state.nativeSearchResult = result;
-  });
-  consumePendingNativeFile();
-  elements.diagramViewer.addEventListener('click', (event) => {
-    if (event.target === elements.diagramViewer) diagrams.closeDiagramViewer();
-  });
-  elements.diagramViewerClose.addEventListener('click', diagrams.closeDiagramViewer);
-  elements.diagramZoomOut.addEventListener('click', () => diagrams.zoomDiagram(-0.15));
-  elements.diagramZoomIn.addEventListener('click', () => diagrams.zoomDiagram(0.15));
-  elements.diagramZoomReset.addEventListener('click', () => diagrams.setDiagramZoom(1));
-  elements.diagramViewerCanvas.addEventListener('wheel', (event) => {
-    if (!elements.diagramViewer.classList.contains('is-visible')) return;
-    diagrams.handleDiagramWheel(event, elements.diagramViewerCanvas, true);
-  }, { passive: false });
-  window.addEventListener('keydown', (event) => {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
-      event.preventDefault();
-      if (event.shiftKey) {
-        saveCurrentDocumentAs();
-      } else {
-        saveCurrentDocument();
-      }
-      return;
-    }
-
-    if (event.key === 'Escape') {
-      diagrams.closeDiagramViewer();
-      closeScanSettingsDialog();
-      closeRecentPanel();
-    }
-  });
-  window.addEventListener('beforeunload', (event) => {
-    if (!state.dirty) return;
-    event.preventDefault();
-    event.returnValue = '';
-  });
-  window.addEventListener('resize', diagrams.fitDiagramsToContainers);
-
-  window.addEventListener('dragenter', showDropOverlay);
-  window.addEventListener('dragover', (event) => {
-    event.preventDefault();
-    showDropOverlay();
-  });
-  window.addEventListener('dragleave', (event) => {
-    if (!event.relatedTarget) hideDropOverlay();
-  });
-  window.addEventListener('drop', (event) => {
-    event.preventDefault();
-    hideDropOverlay();
-    const [file] = event.dataTransfer.files || [];
-    if (!file) return;
-    if (file.type.startsWith('image/')) {
-      insertImageAssetFromFile(file);
-      return;
-    }
-    openFile(file);
-  });
 }
 
 function render({ scrollToSearchMatch = false, focusEditorMatch = false } = {}) {
@@ -1505,114 +1245,12 @@ function hideDropOverlay() {
   elements.dropOverlay.classList.remove('is-visible');
 }
 
-function renderScanSettings() {
-  elements.scanExtensionList.innerHTML = state.scan.extensionOptions
-    .map((extension) => renderScanOption('extension', extension, state.scan.markdownExtensions.includes(extension)))
-    .join('');
-  elements.generalRuleList.innerHTML = state.scan.generalRuleOptions
-    .map((pattern) => renderScanOption('rule', pattern, state.scan.ignoredDirectoryPatterns.includes(pattern)))
-    .join('');
-  elements.ignoreDirectoryList.innerHTML = state.scan.ignoredDirectoryOptions
-    .map((directory) => renderScanOption('directory', directory, state.scan.ignoredDirectoryNames.includes(directory)))
-    .join('');
-  renderScanSummary();
-}
-
-function updateScanSettingsFromInputs() {
-  state.scan.markdownExtensions = [...elements.scanExtensionList.querySelectorAll('[data-scan-extension]')]
-    .filter((input) => input.checked)
-    .map((input) => input.dataset.scanExtension);
-  state.scan.ignoredDirectoryPatterns = [...elements.generalRuleList.querySelectorAll('[data-general-rule]')]
-    .filter((input) => input.checked)
-    .map((input) => input.dataset.generalRule);
-  state.scan.ignoredDirectoryNames = [...elements.ignoreDirectoryList.querySelectorAll('[data-ignore-dir]')]
-    .filter((input) => input.checked)
-    .map((input) => input.dataset.ignoreDir);
-  state.scan.ignoreDotDirectories = state.scan.ignoredDirectoryPatterns.includes('.*');
-  renderScanSummary();
-}
-
-function openScanSettingsDialog() {
-  renderScanSettings();
-  elements.scanSettingsDialog.classList.add('is-visible');
-  elements.scanSettingsDialog.setAttribute('aria-hidden', 'false');
-  elements.scanExtensionInput.focus();
-}
-
-function closeScanSettingsDialog() {
-  elements.scanSettingsDialog.classList.remove('is-visible');
-  elements.scanSettingsDialog.setAttribute('aria-hidden', 'true');
-}
-
-function addScanExtension() {
-  const extension = normalizeScanExtension(elements.scanExtensionInput.value);
-  if (!extension) return;
-  if (!state.scan.extensionOptions.includes(extension)) {
-    state.scan.extensionOptions.push(extension);
-  }
-  if (!state.scan.markdownExtensions.includes(extension)) {
-    state.scan.markdownExtensions.push(extension);
-  }
-  elements.scanExtensionInput.value = '';
-  renderScanSettings();
-}
-
-function addGeneralRule() {
-  const pattern = normalizeGeneralRulePattern(elements.generalRuleInput.value);
-  if (!pattern) return;
-  if (!state.scan.generalRuleOptions.includes(pattern)) {
-    state.scan.generalRuleOptions.push(pattern);
-  }
-  if (!state.scan.ignoredDirectoryPatterns.includes(pattern)) {
-    state.scan.ignoredDirectoryPatterns.push(pattern);
-  }
-  state.scan.ignoreDotDirectories = state.scan.ignoredDirectoryPatterns.includes('.*');
-  elements.generalRuleInput.value = '';
-  renderScanSettings();
-}
-
-function addIgnoredDirectory() {
-  const directory = normalizeDirectoryName(elements.ignoreDirectoryInput.value);
-  if (!directory) return;
-  if (!state.scan.ignoredDirectoryOptions.includes(directory)) {
-    state.scan.ignoredDirectoryOptions.push(directory);
-  }
-  if (!state.scan.ignoredDirectoryNames.includes(directory)) {
-    state.scan.ignoredDirectoryNames.push(directory);
-  }
-  elements.ignoreDirectoryInput.value = '';
-  renderScanSettings();
-}
-
-function removeScanOption(event) {
-  const button = event.target.closest('[data-scan-remove]');
-  if (!button) return;
-
-  const value = button.dataset.value;
-  if (button.dataset.scanRemove === 'extension') {
-    state.scan.extensionOptions = state.scan.extensionOptions.filter((extension) => extension !== value);
-    state.scan.markdownExtensions = state.scan.markdownExtensions.filter((extension) => extension !== value);
-  } else if (button.dataset.scanRemove === 'rule') {
-    state.scan.generalRuleOptions = state.scan.generalRuleOptions.filter((pattern) => pattern !== value);
-    state.scan.ignoredDirectoryPatterns = state.scan.ignoredDirectoryPatterns.filter((pattern) => pattern !== value);
-    state.scan.ignoreDotDirectories = state.scan.ignoredDirectoryPatterns.includes('.*');
-  } else {
-    state.scan.ignoredDirectoryOptions = state.scan.ignoredDirectoryOptions.filter((directory) => directory !== value);
-    state.scan.ignoredDirectoryNames = state.scan.ignoredDirectoryNames.filter((directory) => directory !== value);
-  }
-  renderScanSettings();
-}
-
-function renderScanSummary() {
-  elements.scanSummary.textContent = buildScanSummaryText(state.scan);
-}
-
 async function rescanCurrentProject() {
-  updateScanSettingsFromInputs();
-  closeScanSettingsDialog();
+  scanSettings.updateScanSettingsFromInputs();
+  scanSettings.closeScanSettingsDialog();
 
   if (!state.projectSource) {
-    renderScanSummary();
+    scanSettings.renderScanSummary();
     return;
   }
 

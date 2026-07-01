@@ -3,7 +3,9 @@ import { readFile } from 'node:fs/promises';
 
 const main = await readFile(new URL('../electron/main.cjs', import.meta.url), 'utf8');
 const preload = await readFile(new URL('../electron/preload.cjs', import.meta.url), 'utf8');
-const app = await readFile(new URL('../src/app.js', import.meta.url), 'utf8');
+const appSource = await readFile(new URL('../src/app.js', import.meta.url), 'utf8');
+const appEvents = await readFile(new URL('../src/app-events.mjs', import.meta.url), 'utf8');
+const app = `${appSource}\n${appEvents}`;
 const manifest = await readFile(new URL('../package.json', import.meta.url), 'utf8');
 const pnpmWorkspace = await readFile(new URL('../pnpm-workspace.yaml', import.meta.url), 'utf8');
 const pruneWin = await readFile(new URL('../scripts/prune-win-package.cjs', import.meta.url), 'utf8');
