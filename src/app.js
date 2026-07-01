@@ -788,37 +788,27 @@ function insertMarkdownSnippet(action) {
   render();
 }
 
-function insertImageFile(file) {
-  insertImageSnippet(`./assets/${sanitizeImageFileName(file.name || 'image.png')}`);
-}
-
 async function insertImageAssetFromFile(file) {
   const activeEntry = state.projectFiles.find((entry) => entry.id === state.activeProjectFileId);
   const documentPath = activeEntry?.absolutePath || state.currentNativePath;
   const projectPath = state.projectSource?.type === 'native-directory' ? state.projectSource.path : '';
   const sourcePath = getNativeFilePath(file);
-  const existingProjectImagePath = resolveDroppedImageReference({ documentPath, projectPath, sourcePath });
   const fileName = sanitizeImageFileName(file.name || 'image.png');
 
-  if (existingProjectImagePath) {
-    insertImageSnippet(existingProjectImagePath, fileName);
-    return;
-  }
-
-  if (documentPath && window.markdownNative?.saveImageAsset) {
-    try {
-      const buffer = await file.arrayBuffer();
-      const asset = await window.markdownNative.saveImageAsset({ documentPath, fileName, buffer });
-      if (asset?.relativePath) {
-        insertImageSnippet(formatMarkdownRelativePath(asset.relativePath), asset.fileName || fileName);
-        return;
-      }
-    } catch {
-      window.alert?.('图片复制到 assets 目录失败，已改为插入相对路径占位。');
+  if (sourcePath && documentPath) {
+    const imagePath = resolveDroppedImageReference({ documentPath, projectPath, sourcePath });
+    if (imagePath) {
+      insertImageSnippet(imagePath, fileName);
+      return;
     }
   }
 
-  insertImageSnippet(`./assets/${fileName}`, fileName);
+  if (sourcePath) {
+    insertImageSnippet(formatMarkdownRelativePath(sourcePath), fileName);
+    return;
+  }
+
+  window.alert?.('无法读取图片原始路径，已取消插入。请在桌面应用中拖入图片，或先把图片放到当前 Markdown 文件附近再插入。');
 }
 
 function insertImageSnippet(relativePath, fileName = '') {

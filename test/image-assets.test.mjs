@@ -8,7 +8,9 @@ import {
 
 assert.equal(sanitizeImageFileName('product image:1.png'), 'product-image-1.png');
 assert.equal(buildImageSnippet('./assets/product.png', 'product.png'), '![product](./assets/product.png)');
+assert.equal(buildImageSnippet('/Users/me/Desktop/hero.png', 'hero.png'), '![hero](/Users/me/Desktop/hero.png)');
 assert.equal(formatMarkdownRelativePath('assets/product.png'), './assets/product.png');
+assert.equal(formatMarkdownRelativePath('/Users/me/Desktop/hero.png'), '/Users/me/Desktop/hero.png');
 assert.equal(formatMarkdownRelativePath('../assets/product.png'), '../assets/product.png');
 
 assert.equal(

@@ -14,7 +14,9 @@ export function buildImageSnippet(relativePath, fileName = '') {
 }
 
 export function formatMarkdownRelativePath(value = '') {
-  const relativePath = normalizePath(value).replace(/^\/+/, '');
+  const normalizedPath = normalizePath(value);
+  if (/^\//.test(normalizedPath) || /^[a-z]:\//i.test(normalizedPath)) return normalizedPath;
+  const relativePath = normalizedPath.replace(/^\/+/, '');
   if (!relativePath || relativePath.startsWith('./') || relativePath.startsWith('../')) return relativePath;
   return `./${relativePath}`;
 }
