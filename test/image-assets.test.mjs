@@ -35,7 +35,7 @@ assert.equal(
     projectPath: '/Users/me/docs',
     sourcePath: '/Users/me/Desktop/hero.png',
   }),
-  '',
+  '../../Desktop/hero.png',
 );
 
 assert.equal(
@@ -51,7 +51,15 @@ assert.equal(
     documentPath: '/Users/me/docs/specs/prd.md',
     sourcePath: '/Users/me/Desktop/hero.png',
   }),
-  '',
+  '../../Desktop/hero.png',
+);
+
+assert.equal(
+  resolveDroppedImageReference({
+    documentPath: '/Users/xujiahang/Documents/Typora/当前文件.md',
+    sourcePath: '/Users/xujiahang/Documents/图片/护照/澳门.jpg',
+  }),
+  '../图片/护照/澳门.jpg',
 );
 
 console.log('image asset tests passed');

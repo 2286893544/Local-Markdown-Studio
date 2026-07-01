@@ -21,12 +21,9 @@ export function formatMarkdownRelativePath(value = '') {
 
 export function resolveDroppedImageReference({ documentPath = '', projectPath = '', sourcePath = '' } = {}) {
   const normalizedDocumentPath = normalizeNativePath(documentPath);
-  const normalizedProjectPath = normalizeNativePath(projectPath);
   const normalizedSourcePath = normalizeNativePath(sourcePath);
 
   if (!normalizedDocumentPath || !normalizedSourcePath || !imageExtensionPattern.test(normalizedSourcePath)) return '';
-  const allowedSourceRoot = normalizedProjectPath || getDirectoryPath(normalizedDocumentPath);
-  if (allowedSourceRoot && !isPathInside(allowedSourceRoot, normalizedSourcePath)) return '';
 
   const relativePath = getRelativePath(getDirectoryPath(normalizedDocumentPath), normalizedSourcePath);
   return relativePath ? formatMarkdownRelativePath(relativePath) : '';
@@ -52,12 +49,6 @@ function getRelativePath(fromDirectory, targetPath) {
   return [...upSegments, ...downSegments].join('/') || '.';
 }
 
-function isPathInside(parentPath, childPath) {
-  const parent = normalizeComparablePath(parentPath);
-  const child = normalizeComparablePath(childPath);
-  return child === parent || child.startsWith(`${parent}/`);
-}
-
 function splitPath(value) {
   return normalizeNativePath(value).split('/').filter(Boolean);
 }
@@ -78,11 +69,6 @@ function comparePathSegment(left, right) {
     return left.toLowerCase() === right.toLowerCase();
   }
   return left === right;
-}
-
-function normalizeComparablePath(value) {
-  const normalized = normalizeNativePath(value).replace(/\/+$/g, '');
-  return /^[a-z]:\//i.test(normalized) ? normalized.toLowerCase() : normalized;
 }
 
 function normalizeNativePath(value = '') {
