@@ -9,7 +9,7 @@ const zipName = 'Local Markdown Studio-win32-x64.zip';
 const zipPath = path.join(distDir, zipName);
 
 if (!fs.existsSync(packagePath)) {
-  throw new Error(`Windows package not found: ${packagePath}. Run npm run package:win first.`);
+  throw new Error(`Windows package not found: ${packagePath}. Run pnpm run package:win first.`);
 }
 
 fs.rmSync(zipPath, { force: true });

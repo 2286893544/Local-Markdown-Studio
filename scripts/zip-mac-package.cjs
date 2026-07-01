@@ -34,7 +34,7 @@ function findPackagedApp() {
   if (fs.existsSync(preferredPath)) return preferredPath;
 
   if (!fs.existsSync(distDir)) {
-    throw new Error(`dist directory not found: ${distDir}. Run npm run package:mac first.`);
+    throw new Error(`dist directory not found: ${distDir}. Run pnpm run package:mac first.`);
   }
 
   const candidates = fs.readdirSync(distDir)
@@ -44,5 +44,5 @@ function findPackagedApp() {
 
   if (candidates.length) return candidates[0];
 
-  throw new Error(`macOS app not found in ${distDir}. Run npm run package:mac first.`);
+  throw new Error(`macOS app not found in ${distDir}. Run pnpm run package:mac first.`);
 }
