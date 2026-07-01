@@ -36,10 +36,23 @@
         <button class="segment" data-mode="preview" type="button">预览</button>
       </div>
 
-      <label class="search-box">
-        <span>搜索</span>
-        <input id="searchInput" type="search" placeholder="标题、正文、代码">
-      </label>
+      <div class="search-panel" aria-label="查找和替换">
+        <label class="search-box">
+          <span>查找</span>
+          <input id="searchInput" type="search" placeholder="标题、正文、代码">
+        </label>
+        <label class="search-box replace-box">
+          <span>替换</span>
+          <input id="replaceInput" type="text" placeholder="替换为">
+        </label>
+        <div class="search-actions" role="group" aria-label="查找替换操作">
+          <button class="icon-button search-action" id="searchPrevButton" type="button" title="上一个匹配" aria-label="上一个匹配">‹</button>
+          <button class="icon-button search-action" id="searchNextButton" type="button" title="下一个匹配" aria-label="下一个匹配">›</button>
+          <button class="tool-button search-action" id="replaceButton" type="button" title="替换当前匹配">替换</button>
+          <button class="tool-button search-action" id="replaceAllButton" type="button" title="替换全部匹配">全部</button>
+        </div>
+        <span class="match-status" id="matchStatus" aria-live="polite">0/0</span>
+      </div>
 
       <div class="stats" id="stats" aria-live="polite"></div>
     </section>
@@ -67,7 +80,7 @@
       </aside>
 
       <section class="editor-pane" aria-label="Markdown 编辑器">
-        <textarea id="editor" spellcheck="false" aria-label="Markdown 源码"></textarea>
+        <textarea id="editor" spellcheck="false" wrap="off" aria-label="Markdown 源码"></textarea>
       </section>
 
       <section class="preview-pane" aria-label="Markdown 预览">

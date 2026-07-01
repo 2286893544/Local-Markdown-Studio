@@ -162,6 +162,12 @@ button {
   border-color: var(--accent);
 }
 
+.tool-button:disabled,
+.icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
 .tool-button:focus-visible,
 .icon-button:focus-visible,
 .ghost-button:focus-visible,
@@ -174,6 +180,7 @@ textarea:focus-visible {
 
 .control-strip {
   justify-content: space-between;
+  flex-wrap: wrap;
   padding: 10px 20px;
   border-bottom: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft));
@@ -202,11 +209,20 @@ textarea:focus-visible {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
+.search-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 520px;
+  min-width: min(100%, 420px);
+  gap: 8px;
+}
+
 .search-box {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 260px;
+  min-width: 210px;
   padding: 0 10px;
   min-height: 36px;
   border: 1px solid var(--border);
@@ -216,6 +232,10 @@ textarea:focus-visible {
   font-size: 13px;
 }
 
+.replace-box {
+  min-width: 180px;
+}
+
 .search-box input {
   width: 100%;
   min-width: 0;
@@ -223,6 +243,32 @@ textarea:focus-visible {
   outline: 0;
   background: transparent;
   color: var(--text);
+}
+
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.search-action {
+  min-height: 32px;
+}
+
+.search-action.icon-button {
+  width: 32px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.match-status {
+  flex: 0 0 auto;
+  min-width: 48px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: right;
 }
 
 .stats {
@@ -589,25 +635,37 @@ textarea:focus-visible {
 }
 
 .editor-pane {
+  position: relative;
+  overflow: hidden;
   background: var(--surface);
   border-right: 1px solid var(--border);
 }
 
 textarea {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   min-height: 100%;
-  resize: none;
-  border: 0;
+  margin: 0;
   padding: 34px clamp(20px, 4vw, 52px);
-  outline: 0;
-  background: transparent;
-  color: var(--text);
   font-family: var(--mono);
   font-size: 15px;
   line-height: 1.75;
   tab-size: 2;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+  letter-spacing: 0;
+  font-variant-ligatures: none;
+  resize: none;
+  border: 0;
+  outline: 0;
+  overflow: auto;
+  background: transparent;
+  color: var(--text);
+  caret-color: var(--text);
 }
 
 .preview-pane {
@@ -913,6 +971,11 @@ mark {
   color: inherit;
   border-radius: 4px;
   padding: 0 2px;
+}
+
+mark.is-current-search {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 42%, transparent);
 }
 
 .drop-overlay {

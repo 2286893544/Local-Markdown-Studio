@@ -49,6 +49,9 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+  mainWindow.webContents.on('found-in-page', (_event, result) => {
+    mainWindow?.webContents.send('native:found-in-page', result);
+  });
 
   mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
 }
@@ -121,6 +124,25 @@ function registerNativeHandlers() {
 
   ipcMain.handle('native:set-theme', (_event, theme) => {
     applyWindowTheme(theme);
+    return true;
+  });
+
+  ipcMain.handle('native:find-in-page', (event, query, options = {}) => {
+    const term = String(query || '').trim();
+    if (!term) {
+      event.sender.stopFindInPage('clearSelection');
+      return 0;
+    }
+
+    return event.sender.findInPage(term, {
+      forward: options.forward !== false,
+      findNext: Boolean(options.findNext),
+      matchCase: false,
+    });
+  });
+
+  ipcMain.handle('native:stop-find-in-page', (event) => {
+    event.sender.stopFindInPage('clearSelection');
     return true;
   });
 }

@@ -23,6 +23,11 @@ assert.match(main, /icon:\s*path\.join\(__dirname,\s*'\.\.',\s*'assets',\s*'app-
 assert.match(main, /ipcMain\.handle\('native:set-theme'/);
 assert.match(main, /setTitleBarOverlay/);
 assert.match(main, /setBackgroundColor/);
+assert.match(main, /webContents\.on\('found-in-page'/);
+assert.match(main, /webContents\.send\('native:found-in-page', result\)/);
+assert.match(main, /ipcMain\.handle\('native:find-in-page'/);
+assert.match(main, /findInPage\(term/);
+assert.match(main, /stopFindInPage\('clearSelection'\)/);
 assert.doesNotMatch(main, /label:\s*'文件'/);
 assert.doesNotMatch(main, /label:\s*'编辑'/);
 assert.doesNotMatch(main, /label:\s*'视图'/);
@@ -62,6 +67,10 @@ assert.match(preload, /ipcRenderer\.on\('native:file-opened'/);
 assert.match(preload, /openProject/);
 assert.match(preload, /rescanProject/);
 assert.match(preload, /setTheme/);
+assert.match(preload, /findInPage/);
+assert.match(preload, /stopFindInPage/);
+assert.match(preload, /onFoundInPage/);
+assert.match(preload, /ipcRenderer\.on\('native:found-in-page'/);
 
 assert.match(app, /window\.markdownNative/);
 assert.match(app, /openNativeFile/);
