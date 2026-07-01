@@ -21,10 +21,13 @@
       <div class="toolbar" aria-label="文档操作">
         <button class="tool-button" id="openButton" type="button" title="打开 Markdown 文件">打开</button>
         <button class="tool-button" id="openProjectButton" type="button" title="打开整个项目文件夹">打开项目</button>
+        <button class="tool-button" id="recentButton" type="button" title="查看最近打开的文件和项目">最近</button>
         <button class="tool-button" id="scanSettingsButton" type="button" title="配置项目扫描规则">扫描设置</button>
         <button class="tool-button" id="sampleButton" type="button" title="载入示例文档">示例</button>
-        <button class="tool-button" id="downloadButton" type="button" title="下载当前 Markdown">下载 MD</button>
+        <button class="tool-button" id="saveButton" type="button" title="保存当前 Markdown">保存</button>
+        <button class="tool-button" id="saveAsButton" type="button" title="另存为 Markdown">另存为</button>
         <button class="tool-button" id="exportButton" type="button" title="导出渲染后的 HTML">导出 HTML</button>
+        <button class="tool-button" id="focusButton" type="button" title="切换专注模式">专注</button>
         <button class="icon-button" id="themeButton" type="button" title="切换深浅主题" aria-label="切换深浅主题">◐</button>
       </div>
     </header>
@@ -54,6 +57,16 @@
         <span class="match-status" id="matchStatus" aria-live="polite">0/0</span>
       </div>
 
+      <div class="format-toolbar" aria-label="Markdown 快捷插入">
+        <button class="icon-button" type="button" data-format-action="heading" title="插入标题" aria-label="插入标题">H</button>
+        <button class="icon-button" type="button" data-format-action="bold" title="加粗" aria-label="加粗">B</button>
+        <button class="icon-button" type="button" data-format-action="link" title="插入链接" aria-label="插入链接">↗</button>
+        <button class="icon-button" type="button" data-format-action="image" title="插入图片" aria-label="插入图片">▧</button>
+        <button class="icon-button" type="button" data-format-action="code" title="插入代码块" aria-label="插入代码块">{ }</button>
+        <button class="icon-button" type="button" data-format-action="table" title="插入表格" aria-label="插入表格">▦</button>
+        <button class="icon-button" type="button" data-format-action="task" title="插入任务项" aria-label="插入任务项">☑</button>
+      </div>
+
       <div class="stats" id="stats" aria-live="polite"></div>
     </section>
 
@@ -66,6 +79,10 @@
           </div>
           <div class="scan-settings" aria-label="项目扫描设置">
             <p id="scanSummary" class="scan-summary"></p>
+          </div>
+          <div class="project-search" aria-label="项目内全文搜索">
+            <input id="projectSearchInput" type="search" placeholder="搜索项目文档">
+            <div id="projectSearchResults" class="project-search-results"></div>
           </div>
           <nav id="projectFiles" class="project-file-list"></nav>
         </section>
@@ -93,6 +110,25 @@
     <div>
       <strong>松开以打开 Markdown</strong>
       <span>支持 .md / .markdown / .txt</span>
+    </div>
+  </div>
+
+  <div id="recentPanel" class="recent-panel" aria-hidden="true">
+    <div class="recent-card" role="dialog" aria-modal="true" aria-label="最近打开">
+      <div class="recent-header">
+        <strong>最近打开</strong>
+        <button class="icon-button" id="recentClose" type="button" aria-label="关闭最近打开">×</button>
+      </div>
+      <div class="recent-grid">
+        <section>
+          <h2>文件</h2>
+          <div id="recentFiles" class="recent-list"></div>
+        </section>
+        <section>
+          <h2>项目</h2>
+          <div id="recentProjects" class="recent-list"></div>
+        </section>
+      </div>
     </div>
   </div>
 
@@ -178,6 +214,7 @@
 
   <input id="fileInput" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
   <input id="projectInput" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" webkitdirectory directory multiple hidden>
+  <input id="imageInput" type="file" accept="image/*" hidden>
 
   <script type="module" src="src/app.js"></script>
 </body>

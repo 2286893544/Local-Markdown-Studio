@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('markdownNative', {
   openFile: () => ipcRenderer.invoke('native:open-file'),
+  openRecentFile: (filePath) => ipcRenderer.invoke('native:open-recent-file', filePath),
   consumePendingFile: () => ipcRenderer.invoke('native:consume-pending-file'),
   onFileOpened: (callback) => {
     if (typeof callback !== 'function') return () => {};
@@ -10,7 +11,10 @@ contextBridge.exposeInMainWorld('markdownNative', {
     return () => ipcRenderer.removeListener('native:file-opened', listener);
   },
   openProject: (options) => ipcRenderer.invoke('native:open-project', options),
+  openRecentProject: (directoryPath, options) => ipcRenderer.invoke('native:open-recent-project', directoryPath, options),
   rescanProject: (directoryPath, options) => ipcRenderer.invoke('native:rescan-project', directoryPath, options),
+  saveFile: (filePath, content) => ipcRenderer.invoke('native:save-file', filePath, content),
+  saveFileAs: (suggestedName, content) => ipcRenderer.invoke('native:save-file-as', suggestedName, content),
   setTheme: (theme) => ipcRenderer.invoke('native:set-theme', theme),
   findInPage: (query, options) => ipcRenderer.invoke('native:find-in-page', query, options),
   stopFindInPage: () => ipcRenderer.invoke('native:stop-find-in-page'),

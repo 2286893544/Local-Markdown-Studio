@@ -271,6 +271,20 @@ textarea:focus-visible {
   text-align: right;
 }
 
+.format-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.format-toolbar .icon-button {
+  width: 34px;
+  min-height: 32px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .stats {
   color: var(--muted);
   font-size: 13px;
@@ -361,6 +375,53 @@ textarea:focus-visible {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.45;
+}
+
+.project-search {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-search input {
+  width: 100%;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.project-search-results {
+  display: grid;
+  gap: 6px;
+  max-height: 180px;
+  overflow: auto;
+  margin-top: 8px;
+}
+
+.project-search-result {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 8px 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 80%, var(--surface-soft));
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.project-search-result span,
+.project-search-result small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-search-result small {
+  color: var(--muted);
 }
 
 .scan-settings-dialog {
@@ -535,6 +596,11 @@ textarea:focus-visible {
   color: var(--text);
 }
 
+.outline-entry.is-active {
+  background: color-mix(in srgb, var(--accent) 13%, var(--surface));
+  color: var(--accent-strong);
+}
+
 .outline-toggle,
 .outline-toggle-placeholder {
   flex: 0 0 30px;
@@ -620,6 +686,104 @@ textarea:focus-visible {
   margin-top: 4px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.recent-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: none;
+  padding: 80px 20px 20px;
+  background: rgba(20, 18, 15, 0.28);
+}
+
+.recent-panel.is-visible {
+  display: block;
+}
+
+.recent-card {
+  width: min(760px, calc(100vw - 40px));
+  max-height: min(620px, calc(100vh - 112px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.recent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-height: 0;
+  overflow: auto;
+  padding: 14px;
+}
+
+.recent-grid h2 {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.recent-list {
+  display: grid;
+  gap: 8px;
+}
+
+.recent-item {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--surface-soft));
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.recent-item span,
+.recent-item small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-item small {
+  color: var(--muted);
+}
+
+body.is-focus-mode .outline-pane,
+body.is-focus-mode .preview-pane,
+body.is-focus-mode .search-panel,
+body.is-focus-mode .stats {
+  display: none;
+}
+
+body.is-focus-mode .workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.is-focus-mode .editor-pane {
+  border-right: 0;
+}
+
+body.is-focus-mode textarea {
+  inset: 0 max(16vw, 120px);
 }
 
 .outline-entry.level-2 { padding-left: 16px; }

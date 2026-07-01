@@ -105,6 +105,11 @@ function registerNativeHandlers() {
     return readMarkdownFile(filePath);
   });
 
+  ipcMain.handle('native:open-recent-file', async (_event, filePath) => {
+    if (!filePath) return null;
+    return readMarkdownFile(filePath);
+  });
+
   ipcMain.handle('native:open-project', async (_event, options = {}) => {
     const result = await dialog.showOpenDialog(mainWindow, {
       title: '打开 Markdown 项目',
@@ -115,12 +120,40 @@ function registerNativeHandlers() {
     return scanMarkdownProject(result.filePaths[0], options);
   });
 
+  ipcMain.handle('native:open-recent-project', async (_event, directoryPath, options = {}) => {
+    if (!directoryPath) return null;
+    return scanMarkdownProject(directoryPath, options);
+  });
+
   ipcMain.handle('native:rescan-project', async (_event, directoryPath, options = {}) => {
     if (!directoryPath) return null;
     return scanMarkdownProject(directoryPath, options);
   });
 
   ipcMain.handle('native:consume-pending-file', consumePendingMarkdownFile);
+
+  ipcMain.handle('native:save-file', async (_event, filePath, content = '') => {
+    if (!filePath) return null;
+    await fs.writeFile(filePath, content, 'utf8');
+    return readMarkdownFile(filePath);
+  });
+
+  ipcMain.handle('native:save-file-as', async (_event, suggestedName = '未命名文档.md', content = '') => {
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: '另存为 Markdown',
+      defaultPath: suggestedName,
+      filters: [
+        { name: 'Markdown', extensions: ['md', 'markdown'] },
+        { name: 'Text', extensions: ['txt'] },
+        { name: 'All Files', extensions: ['*'] },
+      ],
+    });
+    if (result.canceled || !result.filePath) return null;
+
+    const filePath = result.filePath;
+    await fs.writeFile(filePath, content, 'utf8');
+    return readMarkdownFile(filePath);
+  });
 
   ipcMain.handle('native:set-theme', (_event, theme) => {
     applyWindowTheme(theme);

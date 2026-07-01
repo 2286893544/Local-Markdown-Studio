@@ -14,6 +14,8 @@ import {
 const draftKey = 'local-markdown-studio:draft';
 const fileNameKey = 'local-markdown-studio:file-name';
 const themeKey = 'local-markdown-studio:theme';
+const recentFilesKey = 'local-markdown-studio:recent-files';
+const recentProjectsKey = 'local-markdown-studio:recent-projects';
 const defaultScanExtensions = ['.md'];
 const defaultIgnoredDirectories = ['node_modules'];
 const defaultScanExtensionOptions = ['.md', '.markdown', '.txt'];
@@ -59,9 +61,17 @@ const elements = {
   projectInput: document.querySelector('#projectInput'),
   openButton: document.querySelector('#openButton'),
   openProjectButton: document.querySelector('#openProjectButton'),
+  recentButton: document.querySelector('#recentButton'),
+  recentPanel: document.querySelector('#recentPanel'),
+  recentClose: document.querySelector('#recentClose'),
+  recentFiles: document.querySelector('#recentFiles'),
+  recentProjects: document.querySelector('#recentProjects'),
   sampleButton: document.querySelector('#sampleButton'),
-  downloadButton: document.querySelector('#downloadButton'),
+  saveButton: document.querySelector('#saveButton'),
+  saveAsButton: document.querySelector('#saveAsButton'),
   exportButton: document.querySelector('#exportButton'),
+  focusButton: document.querySelector('#focusButton'),
+  imageInput: document.querySelector('#imageInput'),
   themeButton: document.querySelector('#themeButton'),
   searchInput: document.querySelector('#searchInput'),
   replaceInput: document.querySelector('#replaceInput'),
@@ -89,6 +99,8 @@ const elements = {
   projectPanel: document.querySelector('.project-panel'),
   projectFiles: document.querySelector('#projectFiles'),
   projectMeta: document.querySelector('#projectMeta'),
+  projectSearchInput: document.querySelector('#projectSearchInput'),
+  projectSearchResults: document.querySelector('#projectSearchResults'),
   scanSummary: document.querySelector('#scanSummary'),
   scanSettingsButton: document.querySelector('#scanSettingsButton'),
   scanSettingsDialog: document.querySelector('#scanSettingsDialog'),
@@ -104,6 +116,7 @@ const elements = {
   ignoreDirectoryInput: document.querySelector('#ignoreDirectoryInput'),
   addIgnoreDirectoryButton: document.querySelector('#addIgnoreDirectoryButton'),
   modeButtons: [...document.querySelectorAll('[data-mode]')],
+  formatButtons: [...document.querySelectorAll('[data-format-action]')],
 };
 
 const state = {
@@ -120,6 +133,13 @@ const state = {
   projectFiles: [],
   activeProjectFileId: '',
   projectSource: null,
+  projectSearchQuery: '',
+  recentFiles: readStoredList(recentFilesKey),
+  recentProjects: readStoredList(recentProjectsKey),
+  currentNativePath: '',
+  dirty: false,
+  focusMode: false,
+  activeOutlineId: '',
   expandedOutlineIds: new Set(),
   collapsedOutlineIds: new Set(),
   diagramZoom: 1,
@@ -150,13 +170,29 @@ function initialize() {
 
 function bindEvents() {
   elements.openButton.addEventListener('click', () => {
+    if (!confirmDiscardChanges()) return;
     if (window.markdownNative) {
       openNativeFile();
       return;
     }
     elements.fileInput.click();
   });
-  elements.openProjectButton.addEventListener('click', openProject);
+  elements.openProjectButton.addEventListener('click', () => {
+    if (confirmDiscardChanges()) openProject();
+  });
+  elements.recentButton.addEventListener('click', openRecentPanel);
+  elements.recentClose.addEventListener('click', closeRecentPanel);
+  elements.recentPanel.addEventListener('click', (event) => {
+    if (event.target === elements.recentPanel) closeRecentPanel();
+  });
+  elements.recentFiles.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-recent-file]');
+    if (button) openRecentFile(button.dataset.recentFile);
+  });
+  elements.recentProjects.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-recent-project]');
+    if (button) openRecentProject(button.dataset.recentProject);
+  });
   elements.fileInput.addEventListener('change', (event) => {
     const [file] = event.target.files || [];
     if (file) openFile(file);
@@ -169,6 +205,7 @@ function bindEvents() {
 
   elements.editor.addEventListener('input', () => {
     state.markdown = elements.editor.value;
+    markDirty();
     persistActiveProjectDraft();
     persistDraft();
     render();
@@ -176,17 +213,19 @@ function bindEvents() {
   });
 
   elements.sampleButton.addEventListener('click', () => {
+    if (!confirmDiscardChanges()) return;
     clearProjectState();
-    state.fileName = '示例文档.md';
-    state.markdown = sampleMarkdown;
-    elements.editor.value = state.markdown;
-    persistDraft();
+    setDocumentContent({
+      fileName: '示例文档.md',
+      markdown: sampleMarkdown,
+      nativePath: '',
+      dirty: false,
+    });
     render();
   });
 
-  elements.downloadButton.addEventListener('click', () => {
-    downloadFile(state.fileName.endsWith('.md') ? state.fileName : `${state.fileName}.md`, state.markdown, 'text/markdown');
-  });
+  elements.saveButton.addEventListener('click', saveCurrentDocument);
+  elements.saveAsButton.addEventListener('click', saveCurrentDocumentAs);
 
   elements.exportButton.addEventListener('click', () => {
     const rendered = renderMarkdown(state.markdown);
@@ -220,20 +259,37 @@ function bindEvents() {
   elements.searchNextButton.addEventListener('click', () => stepSearchMatch(1));
   elements.replaceButton.addEventListener('click', replaceCurrentMatch);
   elements.replaceAllButton.addEventListener('click', replaceAllMatches);
+  elements.projectSearchInput.addEventListener('input', () => {
+    state.projectSearchQuery = elements.projectSearchInput.value;
+    renderProjectSearchResults();
+  });
 
   elements.clearDraftButton.addEventListener('click', () => {
+    if (!confirmDiscardChanges()) return;
     localStorage.removeItem(draftKey);
     localStorage.removeItem(fileNameKey);
     clearProjectState();
-    state.fileName = '未命名文档';
-    state.markdown = '';
-    elements.editor.value = '';
+    setDocumentContent({
+      fileName: '未命名文档',
+      markdown: '',
+      nativePath: '',
+      dirty: false,
+    });
     render();
   });
 
   elements.modeButtons.forEach((button) => {
     button.addEventListener('click', () => setMode(button.dataset.mode));
   });
+  elements.formatButtons.forEach((button) => {
+    button.addEventListener('click', () => insertMarkdownSnippet(button.dataset.formatAction));
+  });
+  elements.imageInput.addEventListener('change', (event) => {
+    const [file] = event.target.files || [];
+    if (file) insertImageFile(file);
+    event.target.value = '';
+  });
+  elements.focusButton.addEventListener('click', () => setFocusMode(!state.focusMode));
 
   elements.scanSettingsButton.addEventListener('click', openScanSettingsDialog);
   elements.scanSettingsClose.addEventListener('click', closeScanSettingsDialog);
@@ -266,6 +322,12 @@ function bindEvents() {
       return;
     }
 
+    const link = event.target.closest('a');
+    if (link && openMarkdownLink(link)) {
+      event.preventDefault();
+      return;
+    }
+
     const diagram = event.target.closest('.diagram-flowchart');
     if (diagram) openDiagramViewer(diagram);
   });
@@ -273,7 +335,10 @@ function bindEvents() {
     const diagram = event.target.closest('.diagram-flowchart');
     if (diagram) handleDiagramWheel(event, diagram, false);
   }, { passive: false });
-  elements.previewPane.addEventListener('scroll', syncEditorScrollToPreview, { passive: true });
+  elements.previewPane.addEventListener('scroll', () => {
+    syncEditorScrollToPreview();
+    updateActiveOutlineFromScroll();
+  }, { passive: true });
   elements.editor.addEventListener('scroll', syncPreviewScrollToEditor, { passive: true });
   window.markdownNative?.onFileOpened?.((file) => {
     loadNativeMarkdownFile(file);
@@ -294,10 +359,26 @@ function bindEvents() {
     handleDiagramWheel(event, elements.diagramViewerCanvas, true);
   }, { passive: false });
   window.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+      event.preventDefault();
+      if (event.shiftKey) {
+        saveCurrentDocumentAs();
+      } else {
+        saveCurrentDocument();
+      }
+      return;
+    }
+
     if (event.key === 'Escape') {
       closeDiagramViewer();
       closeScanSettingsDialog();
+      closeRecentPanel();
     }
+  });
+  window.addEventListener('beforeunload', (event) => {
+    if (!state.dirty) return;
+    event.preventDefault();
+    event.returnValue = '';
   });
   window.addEventListener('resize', fitDiagramsToContainers);
 
@@ -325,10 +406,12 @@ function render({ scrollToSearchMatch = false, focusEditorMatch = false } = {}) 
   if (!useNativeFind) highlightCurrentPreviewMatch();
   fitDiagramsToContainers();
   renderProjectFiles();
+  renderProjectSearchResults();
   renderOutline();
   renderStats();
   renderSearchStatus();
-  elements.fileName.textContent = state.fileName;
+  renderRecentPanel();
+  elements.fileName.textContent = `${state.dirty ? '● ' : ''}${state.fileName}`;
   if (scrollToSearchMatch) scrollToSearchMatchElement({ focusEditorMatch });
 }
 
@@ -399,6 +482,7 @@ function replaceCurrentMatch() {
   const match = state.searchMatches[state.searchMatchIndex];
   state.markdown = `${state.markdown.slice(0, match.start)}${state.replaceText}${state.markdown.slice(match.end)}`;
   elements.editor.value = state.markdown;
+  markDirty();
   persistActiveProjectDraft();
   persistDraft();
   render({ scrollToSearchMatch: true, focusEditorMatch: true });
@@ -413,6 +497,7 @@ function replaceAllMatches() {
   state.markdown = state.markdown.replace(matcher, state.replaceText);
   state.searchMatchIndex = 0;
   elements.editor.value = state.markdown;
+  markDirty();
   persistActiveProjectDraft();
   persistDraft();
   render({ scrollToSearchMatch: true, focusEditorMatch: true });
@@ -468,6 +553,221 @@ function runNativeFindInPage({ forward = true, findNext = false } = {}) {
   window.markdownNative.findInPage(term, { forward, findNext });
 }
 
+function renderRecentPanel() {
+  const renderItem = (item, dataName) => `<button class="recent-item" type="button" ${dataName}="${escapeHtml(item.path)}">
+    <span>${escapeHtml(item.name || stripNativePath(item.path) || item.path)}</span>
+    <small>${escapeHtml(item.path)}</small>
+  </button>`;
+
+  elements.recentFiles.innerHTML = state.recentFiles.length
+    ? state.recentFiles.map((item) => renderItem(item, 'data-recent-file')).join('')
+    : '<p class="empty-outline">还没有最近文件</p>';
+  elements.recentProjects.innerHTML = state.recentProjects.length
+    ? state.recentProjects.map((item) => renderItem(item, 'data-recent-project')).join('')
+    : '<p class="empty-outline">还没有最近项目</p>';
+}
+
+function openRecentPanel() {
+  renderRecentPanel();
+  elements.recentPanel.classList.add('is-visible');
+  elements.recentPanel.setAttribute('aria-hidden', 'false');
+}
+
+function closeRecentPanel() {
+  elements.recentPanel.classList.remove('is-visible');
+  elements.recentPanel.setAttribute('aria-hidden', 'true');
+}
+
+async function openRecentFile(filePath) {
+  if (!filePath || !confirmDiscardChanges()) return;
+  closeRecentPanel();
+
+  if (!window.markdownNative?.openRecentFile) {
+    window.alert?.('浏览器模式不能重新打开最近文件，请使用“打开”重新选择。');
+    return;
+  }
+
+  try {
+    const file = await window.markdownNative.openRecentFile(filePath);
+    if (file) loadNativeMarkdownFile(file);
+  } catch {
+    forgetRecentItem(recentFilesKey, state.recentFiles, filePath);
+    renderRecentPanel();
+    window.alert?.('这个文件已经无法打开，已从最近文件中移除。');
+  }
+}
+
+async function openRecentProject(projectPath) {
+  if (!projectPath || !confirmDiscardChanges()) return;
+  closeRecentPanel();
+
+  if (!window.markdownNative?.openRecentProject) {
+    window.alert?.('浏览器模式不能重新打开最近项目，请使用“打开项目”重新选择。');
+    return;
+  }
+
+  showGlobalLoading('正在打开最近项目', projectPath, 8);
+  try {
+    const project = await window.markdownNative.openRecentProject(projectPath, getProjectScanOptions());
+    if (!project) return;
+
+    state.projectSource = { type: 'native-directory', path: project.path, name: project.name };
+    rememberRecentProject(project.path, project.name);
+    await openProjectEntries(project.entries || [], project.name || stripNativePath(project.path) || '本地项目', { showLoading: false });
+  } catch {
+    forgetRecentItem(recentProjectsKey, state.recentProjects, projectPath);
+    window.alert?.('这个项目已经无法打开，已从最近项目中移除。');
+  } finally {
+    hideGlobalLoading();
+  }
+}
+
+function rememberRecentFile(filePath, name) {
+  if (!filePath) return;
+  state.recentFiles = rememberRecentItem(recentFilesKey, state.recentFiles, { path: filePath, name });
+}
+
+function rememberRecentProject(projectPath, name) {
+  if (!projectPath) return;
+  state.recentProjects = rememberRecentItem(recentProjectsKey, state.recentProjects, { path: projectPath, name });
+}
+
+function rememberRecentItem(storageKey, list, item) {
+  const next = [
+    { path: item.path, name: item.name || stripNativePath(item.path) },
+    ...list.filter((entry) => entry.path !== item.path),
+  ].slice(0, 10);
+  localStorage.setItem(storageKey, JSON.stringify(next));
+  return next;
+}
+
+function forgetRecentItem(storageKey, list, itemPath) {
+  const next = list.filter((entry) => entry.path !== itemPath);
+  list.splice(0, list.length, ...next);
+  localStorage.setItem(storageKey, JSON.stringify(next));
+}
+
+function renderProjectSearchResults() {
+  const query = state.projectSearchQuery.trim().toLocaleLowerCase();
+  if (!state.projectSource || !query) {
+    elements.projectSearchResults.innerHTML = '';
+    return;
+  }
+
+  const results = [];
+  for (const entry of state.projectFiles) {
+    const text = String(entry.draft ?? entry.content ?? '');
+    const index = text.toLocaleLowerCase().indexOf(query);
+    if (index === -1 && !entry.path.toLocaleLowerCase().includes(query)) continue;
+    const start = Math.max(0, index - 28);
+    const excerpt = index >= 0 ? text.slice(start, index + query.length + 48).replace(/\s+/g, ' ') : entry.path;
+    results.push({ entry, excerpt, index });
+  }
+
+  elements.projectSearchResults.innerHTML = results.length
+    ? results.slice(0, 20).map(({ entry, excerpt }) => `<button class="project-search-result" type="button" data-project-search-id="${escapeHtml(entry.id)}">
+      <span>${escapeHtml(entry.name)}</span>
+      <small>${escapeHtml(excerpt)}</small>
+    </button>`).join('')
+    : '<p class="empty-outline">项目中没有匹配内容</p>';
+
+  elements.projectSearchResults.querySelectorAll('[data-project-search-id]').forEach((button) => {
+    button.addEventListener('click', () => openProjectSearchResult(button.dataset.projectSearchId));
+  });
+}
+
+async function openProjectSearchResult(fileId) {
+  const query = state.projectSearchQuery.trim();
+  if (!fileId || !query) return;
+  await openProjectEntry(fileId, { showLoading: false, preserveMode: true });
+  state.query = query;
+  elements.searchInput.value = query;
+  state.searchMatchIndex = 0;
+  render({ scrollToSearchMatch: true, focusEditorMatch: true });
+  runNativeFindInPage({ forward: true, findNext: false });
+}
+
+async function saveCurrentDocument() {
+  const activeEntry = state.projectFiles.find((entry) => entry.id === state.activeProjectFileId);
+  const targetPath = activeEntry?.absolutePath || state.currentNativePath;
+
+  if (targetPath && window.markdownNative?.saveFile) {
+    const file = await window.markdownNative.saveFile(targetPath, state.markdown);
+    if (!file) return;
+    state.currentNativePath = file.path;
+    state.fileName = activeEntry?.path || file.name || stripNativePath(file.path);
+    if (activeEntry) {
+      activeEntry.content = state.markdown;
+      activeEntry.draft = undefined;
+    }
+    rememberRecentFile(file.path, file.name);
+    state.dirty = false;
+    persistDraft();
+    render();
+    return;
+  }
+
+  if (state.activeProjectFileId) {
+    const entry = state.projectFiles.find((file) => file.id === state.activeProjectFileId);
+    if (entry?.handle?.createWritable) {
+      const writable = await entry.handle.createWritable();
+      await writable.write(state.markdown);
+      await writable.close();
+      entry.content = state.markdown;
+      entry.draft = undefined;
+      state.dirty = false;
+      render();
+      return;
+    }
+  }
+
+  await saveCurrentDocumentAs();
+}
+
+async function saveCurrentDocumentAs() {
+  const suggestedName = state.fileName.endsWith('.md') || state.fileName.endsWith('.markdown')
+    ? stripNativePath(state.fileName)
+    : `${stripExtension(stripNativePath(state.fileName))}.md`;
+
+  if (window.markdownNative?.saveFileAs) {
+    const file = await window.markdownNative.saveFileAs(suggestedName, state.markdown);
+    if (!file) return;
+    state.currentNativePath = file.path;
+    state.fileName = file.name || stripNativePath(file.path);
+    rememberRecentFile(file.path, file.name);
+    state.dirty = false;
+    persistDraft();
+    render();
+    return;
+  }
+
+  downloadFile(suggestedName, state.markdown, 'text/markdown');
+  state.dirty = false;
+  render();
+}
+
+function confirmDiscardChanges() {
+  if (!state.dirty) return true;
+  return window.confirm?.('当前文档有未保存修改，继续会丢失这些修改。要继续吗？') !== false;
+}
+
+function markDirty() {
+  state.dirty = true;
+}
+
+function setDocumentContent({ fileName, markdown, nativePath = '', dirty = false }) {
+  state.fileName = fileName;
+  state.markdown = String(markdown || '');
+  state.currentNativePath = nativePath;
+  state.dirty = dirty;
+  state.query = '';
+  state.searchMatchIndex = -1;
+  state.searchMatches = [];
+  elements.editor.value = state.markdown;
+  elements.searchInput.value = '';
+  persistDraft();
+}
+
 function renderProjectFiles() {
   const hasProject = Boolean(state.projectSource);
   elements.projectPanel.classList.toggle('is-hidden', !hasProject);
@@ -513,11 +813,12 @@ function renderOutline() {
     .map((entry) => {
       const hiddenClass = entry.hidden ? ' is-hidden' : '';
       const collapsedClass = entry.collapsed ? ' is-collapsed' : '';
+      const activeClass = entry.outlineId === state.activeOutlineId ? ' is-active' : '';
       const toggle = entry.hasChildren
         ? `<button class="outline-toggle" type="button" data-outline-toggle="${escapeHtml(entry.outlineId)}" aria-label="${entry.collapsed ? '展开' : '收起'} ${escapeHtml(entry.text)}" aria-expanded="${entry.collapsed ? 'false' : 'true'}"></button>`
         : '<span class="outline-toggle-placeholder"></span>';
 
-      return `<div class="outline-entry level-${entry.level}${hiddenClass}${collapsedClass}" data-outline-id="${escapeHtml(entry.outlineId)}" data-target="${escapeHtml(entry.id)}" data-heading-index="${entry.headingIndex}" data-line-index="${entry.lineIndex}">
+      return `<div class="outline-entry${activeClass} level-${entry.level}${hiddenClass}${collapsedClass}" data-outline-id="${escapeHtml(entry.outlineId)}" data-target="${escapeHtml(entry.id)}" data-heading-index="${entry.headingIndex}" data-line-index="${entry.lineIndex}">
         ${toggle}
         <span class="outline-label">${escapeHtml(entry.text)}</span>
       </div>`;
@@ -542,6 +843,8 @@ function renderOutline() {
 function scrollToOutlineTarget(entry) {
   const target = elements.preview.querySelector(`[data-heading-index="${entry.dataset.headingIndex}"]`) || document.getElementById(entry.dataset.target);
   state.syncingScroll = true;
+  state.activeOutlineId = entry.dataset.outlineId || '';
+  renderOutline();
   if (target) scrollPreviewToHeading(target);
   scrollEditorToLine(Number(entry.dataset.lineIndex));
   setTimeout(() => {
@@ -563,6 +866,120 @@ function scrollEditorToLine(lineIndex) {
   const lineHeight = parseFloat(styles.lineHeight) || 24;
   const top = Math.max(0, lineIndex * lineHeight - elements.editor.clientHeight * 0.18);
   elements.editor.scrollTo({ top, behavior: 'smooth' });
+}
+
+function updateActiveOutlineFromScroll() {
+  if (state.syncingScroll) return;
+
+  const headings = [...elements.preview.querySelectorAll('[data-heading-index]')];
+  if (!headings.length) return;
+
+  const paneRect = elements.previewPane.getBoundingClientRect();
+  let active = headings[0];
+  for (const heading of headings) {
+    if (heading.getBoundingClientRect().top - paneRect.top <= 40) {
+      active = heading;
+    } else {
+      break;
+    }
+  }
+
+  const headingIndex = active?.dataset.headingIndex;
+  if (!headingIndex) return;
+  const nextOutlineId = [...elements.outline.querySelectorAll('.outline-entry')]
+    .find((entry) => entry.dataset.headingIndex === headingIndex)?.dataset.outlineId || '';
+  if (nextOutlineId && nextOutlineId !== state.activeOutlineId) {
+    state.activeOutlineId = nextOutlineId;
+    renderOutline();
+  }
+}
+
+function openMarkdownLink(link) {
+  const href = link.getAttribute('href') || '';
+  if (!href || /^(https?:|mailto:|tel:)/i.test(href)) return false;
+
+  const [rawPath, rawHash = ''] = href.split('#');
+  const hash = decodeURIComponent(rawHash || '');
+  if (!rawPath && hash) {
+    const target = document.getElementById(hash);
+    if (target) scrollPreviewToHeading(target);
+    return true;
+  }
+
+  const targetPath = normalizeRelativePath(rawPath);
+  if (!targetPath) return false;
+  const currentDir = state.activeProjectFileId.includes('/')
+    ? state.activeProjectFileId.split('/').slice(0, -1).join('/')
+    : '';
+  const candidates = [
+    normalizeRelativePath(`${currentDir}/${targetPath}`),
+    targetPath,
+    `${targetPath}.md`,
+    `${targetPath}.markdown`,
+  ];
+  const entry = state.projectFiles.find((file) => candidates.includes(normalizeRelativePath(file.path)));
+  if (!entry) return false;
+
+  openProjectEntry(entry.id, { showLoading: false, preserveMode: true }).then(() => {
+    if (!hash) return;
+    requestAnimationFrame(() => {
+      const target = document.getElementById(hash);
+      if (target) scrollPreviewToHeading(target);
+    });
+  });
+  return true;
+}
+
+function setFocusMode(enabled) {
+  state.focusMode = Boolean(enabled);
+  elements.body.classList.toggle('is-focus-mode', state.focusMode);
+  elements.focusButton.classList.toggle('is-active', state.focusMode);
+}
+
+function insertMarkdownSnippet(action) {
+  if (action === 'image') {
+    elements.imageInput.click();
+    return;
+  }
+
+  const snippets = {
+    heading: { prefix: '## ', suffix: '', fallback: '标题' },
+    bold: { prefix: '**', suffix: '**', fallback: '加粗文本' },
+    link: { prefix: '[', suffix: '](./path.md)', fallback: '链接文本' },
+    code: { prefix: '```text\n', suffix: '\n```', fallback: '代码' },
+    table: { prefix: '\n| 列 1 | 列 2 |\n| --- | --- |\n| ', suffix: ' | 内容 |\n', fallback: '内容' },
+    task: { prefix: '- [ ] ', suffix: '', fallback: '待办事项' },
+  };
+  const snippet = snippets[action];
+  if (!snippet) return;
+
+  const start = elements.editor.selectionStart;
+  const end = elements.editor.selectionEnd;
+  const selected = state.markdown.slice(start, end) || snippet.fallback;
+  const next = `${snippet.prefix}${selected}${snippet.suffix}`;
+  state.markdown = `${state.markdown.slice(0, start)}${next}${state.markdown.slice(end)}`;
+  elements.editor.value = state.markdown;
+  const cursor = start + snippet.prefix.length + selected.length;
+  elements.editor.setSelectionRange(cursor, cursor);
+  elements.editor.focus();
+  markDirty();
+  persistActiveProjectDraft();
+  persistDraft();
+  render();
+}
+
+function insertImageFile(file) {
+  const safeName = String(file.name || 'image.png').replace(/\s+/g, '-');
+  const snippet = `![${stripExtension(safeName)}](./assets/${safeName})`;
+  const start = elements.editor.selectionStart;
+  const end = elements.editor.selectionEnd;
+  state.markdown = `${state.markdown.slice(0, start)}${snippet}${state.markdown.slice(end)}`;
+  elements.editor.value = state.markdown;
+  elements.editor.setSelectionRange(start + snippet.length, start + snippet.length);
+  markDirty();
+  persistActiveProjectDraft();
+  persistDraft();
+  render();
 }
 
 function buildOutlineEntries(headings) {
@@ -632,10 +1049,13 @@ function openFile(file) {
   clearProjectState();
   const reader = new FileReader();
   reader.onload = () => {
-    state.fileName = file.name;
-    state.markdown = String(reader.result || '');
-    elements.editor.value = state.markdown;
-    persistDraft();
+    setDocumentContent({
+      fileName: file.name,
+      markdown: String(reader.result || ''),
+      nativePath: '',
+      dirty: false,
+    });
+    rememberRecentFile(file.name, file.name);
     setMode('split');
     render();
   };
@@ -685,10 +1105,13 @@ async function openNativeFile() {
 
 function loadNativeMarkdownFile(file) {
   clearProjectState();
-  state.fileName = file.name || stripNativePath(file.path) || '未命名文档';
-  state.markdown = String(file.content || '');
-  elements.editor.value = state.markdown;
-  persistDraft();
+  setDocumentContent({
+    fileName: file.name || stripNativePath(file.path) || '未命名文档',
+    markdown: String(file.content || ''),
+    nativePath: file.path || '',
+    dirty: false,
+  });
+  rememberRecentFile(file.path, file.name || stripNativePath(file.path));
   setMode('split');
   render();
 }
@@ -708,6 +1131,7 @@ async function openNativeProject() {
     updateGlobalLoading(`已扫描 ${project.visited || 0} 项，找到 ${project.entries?.length || 0} 篇 Markdown`, 76);
     await yieldToBrowser();
     state.projectSource = { type: 'native-directory', path: project.path, name: project.name };
+    rememberRecentProject(project.path, project.name);
     await openProjectEntries(project.entries || [], project.name || stripNativePath(project.path) || '本地项目', { showLoading: false });
     updateGlobalLoading('项目加载完成', 100);
     await delay(180);
@@ -739,15 +1163,20 @@ async function openProjectEntries(entries, projectName, options = {}) {
   if (options.showLoading !== false) {
     showGlobalLoading('正在加载项目', '正在建立项目列表', 70);
   }
+  const hydratedEntries = await hydrateProjectEntries(entries);
   state.projectName = projectName;
-  state.projectFiles = entries;
+  state.projectFiles = hydratedEntries;
   state.activeProjectFileId = '';
+  state.projectSearchQuery = '';
+  elements.projectSearchInput.value = '';
 
   if (!entries.length) {
-    state.fileName = `${projectName} · 未找到 Markdown`;
-    state.markdown = '# 未找到 Markdown 文档\n\n这个文件夹里没有 `.md`、`.markdown` 或 `.txt` 文件。';
-    elements.editor.value = state.markdown;
-    persistDraft();
+    setDocumentContent({
+      fileName: `${projectName} · 未找到 Markdown`,
+      markdown: '# 未找到 Markdown 文档\n\n这个文件夹里没有 `.md`、`.markdown` 或 `.txt` 文件。',
+      nativePath: '',
+      dirty: false,
+    });
     render();
     hideGlobalLoading();
     return;
@@ -761,6 +1190,29 @@ async function openProjectEntries(entries, projectName, options = {}) {
     await delay(180);
     hideGlobalLoading();
   }
+}
+
+async function hydrateProjectEntries(entries) {
+  const hydrated = [];
+  for (const entry of entries) {
+    if (typeof entry.content === 'string') {
+      hydrated.push(entry);
+      continue;
+    }
+
+    try {
+      const file = entry.handle ? await entry.handle.getFile() : entry.file;
+      if (file?.text) {
+        hydrated.push({ ...entry, content: await file.text() });
+        continue;
+      }
+    } catch {
+      // Keep unreadable entries visible so users can still see and rescan the project.
+    }
+
+    hydrated.push(entry);
+  }
+  return hydrated;
 }
 
 async function openProjectEntry(fileId, options = {}) {
@@ -781,10 +1233,12 @@ async function openProjectEntry(fileId, options = {}) {
 
   const text = entry.draft ?? entry.content ?? (await file.text());
   state.activeProjectFileId = entry.id;
-  state.fileName = entry.path;
-  state.markdown = text;
-  elements.editor.value = state.markdown;
-  persistDraft();
+  setDocumentContent({
+    fileName: entry.path,
+    markdown: text,
+    nativePath: entry.absolutePath || '',
+    dirty: Boolean(entry.draft),
+  });
   if (!options.preserveMode) {
     setMode('split');
   }
@@ -801,6 +1255,9 @@ function clearProjectState() {
   state.projectFiles = [];
   state.activeProjectFileId = '';
   state.projectSource = null;
+  state.projectSearchQuery = '';
+  state.currentNativePath = '';
+  if (elements.projectSearchInput) elements.projectSearchInput.value = '';
 }
 
 function persistActiveProjectDraft() {
@@ -1211,6 +1668,37 @@ function hideGlobalLoading() {
 function getProjectNameFromFiles(files) {
   const [firstFile] = Array.from(files || []);
   return firstFile?.webkitRelativePath?.split('/')?.[0] || '';
+}
+
+function readStoredList(storageKey) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((item) => item && item.path)
+      .map((item) => ({ path: String(item.path), name: String(item.name || stripNativePath(item.path)) }))
+      .slice(0, 10);
+  } catch {
+    return [];
+  }
+}
+
+function normalizeRelativePath(value = '') {
+  return decodeURIComponent(String(value))
+    .replace(/\\/g, '/')
+    .replace(/^\.\/+/, '')
+    .replace(/\/{2,}/g, '/')
+    .split('/')
+    .reduce((parts, part) => {
+      if (!part || part === '.') return parts;
+      if (part === '..') {
+        parts.pop();
+        return parts;
+      }
+      parts.push(part);
+      return parts;
+    }, [])
+    .join('/');
 }
 
 function yieldToBrowser() {

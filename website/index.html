@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Local Markdown Studio - 本地 Markdown 阅读与编辑器</title>
-  <meta name="description" content="Local Markdown Studio 是一个本地优先的 macOS Markdown 阅读与编辑工具，支持实时预览、项目扫描、目录跳转、搜索高亮和 HTML 导出。">
+  <meta name="description" content="Local Markdown Studio 是一个本地优先的 macOS Markdown 阅读与编辑工具，支持保存与另存为、最近文件、项目搜索、实时预览、专注写作和 HTML 导出。">
   <link rel="icon" href="../assets/app-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -27,7 +27,7 @@
         <div class="hero-copy">
           <p class="eyebrow">macOS Markdown Studio</p>
           <h1>Local Markdown Studio</h1>
-          <p class="hero-lead">本地优先的 Markdown 阅读与编辑器。打开文件夹，扫描文档，编辑、预览、搜索和导出都在你的电脑上完成。</p>
+          <p class="hero-lead">本地优先的 Markdown 阅读与编辑器。打开文件夹，扫描文档，保存、搜索、跳转、专注写作和导出都在你的电脑上完成。</p>
           <div class="hero-actions">
             <a class="primary-action" href="#download">选择下载版本</a>
             <a class="secondary-action" href="#install">查看安装说明</a>
@@ -36,9 +36,9 @@
 
           <div class="hero-highlights" aria-label="核心能力">
             <span>无需账号</span>
-            <span>本地文件</span>
-            <span>实时预览</span>
-            <span>HTML 导出</span>
+            <span>本地保存</span>
+            <span>项目搜索</span>
+            <span>专注写作</span>
           </div>
         </div>
 
@@ -56,10 +56,10 @@
     <section class="trust-strip" aria-label="产品定位">
       <div class="section-inner">
         <span>无需账号</span>
-        <span>本地文件</span>
-        <span>实时预览</span>
+        <span>保存 / 另存为</span>
+        <span>最近文件</span>
         <span>项目扫描</span>
-        <span>HTML 导出</span>
+        <span>项目搜索</span>
       </div>
     </section>
 
@@ -68,25 +68,41 @@
         <div class="section-heading">
           <p class="eyebrow">Workflow</p>
           <h2>为本地文档工作流做减法</h2>
-          <p>它不是云笔记，也不是复杂知识库。它专注于把本机 Markdown 文件打开、组织、阅读和导出。</p>
+          <p>它不是云笔记，也不是复杂知识库。它专注于把本机 Markdown 文件打开、组织、保存、阅读和导出。</p>
         </div>
 
         <div class="feature-grid">
           <article class="feature-card">
+            <h3>可靠保存</h3>
+            <p>支持保存、另存为、未保存变更提醒，以及 Cmd/Ctrl + S 快捷键，降低桌面写作时误丢内容的风险。</p>
+          </article>
+          <article class="feature-card">
+            <h3>最近文件与项目</h3>
+            <p>常用文档和项目目录会保留在最近记录中，重新进入工作流不需要反复从系统文件夹里查找。</p>
+          </article>
+          <article class="feature-card">
+            <h3>项目级搜索</h3>
+            <p>打开文件夹后可以跨 Markdown 文档搜索内容，直接跳转到命中文档，适合本地资料库和项目说明。</p>
+          </article>
+          <article class="feature-card">
             <h3>编辑与预览同步</h3>
-            <p>分屏、编辑、预览三种模式快速切换，写作时保持 Markdown 源码和渲染结果同步。</p>
+            <p>分屏、编辑、预览三种模式快速切换，目录会跟随当前位置高亮，长文档阅读更稳定。</p>
+          </article>
+          <article class="feature-card">
+            <h3>写作工具栏</h3>
+            <p>常用标题、加粗、链接、图片、代码、表格和任务项可以快速插入，减少重复输入 Markdown 片段。</p>
+          </article>
+          <article class="feature-card">
+            <h3>专注与导出</h3>
+            <p>专注模式隐藏旁侧面板，保留纯写作空间；完成后可把当前 Markdown 导出为可分享的 HTML 文件。</p>
+          </article>
+          <article class="feature-card">
+            <h3>本地链接跳转</h3>
+            <p>预览区支持相对 Markdown 链接跳转，适合在项目文档、索引页和章节资料之间快速切换。</p>
           </article>
           <article class="feature-card">
             <h3>项目级扫描</h3>
-            <p>选择一个文件夹后自动整理 Markdown 文档，适合项目说明、技术笔记和本地资料库。</p>
-          </article>
-          <article class="feature-card">
-            <h3>目录和搜索</h3>
-            <p>自动提取标题目录，支持层级折叠、平滑跳转和搜索高亮，长文档也能快速定位。</p>
-          </article>
-          <article class="feature-card">
-            <h3>导出 HTML</h3>
-            <p>把当前 Markdown 渲染为可分享的 HTML 文件，适合交付说明、评审材料和归档。</p>
+            <p>选择一个文件夹后自动整理 Markdown 文档，并可调整扫描扩展名、忽略目录和通用过滤规则。</p>
           </article>
         </div>
       </div>
@@ -100,7 +116,7 @@
         </div>
         <div class="copy-column">
           <p>Local Markdown Studio 不要求登录账号，不把文档上传到远端服务。你打开的 `.md` 文件和项目目录都在本机读取，适合处理私有文档、内部说明、学习笔记和离线资料。</p>
-          <p>它保留桌面应用应有的直接感：双击文件、打开项目、搜索内容、导出 HTML。功能边界清晰，启动后就是工作区。</p>
+          <p>它保留桌面应用应有的直接感：双击文件、打开项目、保存修改、搜索内容、跳转文档、导出 HTML。功能边界清晰，启动后就是工作区。</p>
         </div>
       </div>
     </section>
