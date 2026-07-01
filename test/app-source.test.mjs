@@ -17,6 +17,9 @@ assert.match(
 
 assert.match(html, /rel="icon" href="assets\/app-icon\.svg"/);
 assert.match(html, /src="assets\/app-icon\.svg"/);
+assert.doesNotMatch(html, /accept="[^"]*\.txt/);
+assert.doesNotMatch(html, /text\/plain/);
+assert.doesNotMatch(html, /支持 \.md \/ \.markdown \/ \.txt/);
 assert.doesNotMatch(html, /<script\s+type="module"\s+src="src\/app\.js"><\/script>/);
 assert.match(html, /location\.protocol === 'file:' && !window\.markdownNative/);
 assert.match(html, /script\.type = 'module'/);
@@ -163,7 +166,8 @@ assert.match(html, /id="ignoreDirectoryInput"/);
 assert.match(html, /id="generalRuleList"/);
 assert.doesNotMatch(html, /data-scan-extension="\.markdown" checked/);
 assert.doesNotMatch(html, /data-scan-extension="\.txt" checked/);
-assert.match(source, /defaultScanExtensionOptions = \['\.md', '\.markdown', '\.txt'\]/);
+assert.match(source, /defaultScanExtensionOptions = \['\.md', '\.markdown'\]/);
+assert.doesNotMatch(source, /defaultScanExtensionOptions = \[[^\]]*'\.txt'/);
 assert.match(source, /defaultIgnoredDirectoryOptions = \['node_modules', 'dist', 'build', 'coverage', 'out'\]/);
 assert.match(source, /data-ignore-dir/);
 assert.match(source, /data-scan-extension/);

@@ -102,18 +102,18 @@ const scannedAssets = await collectProjectAssetsFromDirectoryHandle(
 
 assert.deepEqual(scannedAssets.map((asset) => asset.path), ['assets/logo.png']);
 
-const markdownAndTxt = normalizeProjectFiles(
+const markdownOnlyIgnoresTxt = normalizeProjectFiles(
   [
     { name: 'README.md', webkitRelativePath: 'README.md' },
     { name: 'notes.txt', webkitRelativePath: 'notes.txt' },
     { name: 'draft.markdown', webkitRelativePath: 'draft.markdown' },
   ],
-  { markdownExtensions: ['.md', '.txt'] },
+  { markdownExtensions: ['.md', '.markdown', '.txt'] },
 );
 
 assert.deepEqual(
-  markdownAndTxt.map((entry) => entry.path),
-  ['README.md', 'notes.txt'],
+  markdownOnlyIgnoresTxt.map((entry) => entry.path),
+  ['README.md', 'draft.markdown'],
 );
 
 const noIgnoredDirectories = normalizeProjectFiles(

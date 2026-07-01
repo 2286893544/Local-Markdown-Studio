@@ -1,5 +1,7 @@
 import { escapeHtml } from './text-utils.mjs';
 
+const supportedScanExtensions = new Set(['.md', '.markdown']);
+
 export function renderScanOption(type, value, checked) {
   const dataName = {
     extension: 'data-scan-extension',
@@ -23,7 +25,8 @@ export function normalizeScanExtension(value) {
   const trimmed = value.trim().toLowerCase();
   if (!trimmed) return '';
   const withoutWildcard = trimmed.replace(/^\*+/, '');
-  return withoutWildcard.startsWith('.') ? withoutWildcard : `.${withoutWildcard}`;
+  const extension = withoutWildcard.startsWith('.') ? withoutWildcard : `.${withoutWildcard}`;
+  return supportedScanExtensions.has(extension) ? extension : '';
 }
 
 export function normalizeGeneralRulePattern(value) {

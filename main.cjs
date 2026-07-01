@@ -4,6 +4,7 @@ const path = require('node:path');
 
 const defaultMarkdownExtensions = ['.md'];
 const defaultIgnoredDirectoryNames = ['node_modules'];
+const supportedMarkdownExtensions = new Set(['.md', '.markdown']);
 
 let mainWindow;
 
@@ -91,13 +92,13 @@ function registerNativeHandlers() {
       title: '打开 Markdown 文件',
       properties: ['openFile'],
       filters: [
-        { name: 'Markdown', extensions: ['md', 'markdown', 'txt'] },
-        { name: 'All Files', extensions: ['*'] },
+        { name: 'Markdown', extensions: ['md', 'markdown'] },
       ],
     });
     if (result.canceled || !result.filePaths[0]) return null;
 
     const filePath = result.filePaths[0];
+    if (!isSupportedMarkdownPath(filePath)) return null;
     return {
       name: path.basename(filePath),
       path: filePath,
@@ -179,7 +180,9 @@ function isIgnoredDirectoryName(name, options = {}) {
 
 function getMarkdownExtensions(options = {}) {
   const extensions = options.markdownExtensions ?? defaultMarkdownExtensions;
-  return extensions.map((extension) => String(extension).toLowerCase());
+  return extensions
+    .map((extension) => String(extension).toLowerCase())
+    .filter((extension) => supportedMarkdownExtensions.has(extension));
 }
 
 function getIgnoredDirectoryNames(options = {}) {
@@ -212,9 +215,13 @@ function compareProjectEntries(left, right) {
 }
 
 function getPriorityScore(filePath) {
-  return /^readme(?:\.(md|markdown|txt))?$/i.test(filePath) ? 0 : 1;
+  return /^readme(?:\.(md|markdown))?$/i.test(filePath) ? 0 : 1;
 }
 
 function normalizePath(filePath) {
   return String(filePath).replace(/\\/g, '/').replace(/^\/+/, '');
+}
+
+function isSupportedMarkdownPath(filePath) {
+  return supportedMarkdownExtensions.has(path.extname(String(filePath || '')).toLowerCase());
 }

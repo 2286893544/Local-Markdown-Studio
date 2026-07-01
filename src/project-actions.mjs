@@ -1,6 +1,6 @@
 export function ensureMarkdownFilePath(relativePath) {
   if (!relativePath) return '';
-  return /\.(md|markdown|txt)$/i.test(relativePath) ? relativePath : `${relativePath}.md`;
+  return /\.(md|markdown)$/i.test(relativePath) ? relativePath : `${relativePath}.md`;
 }
 
 export function normalizeCreatePath(value = '') {

@@ -1,6 +1,7 @@
 const defaultMarkdownExtensions = ['.md'];
 const defaultIgnoredDirectoryNames = ['node_modules'];
 const imageAssetExtensionPattern = /\.(apng|avif|gif|jpe?g|png|svg|webp)$/i;
+const supportedMarkdownExtensions = new Set(['.md', '.markdown']);
 
 export function isMarkdownProjectFile(path = '', options = {}) {
   const lowerPath = String(path).toLowerCase();
@@ -116,7 +117,7 @@ function compareProjectEntries(left, right) {
 }
 
 function getPriorityScore(path) {
-  return /^readme(?:\.(md|markdown|txt))?$/i.test(path) ? 0 : 1;
+  return /^readme(?:\.(md|markdown))?$/i.test(path) ? 0 : 1;
 }
 
 function normalizePath(path) {
@@ -138,7 +139,9 @@ function isIgnoredDirectoryName(name, options = {}) {
 
 function getMarkdownExtensions(options = {}) {
   const extensions = options.markdownExtensions ?? defaultMarkdownExtensions;
-  return extensions.map((extension) => String(extension).toLowerCase());
+  return extensions
+    .map((extension) => String(extension).toLowerCase())
+    .filter((extension) => supportedMarkdownExtensions.has(extension));
 }
 
 function getIgnoredDirectoryNames(options = {}) {

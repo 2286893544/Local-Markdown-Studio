@@ -9,7 +9,8 @@ import {
 } from '../src/scan-settings.mjs';
 
 assert.equal(normalizeScanExtension('*.MARKDOWN'), '.markdown');
-assert.equal(normalizeScanExtension('txt'), '.txt');
+assert.equal(normalizeScanExtension('txt'), '');
+assert.equal(normalizeScanExtension('*.TXT'), '');
 assert.equal(normalizeScanExtension(''), '');
 assert.equal(normalizeGeneralRulePattern('/dist/'), 'dist');
 assert.equal(normalizeDirectoryName('/Build/'), 'Build');

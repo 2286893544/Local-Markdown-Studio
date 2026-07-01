@@ -13,6 +13,7 @@ assert.deepEqual(extractMarkdownLinks('Read [Intro](./intro.md) and ![Logo](asse
 
 assert.equal(isLocalMarkdownHref('./intro.md'), true);
 assert.equal(isLocalMarkdownHref('../guide.markdown#install'), true);
+assert.equal(isLocalMarkdownHref('./notes.txt'), false);
 assert.equal(isLocalMarkdownHref('https://example.com/readme.md'), false);
 assert.equal(isLocalMarkdownHref('#local-section'), false);
 assert.equal(isLocalMarkdownHref('assets/logo.png'), false);

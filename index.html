@@ -119,7 +119,7 @@
   <div id="dropOverlay" class="drop-overlay" aria-hidden="true">
     <div>
       <strong>松开以打开 Markdown</strong>
-      <span>支持 .md / .markdown / .txt</span>
+      <span>支持 .md / .markdown</span>
     </div>
   </div>
 
@@ -170,7 +170,7 @@
           </div>
           <div id="scanExtensionList" class="scan-option-list"></div>
           <div class="scan-add-row">
-            <input id="scanExtensionInput" type="text" placeholder=".mdx">
+            <input id="scanExtensionInput" type="text" placeholder=".markdown">
             <button class="ghost-button" id="addScanExtensionButton" type="button">新增</button>
           </div>
         </section>
@@ -222,8 +222,8 @@
     </div>
   </div>
 
-  <input id="fileInput" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
-  <input id="projectInput" type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" webkitdirectory directory multiple hidden>
+  <input id="fileInput" type="file" accept=".md,.markdown,text/markdown" hidden>
+  <input id="projectInput" type="file" accept=".md,.markdown,text/markdown" webkitdirectory directory multiple hidden>
   <input id="imageInput" type="file" accept="image/*" hidden>
 
   <div id="fileProtocolNotice" class="file-protocol-notice" hidden>

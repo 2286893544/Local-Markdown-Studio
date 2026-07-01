@@ -60,9 +60,10 @@ const recentFilesKey = 'local-markdown-studio:recent-files';
 const recentProjectsKey = 'local-markdown-studio:recent-projects';
 const defaultScanExtensions = ['.md'];
 const defaultIgnoredDirectories = ['node_modules'];
-const defaultScanExtensionOptions = ['.md', '.markdown', '.txt'];
+const defaultScanExtensionOptions = ['.md', '.markdown'];
 const defaultIgnoredDirectoryOptions = ['node_modules', 'dist', 'build', 'coverage', 'out'];
 const defaultGeneralRuleOptions = ['.*'];
+const supportedMarkdownFilePattern = /\.(md|markdown)$/i;
 
 const elements = {
   body: document.body,
@@ -849,6 +850,11 @@ function renderStats() {
 }
 
 function openFile(file) {
+  if (!isSupportedMarkdownFile(file)) {
+    window.alert?.('仅支持打开 .md / .markdown 文件。');
+    return;
+  }
+
   clearProjectState();
   const reader = new FileReader();
   reader.onload = () => {
@@ -908,6 +914,11 @@ async function openNativeFile() {
 }
 
 function loadNativeMarkdownFile(file) {
+  if (!isSupportedMarkdownFile(file)) {
+    window.alert?.('仅支持打开 .md / .markdown 文件。');
+    return;
+  }
+
   clearProjectState();
   setDocumentContent({
     fileName: file.name || stripNativePath(file.path) || '未命名文档',
@@ -981,7 +992,7 @@ async function openProjectEntries(entries, projectName, options = {}) {
   if (!entries.length) {
     setDocumentContent({
       fileName: `${projectName} · 未找到 Markdown`,
-      markdown: '# 未找到 Markdown 文档\n\n这个文件夹里没有 `.md`、`.markdown` 或 `.txt` 文件。',
+      markdown: '# 未找到 Markdown 文档\n\n这个文件夹里没有 `.md` 或 `.markdown` 文件。',
       nativePath: '',
       dirty: false,
     });
@@ -1001,6 +1012,11 @@ async function openProjectEntries(entries, projectName, options = {}) {
     await delay(180);
     hideGlobalLoading();
   }
+}
+
+function isSupportedMarkdownFile(file) {
+  const fileName = String(file?.name || file?.path || '');
+  return supportedMarkdownFilePattern.test(fileName);
 }
 
 async function createProjectFile() {

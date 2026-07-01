@@ -1,5 +1,5 @@
 const markdownLinkPattern = /(!)?\[([^\]]*)\]\(([^)\s]+)\)/g;
-const localMarkdownExtensionPattern = /\.(md|markdown|txt)$/i;
+const localMarkdownExtensionPattern = /\.(md|markdown)$/i;
 
 export function extractMarkdownLinks(markdown = '') {
   return [...String(markdown).matchAll(markdownLinkPattern)].map((match) => ({

@@ -4,6 +4,7 @@ const path = require('node:path');
 
 const defaultMarkdownExtensions = ['.md'];
 const defaultIgnoredDirectoryNames = ['node_modules'];
+const supportedMarkdownExtensions = new Set(['.md', '.markdown']);
 const isWindows = process.platform === 'win32';
 const titleBarThemes = {
   light: {
@@ -95,8 +96,7 @@ function registerNativeHandlers() {
       title: '打开 Markdown 文件',
       properties: ['openFile'],
       filters: [
-        { name: 'Markdown', extensions: ['md', 'markdown', 'txt'] },
-        { name: 'All Files', extensions: ['*'] },
+        { name: 'Markdown', extensions: ['md', 'markdown'] },
       ],
     });
     if (result.canceled || !result.filePaths[0]) return null;
@@ -144,8 +144,6 @@ function registerNativeHandlers() {
       defaultPath: suggestedName,
       filters: [
         { name: 'Markdown', extensions: ['md', 'markdown'] },
-        { name: 'Text', extensions: ['txt'] },
-        { name: 'All Files', extensions: ['*'] },
       ],
     });
     if (result.canceled || !result.filePath) return null;
@@ -221,7 +219,7 @@ function registerNativeHandlers() {
 }
 
 async function openMarkdownFileFromPath(filePath) {
-  if (!filePath) return;
+  if (!filePath || !isSupportedMarkdownPath(filePath)) return;
   if (!mainWindow || mainWindow.isDestroyed()) {
     pendingMarkdownFilePath = filePath;
     ensureWindowForPendingFile();
@@ -234,6 +232,7 @@ async function openMarkdownFileFromPath(filePath) {
 
   try {
     const file = await readMarkdownFile(filePath);
+    if (!file) return;
     mainWindow.webContents.send('native:file-opened', file);
   } catch (error) {
     console.error(`Failed to open Markdown file: ${filePath}`, error);
@@ -241,11 +240,16 @@ async function openMarkdownFileFromPath(filePath) {
 }
 
 async function readMarkdownFile(filePath) {
+  if (!isSupportedMarkdownPath(filePath)) return null;
   return {
     name: path.basename(filePath),
     path: filePath,
     content: await fs.readFile(filePath, 'utf8'),
   };
+}
+
+function isSupportedMarkdownPath(filePath) {
+  return supportedMarkdownExtensions.has(path.extname(String(filePath || '')).toLowerCase());
 }
 
 async function consumePendingMarkdownFile() {
@@ -407,7 +411,9 @@ function isIgnoredDirectoryName(name, options = {}) {
 
 function getMarkdownExtensions(options = {}) {
   const extensions = options.markdownExtensions ?? defaultMarkdownExtensions;
-  return extensions.map((extension) => String(extension).toLowerCase());
+  return extensions
+    .map((extension) => String(extension).toLowerCase())
+    .filter((extension) => supportedMarkdownExtensions.has(extension));
 }
 
 function getIgnoredDirectoryNames(options = {}) {
@@ -440,7 +446,7 @@ function compareProjectEntries(left, right) {
 }
 
 function getPriorityScore(filePath) {
-  return /^readme(?:\.(md|markdown|txt))?$/i.test(filePath) ? 0 : 1;
+  return /^readme(?:\.(md|markdown))?$/i.test(filePath) ? 0 : 1;
 }
 
 function normalizePath(filePath) {

@@ -12,5 +12,6 @@ assert.equal(normalizeCreatePath('../prd.md'), '');
 assert.equal(normalizeCreatePath('docs/../prd.md'), '');
 assert.equal(ensureMarkdownFilePath('docs/prd'), 'docs/prd.md');
 assert.equal(ensureMarkdownFilePath('docs/prd.markdown'), 'docs/prd.markdown');
+assert.equal(ensureMarkdownFilePath('docs/prd.txt'), 'docs/prd.txt.md');
 
 console.log('project action tests passed');

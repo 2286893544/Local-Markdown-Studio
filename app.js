@@ -16,9 +16,11 @@ const fileNameKey = 'local-markdown-studio:file-name';
 const themeKey = 'local-markdown-studio:theme';
 const defaultScanExtensions = ['.md'];
 const defaultIgnoredDirectories = ['node_modules'];
-const defaultScanExtensionOptions = ['.md', '.markdown', '.txt'];
+const defaultScanExtensionOptions = ['.md', '.markdown'];
 const defaultIgnoredDirectoryOptions = ['node_modules', 'dist', 'build', 'coverage', 'out'];
 const defaultGeneralRuleOptions = ['.*'];
+const supportedMarkdownFilePattern = /\.(md|markdown)$/i;
+const supportedScanExtensions = new Set(['.md', '.markdown']);
 
 const sampleMarkdown = `# 我的 Markdown 工作台
 
@@ -335,6 +337,11 @@ function renderStats() {
 }
 
 function openFile(file) {
+  if (!isSupportedMarkdownFile(file)) {
+    window.alert?.('仅支持打开 .md / .markdown 文件。');
+    return;
+  }
+
   clearProjectState();
   const reader = new FileReader();
   reader.onload = () => {
@@ -346,6 +353,11 @@ function openFile(file) {
     render();
   };
   reader.readAsText(file);
+}
+
+function isSupportedMarkdownFile(file) {
+  const fileName = String(file?.name || file?.path || '');
+  return supportedMarkdownFilePattern.test(fileName);
 }
 
 async function openProject() {
@@ -442,7 +454,7 @@ async function openProjectEntries(entries, projectName, options = {}) {
 
   if (!entries.length) {
     state.fileName = `${projectName} · 未找到 Markdown`;
-    state.markdown = '# 未找到 Markdown 文档\n\n这个文件夹里没有 `.md`、`.markdown` 或 `.txt` 文件。';
+    state.markdown = '# 未找到 Markdown 文档\n\n这个文件夹里没有 `.md` 或 `.markdown` 文件。';
     elements.editor.value = state.markdown;
     persistDraft();
     render();
@@ -768,7 +780,8 @@ function normalizeScanExtension(value) {
   const trimmed = value.trim().toLowerCase();
   if (!trimmed) return '';
   const withoutWildcard = trimmed.replace(/^\*+/, '');
-  return withoutWildcard.startsWith('.') ? withoutWildcard : `.${withoutWildcard}`;
+  const extension = withoutWildcard.startsWith('.') ? withoutWildcard : `.${withoutWildcard}`;
+  return supportedScanExtensions.has(extension) ? extension : '';
 }
 
 function normalizeGeneralRulePattern(value) {
