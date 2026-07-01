@@ -6,6 +6,7 @@ const preload = await readFile(new URL('../electron/preload.cjs', import.meta.ur
 const app = await readFile(new URL('../src/app.js', import.meta.url), 'utf8');
 const manifest = await readFile(new URL('../package.json', import.meta.url), 'utf8');
 const pruneWin = await readFile(new URL('../scripts/prune-win-package.cjs', import.meta.url), 'utf8');
+const pruneMac = await readFile(new URL('../scripts/prune-mac-package.cjs', import.meta.url), 'utf8');
 const dmgMac = await readFile(new URL('../scripts/dmg-mac-package.cjs', import.meta.url), 'utf8');
 const zipMac = await readFile(new URL('../scripts/zip-mac-package.cjs', import.meta.url), 'utf8');
 const zipWin = await readFile(new URL('../scripts/zip-win-package.cjs', import.meta.url), 'utf8');
@@ -127,6 +128,9 @@ assert.match(pruneWin, /HKCU\\Software\\Classes\\\.md/);
 assert.match(pruneWin, /HKCU\\Software\\Classes\\\.markdown/);
 assert.match(pruneWin, /LocalMarkdownStudio\.Markdown\\shell\\open\\command/);
 assert.match(pruneWin, /%%1/);
+assert.match(pruneMac, /function removePackageSiblings\(rootPath, keptEntryName\)/);
+assert.match(pruneMac, /if \(entry === keptEntryName\) continue/);
+assert.match(pruneMac, /Removed macOS package metadata outside app bundle/);
 
 assert.match(macInfo, /CFBundleDocumentTypes/);
 assert.match(macInfo, /net\.daringfireball\.markdown/);
