@@ -1,0 +1,55 @@
+src/scan-settings.mjs
+  s_2b3e65cfadc3db::t_9408d1b76b07be 3-4,28-29
+src/project-actions.mjs
+  s_2b3e65cfadc3db::t_9408d1b76b07be 3
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_fb62b586ed48f8 20-22,169-170
+test/project.test.mjs
+  s_2b3e65cfadc3db::t_749cc3228049b4 105,111,115-116
+README.md
+  s_2b3e65cfadc3db::t_29e763e7ee725d 150
+test/scan-settings.test.mjs
+  s_2b3e65cfadc3db::t_749cc3228049b4 12-13
+app.js
+  s_2b3e65cfadc3db::t_79416653f553cb 358-362
+  s_2b3e65cfadc3db::t_0c2ba7fcae1ddb 19,22-23,340-344,457,783-784
+src/app.js
+  s_2b3e65cfadc3db::t_bbeeac45dcdec0 63,66,853-857,917-921,995,1017-1019
+  s_2b3e65cfadc3db::t_268e711e8c8398 1020-1021
+test/electron-source.test.mjs
+  s_2b3e65cfadc3db::t_749cc3228049b4 43-44,73-74
+src/project.mjs
+  s_2b3e65cfadc3db::t_9408d1b76b07be 4,120,142-144
+index.html
+  s_2b3e65cfadc3db::t_2c1def4dca5408 122,173,225-226
+test/project-actions.test.mjs
+  s_2b3e65cfadc3db::t_749cc3228049b4 15
+test/knowledge.test.mjs
+  s_2b3e65cfadc3db::t_749cc3228049b4 16
+src/knowledge.mjs
+  s_2b3e65cfadc3db::t_9408d1b76b07be 2
+main.cjs
+  s_2b3e65cfadc3db::t_75210b4539e243 7,95,101,183-185,218,224-226
+  s_2b3e65cfadc3db::t_eef2420fc3b855 227
+electron/main.cjs
+  s_2b3e65cfadc3db::t_70831146634546 222,235,243,251-252
+  s_2b3e65cfadc3db::t_29e763e7ee725d 414-416,449
+  s_2b3e65cfadc3db::t_d9b7264c06fd96 7,99
+  s_2b3e65cfadc3db::t_f8b4b5395fdd42 253-254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "bb90b5f50b6cdbb230d4ce7cd58c94b37d56b6bc",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
