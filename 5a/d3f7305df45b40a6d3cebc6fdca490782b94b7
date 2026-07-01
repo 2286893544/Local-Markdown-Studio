@@ -1,0 +1,21 @@
+scripts/prune-mac-package.cjs
+  s_909a4560bd47bc::t_6e1db83c4c364d 6-7,21-22,24,27-33
+test/electron-source.test.mjs
+  s_909a4560bd47bc::t_5feece80822a8a 9,131-133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "5ad3f7305df45b40a6d3cebc6fdca490782b94b7",
+  "prompts": {},
+  "sessions": {
+    "s_909a4560bd47bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1680-ddfd-7160-a08e-efec05fc6f65",
+        "model": "unknown"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
