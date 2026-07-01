@@ -1,0 +1,65 @@
+test/electron-source.test.mjs
+  s_2b3e65cfadc3db::t_f59fa0c530ab2c 48-50
+  s_2b3e65cfadc3db::t_9c4915553de663 46-47,82-83
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_0ce186be0f487a 86-89,93-94,138-140
+  s_2b3e65cfadc3db::t_2a3a173d178442 90-92
+styles.css
+  s_2b3e65cfadc3db::t_d17340d080b7a7 367-374,477-531
+  s_2b3e65cfadc3db::t_50076a30ade499 532
+electron/main.cjs
+  s_2b3e65cfadc3db::t_4139262d3e0284 175,184,187,195
+  s_2b3e65cfadc3db::t_99924321bd6894 178-183,189-194,370-372,385-387
+  s_2b3e65cfadc3db::t_4b6edbe0f4b728 176-177,185-186,188,196-197,314,316,318,326,330,341,345-356,369,373-384,388-391,397-399
+  s_2b3e65cfadc3db::t_fe4b9e3ad7d2a2 400
+website/index.html
+  s_2b3e65cfadc3db::t_b61fdd67abbae3 7,30,42,63,85-92
+test/project-health.test.mjs
+  s_2b3e65cfadc3db::t_7dfc892bec1003 1-81
+test/website-source.test.mjs
+  s_2b3e65cfadc3db::t_933b13021259d5 21-23
+index.html
+  s_2b3e65cfadc3db::t_63ed7e9ffa1cd0 80-83,96
+src/app.js
+  s_2b3e65cfadc3db::t_a34e08ce8b5929 450,934-935
+  s_2b3e65cfadc3db::t_06997e399dcce6 220-221
+  s_2b3e65cfadc3db::t_7f9693de37a356 1927,1930,1949
+  s_2b3e65cfadc3db::t_05fa640f456eac 658,1267,1270,1322,1339,1342,1357
+  s_2b3e65cfadc3db::t_c4873458f8235e 1400-1424,1434-1435,1439-1457,1475-1481,1502-1504
+  s_2b3e65cfadc3db::t_80f62208de28a3 1376-1379,1381
+  s_2b3e65cfadc3db::t_255db5683c7d12 1570
+  s_2b3e65cfadc3db::t_2d72a00656c5b5 1389-1399,1425-1433,1436-1438,1458-1474,1482-1501,1505-1508
+  s_2b3e65cfadc3db::t_525dc870df563e 793-830
+  s_2b3e65cfadc3db::t_7fe42951cb5ee4 9,12,19,107-108,115,147
+README.md
+  s_2b3e65cfadc3db::t_9e6ef23c8a4f33 15,17,150
+src/project-health.mjs
+  s_2b3e65cfadc3db::t_939fdd72bc5007 1-105
+electron/preload.cjs
+  s_2b3e65cfadc3db::t_43a3c2e6dcaf9c 19-20
+package.json
+  s_2b3e65cfadc3db::t_16af54d281bdeb 16-17
+test/project.test.mjs
+  s_2b3e65cfadc3db::t_191361e642bbed 7,41-52,64-69,94-103
+  s_2b3e65cfadc3db::t_42b58350991bbb 3
+  s_2b3e65cfadc3db::t_f2f63a143da66e 104
+src/project.mjs
+  s_2b3e65cfadc3db::t_aee01589c3a3ac 3,25-39,48-53,63-81,107-109
+  s_2b3e65cfadc3db::t_512ab9af1832ac 110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "6bcd4ae00d1d83ebab4b48c796ee8a25579099ef",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
