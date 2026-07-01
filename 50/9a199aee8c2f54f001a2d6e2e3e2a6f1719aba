@@ -1,0 +1,40 @@
+src/app-scan-settings.mjs
+  s_2b3e65cfadc3db::t_4fa3645914dc72 1-123
+src/app.js
+  s_2b3e65cfadc3db::t_217845495742f7 54
+  s_2b3e65cfadc3db::t_aed576b78ae381 206-212
+  s_2b3e65cfadc3db::t_075e28dc110769 53,182,200-205,213-215,218-219,1249-1250,1253
+  s_2b3e65cfadc3db::t_7da4df56b6c004 52,191-199,216
+package.json
+  s_2b3e65cfadc3db::t_98ffe6e28f5f64 16
+  s_2b3e65cfadc3db::t_b9598c334f82e6 17
+test/electron-source.test.mjs
+  s_2b3e65cfadc3db::t_50eeebd5c38dae 6-8
+src/app-events.mjs
+  s_2b3e65cfadc3db::t_704450a6af505e 1-268
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_435e80686115c4 46-47
+  s_2b3e65cfadc3db::t_8e4f276a680f00 4-5
+  s_2b3e65cfadc3db::t_a2328a7d0c293b 6-7
+src/sample-document.mjs
+  s_2b3e65cfadc3db::t_a0ebc3fc2311ff 1-27
+test/app-structure.test.mjs
+  s_2b3e65cfadc3db::t_e1009ee50b5b37 1-5,7,9,11-12
+  s_2b3e65cfadc3db::t_988f19bf2705a4 6,8,10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "509a199aee8c2f54f001a2d6e2e3e2a6f1719aba",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
