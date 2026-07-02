@@ -104,6 +104,7 @@ export function bindAppEvents({
   });
   elements.searchPrevButton.addEventListener('click', () => actions.stepSearchMatch(-1));
   elements.searchNextButton.addEventListener('click', () => actions.stepSearchMatch(1));
+  elements.closeFindButton.addEventListener('click', actions.closeFindPanel);
   elements.replaceButton.addEventListener('click', actions.replaceCurrentMatch);
   elements.replaceAllButton.addEventListener('click', actions.replaceAllMatches);
   elements.quickOpenInput.addEventListener('input', () => {
@@ -223,6 +224,12 @@ export function bindAppEvents({
     diagrams.handleDiagramWheel(event, elements.diagramViewerCanvas, true);
   }, { passive: false });
   window.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f') {
+      event.preventDefault();
+      actions.openFindPanel({ showReplace: event.altKey || event.shiftKey });
+      return;
+    }
+
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
       event.preventDefault();
       if (event.shiftKey) {
@@ -237,6 +244,7 @@ export function bindAppEvents({
       diagrams.closeDiagramViewer();
       actions.closeScanSettingsDialog();
       actions.closeRecentPanel();
+      actions.closeFindPanel();
     }
   });
   window.addEventListener('beforeunload', (event) => {

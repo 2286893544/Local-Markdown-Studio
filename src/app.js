@@ -11,20 +11,14 @@ import {
   normalizeProjectAssets,
   normalizeProjectFiles,
 } from './project.mjs';
-import {
-  buildProjectKnowledge,
-  resolveMarkdownLinkPath,
-} from './knowledge.mjs';
+import { buildProjectKnowledge, resolveMarkdownLinkPath } from './knowledge.mjs';
 import {
   buildImageSnippet,
   formatMarkdownRelativePath,
   resolveDroppedImageReference,
   sanitizeImageFileName,
 } from './image-assets.mjs';
-import {
-  ensureMarkdownFilePath,
-  normalizeCreatePath,
-} from './project-actions.mjs';
+import { ensureMarkdownFilePath, normalizeCreatePath } from './project-actions.mjs';
 import { collectSearchMatches } from './editor-search.mjs';
 import { buildOutlineEntries } from './outline.mjs';
 import {
@@ -47,6 +41,7 @@ import {
   stripNativePath,
 } from './text-utils.mjs';
 import { createDiagramController } from './diagram-controller.mjs';
+import { closeFindPanel as closeFindPanelWidget, openFindPanel as openFindPanelWidget } from './find-panel.mjs';
 import { bindAppEvents } from './app-events.mjs';
 import { createScanSettingsController } from './app-scan-settings.mjs';
 import { createInitialDocumentState } from './app-state.mjs';
@@ -91,6 +86,7 @@ const elements = {
   matchStatus: document.querySelector('#matchStatus'),
   searchPrevButton: document.querySelector('#searchPrevButton'),
   searchNextButton: document.querySelector('#searchNextButton'),
+  closeFindButton: document.querySelector('#closeFindButton'),
   replaceButton: document.querySelector('#replaceButton'),
   replaceAllButton: document.querySelector('#replaceAllButton'),
   clearDraftButton: document.querySelector('#clearDraftButton'),
@@ -222,7 +218,7 @@ function initialize() {
       createProjectFile, createProjectFolder, getProjectNameFromFiles, getQuickOpenResults, openProject, openProjectFromFiles, openQuickOpenResult,
       downloadFile, getDocumentTitle, render, renderProjectSearchResults, renderQuickOpenResults,
       hideDropOverlay, insertImageAssetFromFile, insertMarkdownSnippet, openFile, showDropOverlay,
-      loadNativeMarkdownFile, openMarkdownLink, openNativeFile, replaceAllMatches, replaceCurrentMatch, runNativeFindInPage,
+      closeFindPanel, loadNativeMarkdownFile, openFindPanel, openMarkdownLink, openNativeFile, replaceAllMatches, replaceCurrentMatch, runNativeFindInPage,
       saveCurrentDocument, saveCurrentDocumentAs, setDocumentContent, setFocusMode, setMode, stepSearchMatch,
       closeScanSettingsDialog: scanSettings.closeScanSettingsDialog,
       openScanSettingsDialog: scanSettings.openScanSettingsDialog,
@@ -291,11 +287,12 @@ function renderSearchStatus() {
   const current = total && state.searchMatchIndex >= 0 ? state.searchMatchIndex + 1 : 0;
   elements.matchStatus.textContent = `${current}/${total}`;
   const disabled = !total;
-  elements.searchPrevButton.disabled = disabled;
-  elements.searchNextButton.disabled = disabled;
-  elements.replaceButton.disabled = disabled;
-  elements.replaceAllButton.disabled = disabled;
+  elements.searchPrevButton.disabled = disabled; elements.searchNextButton.disabled = disabled;
+  elements.replaceButton.disabled = disabled; elements.replaceAllButton.disabled = disabled;
 }
+
+function openFindPanel(options) { openFindPanelWidget({ elements, ...options }); }
+function closeFindPanel() { closeFindPanelWidget({ elements }); }
 
 function highlightCurrentPreviewMatch() {
   const marks = [...elements.preview.querySelectorAll('mark')];

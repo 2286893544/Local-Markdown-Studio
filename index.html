@@ -39,24 +39,6 @@
         <button class="segment" data-mode="preview" type="button">预览</button>
       </div>
 
-      <div class="search-panel" aria-label="查找和替换">
-        <label class="search-box">
-          <span>查找</span>
-          <input id="searchInput" type="search" placeholder="标题、正文、代码">
-        </label>
-        <label class="search-box replace-box">
-          <span>替换</span>
-          <input id="replaceInput" type="text" placeholder="替换为">
-        </label>
-        <div class="search-actions" role="group" aria-label="查找替换操作">
-          <button class="icon-button search-action" id="searchPrevButton" type="button" title="上一个匹配" aria-label="上一个匹配">‹</button>
-          <button class="icon-button search-action" id="searchNextButton" type="button" title="下一个匹配" aria-label="下一个匹配">›</button>
-          <button class="tool-button search-action" id="replaceButton" type="button" title="替换当前匹配">替换</button>
-          <button class="tool-button search-action" id="replaceAllButton" type="button" title="替换全部匹配">全部</button>
-        </div>
-        <span class="match-status" id="matchStatus" aria-live="polite">0/0</span>
-      </div>
-
       <div class="format-toolbar" aria-label="Markdown 快捷插入">
         <button class="icon-button" type="button" data-format-action="heading" title="插入标题" aria-label="插入标题">H</button>
         <button class="icon-button" type="button" data-format-action="bold" title="加粗" aria-label="加粗">B</button>
@@ -69,6 +51,31 @@
 
       <div class="stats" id="stats" aria-live="polite"></div>
     </section>
+
+    <div class="search-panel editor-find-widget" aria-label="查找和替换">
+      <div class="find-row">
+        <label class="search-box">
+          <span>查找</span>
+          <input id="searchInput" type="search" placeholder="标题、正文、代码">
+        </label>
+        <span class="match-status" id="matchStatus" aria-live="polite">0/0</span>
+        <div class="search-actions" role="group" aria-label="查找操作">
+          <button class="icon-button search-action" id="searchPrevButton" type="button" title="上一个匹配" aria-label="上一个匹配">‹</button>
+          <button class="icon-button search-action" id="searchNextButton" type="button" title="下一个匹配" aria-label="下一个匹配">›</button>
+          <button class="icon-button find-close-button" id="closeFindButton" type="button" title="关闭查找" aria-label="关闭查找">×</button>
+        </div>
+      </div>
+      <div class="find-row replace-row">
+        <label class="search-box replace-box">
+          <span>替换</span>
+          <input id="replaceInput" type="text" placeholder="替换为">
+        </label>
+        <div class="search-actions" role="group" aria-label="替换操作">
+          <button class="tool-button search-action" id="replaceButton" type="button" title="替换当前匹配">替换</button>
+          <button class="tool-button search-action" id="replaceAllButton" type="button" title="替换全部匹配">全部</button>
+        </div>
+      </div>
+    </div>
 
     <main class="workspace">
       <aside class="outline-pane" aria-label="项目与文档目录">
