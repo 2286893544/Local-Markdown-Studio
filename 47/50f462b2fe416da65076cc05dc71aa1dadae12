@@ -1,0 +1,38 @@
+src/app-sidebar.mjs
+  s_2b3e65cfadc3db::t_4384102cd7e748 1-8
+src/app-events.mjs
+  s_2b3e65cfadc3db::t_4384102cd7e748 52
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_71913a77c13020 258,260
+  s_2b3e65cfadc3db::t_e910eacf57e613 263
+  s_2b3e65cfadc3db::t_0826b14d948f38 261-262
+  s_2b3e65cfadc3db::t_ccd8b8a923ada2 7,11,249-257,259,264
+styles.css
+  s_2b3e65cfadc3db::t_cd9b47c3f9d173 462-463,466,468-470,474,477-480,483-486,1638-1639
+  s_2b3e65cfadc3db::t_b9e8dc9d77245c 497,1618-1621,1630-1632,1640,1671-1674,1678-1682
+  s_2b3e65cfadc3db::t_3f9b5f8646d187 471,473
+  s_2b3e65cfadc3db::t_4384102cd7e748 436-440,452,455,460-461,464-465,467,472,475-476,481-482,487-496
+  s_2b3e65cfadc3db::t_0bad0358199e0d 498,1633,1641,1683-1684
+index.html
+  s_2b3e65cfadc3db::t_4384102cd7e748 88
+src/app.js
+  s_2b3e65cfadc3db::t_4384102cd7e748 23,85,142,205
+package.json
+  s_2b3e65cfadc3db::t_0c525a98910347 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "4750f462b2fe416da65076cc05dc71aa1dadae12",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
