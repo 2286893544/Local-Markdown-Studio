@@ -1,0 +1,38 @@
+package.json
+  s_2b3e65cfadc3db::t_6f5ee2b9a850c6 17
+index.html
+  s_2b3e65cfadc3db::t_817d7a582820eb 55-78
+  s_2b3e65cfadc3db::t_18b41d32424ecf 79
+styles.css
+  s_2b3e65cfadc3db::t_7947128d5d16d5 70,272-295,297-306,313,315,317,320,324,344,348-357,363
+src/find-panel.mjs
+  s_2b3e65cfadc3db::t_04e7bc333cc255 4,8
+  s_2b3e65cfadc3db::t_024e2f12d7ac70 1-3,5-7,9-15
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_461206362d758a 7,9
+  s_2b3e65cfadc3db::t_b885e5d756f79e 75-81,161-162,239-241
+  s_2b3e65cfadc3db::t_a43600251a0684 74
+src/app-events.mjs
+  s_2b3e65cfadc3db::t_35f0663eaaada9 107,227-232,247
+src/app.js
+  s_2b3e65cfadc3db::t_2ac909bff8fd4e 14,21,290-291
+  s_2b3e65cfadc3db::t_c31385a7984ace 44,294-295
+  s_2b3e65cfadc3db::t_6bf6913c11ef01 89,221
+  s_2b3e65cfadc3db::t_919170d4f9bb6d 296
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "32a6379f94a170e8a0c6349af1c83b67c1c61498",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
