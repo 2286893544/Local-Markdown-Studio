@@ -841,10 +841,11 @@ function getNativeFilePath(file) {
 }
 
 function toggleOutlineEntry(outlineId) {
-  const entries = buildOutlineEntries(extractHeadings(state.markdown));
+  const entries = buildOutlineEntries(extractHeadings(state.markdown), {
+    collapsedOutlineIds: state.collapsedOutlineIds, expandedOutlineIds: state.expandedOutlineIds,
+  });
   const entry = entries.find((item) => item.outlineId === outlineId);
   if (!entry || !entry.hasChildren) return;
-
   if (entry.collapsed) {
     state.expandedOutlineIds.add(outlineId);
     state.collapsedOutlineIds.delete(outlineId);

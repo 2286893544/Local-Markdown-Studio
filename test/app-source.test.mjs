@@ -250,6 +250,7 @@ assert.match(source, /setTimeout\(\(\) => \{\s*state\.syncingScroll = false;\s*\
 assert.match(source, /elements\.outline\.querySelectorAll\('\.outline-entry:not\(\.is-hidden\)'\)/);
 assert.match(source, /renderOutline\(\);/);
 assert.match(source, /function toggleOutlineEntry\(outlineId\)[\s\S]*renderOutline\(\);\s*\}/);
+assert.match(toggleOutlineEntrySource, /buildOutlineEntries\(extractHeadings\(state\.markdown\),\s*\{\s*collapsedOutlineIds:\s*state\.collapsedOutlineIds,\s*expandedOutlineIds:\s*state\.expandedOutlineIds,\s*\}\)/);
 assert.doesNotMatch(toggleOutlineEntrySource, /render\(\);/);
 assert.match(source, /outline-entry/);
 assert.match(source, /projectPanel:\s*document\.querySelector\('\.project-panel'\)/);
