@@ -1,0 +1,25 @@
+src/find-panel.mjs
+  s_2b3e65cfadc3db::t_b81d325b96f1da 1,4-5
+src/app-events.mjs
+  s_2b3e65cfadc3db::t_e1ca8f49cd9370 229
+styles.css
+  s_2b3e65cfadc3db::t_3434c99800ef26 302
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_2ff7b0146605de 74,77,79-81,241
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "74acd6fcead1d0704b5a29a052da561c58110e5b",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
