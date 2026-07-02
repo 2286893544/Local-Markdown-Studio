@@ -1,0 +1,28 @@
+package.json
+  s_2b3e65cfadc3db::t_34b1f245ebba35 17
+  s_2b3e65cfadc3db::t_eb4a954a87c3b9 16
+src/app.js
+  s_2b3e65cfadc3db::t_de3941e711e0ec 57
+  s_2b3e65cfadc3db::t_34b1f245ebba35 52,64,143-144
+  s_2b3e65cfadc3db::t_96eddcd692f7ba 56
+test/app-state.test.mjs
+  s_2b3e65cfadc3db::t_eb4a954a87c3b9 1-40
+src/app-state.mjs
+  s_2b3e65cfadc3db::t_34b1f245ebba35 1-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "0b89bc3affefa004d5783ef46060ebad7f2ffe35",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
