@@ -157,6 +157,7 @@ export function getDocumentStats(markdown = '') {
 
 export function buildExportHtml(title = 'Markdown Document', renderedHtml = '') {
   const safeTitle = escapeHtml(title || 'Markdown Document');
+  const outline = buildExportOutline(renderedHtml);
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -164,8 +165,18 @@ export function buildExportHtml(title = 'Markdown Document', renderedHtml = '') 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${safeTitle}</title>
   <style>
+    html { scroll-behavior: smooth; }
     body { margin: 0; background: #f7f5f0; color: #25221d; font: 17px/1.75 ui-serif, Georgia, "Times New Roman", serif; }
-    .markdown-body { max-width: 820px; margin: 48px auto; padding: 0 28px 64px; }
+    .export-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: 100vh; }
+    .export-outline { position: sticky; top: 0; align-self: start; height: 100vh; overflow: auto; padding: 38px 22px; border-right: 1px solid #ddd4c4; background: #fffdf8; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .export-outline-title { margin: 0 0 14px; color: #6b6256; font-size: 13px; font-weight: 800; }
+    .export-outline-nav { display: grid; gap: 4px; }
+    .export-outline-link { display: block; border-radius: 6px; padding: 6px 8px; color: #6b6256; text-decoration: none; font-size: 13px; line-height: 1.45; }
+    .export-outline-link:hover { background: #ebe5d8; color: #25221d; }
+    .export-outline-link.level-2 { padding-left: 20px; }
+    .export-outline-link.level-3 { padding-left: 32px; }
+    .export-outline-link.level-4, .export-outline-link.level-5, .export-outline-link.level-6 { padding-left: 44px; }
+    .markdown-body { max-width: 820px; width: 100%; margin: 48px auto; padding: 0 28px 64px; }
     h1, h2, h3, h4, h5, h6 { line-height: 1.25; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
     pre { overflow: auto; padding: 18px; border-radius: 8px; background: #24211d; color: #f7f2e8; }
@@ -181,14 +192,46 @@ export function buildExportHtml(title = 'Markdown Document', renderedHtml = '') 
     .diagram-edge { fill: none; stroke: #1f7a6d; stroke-width: 2; }
     .diagram-arrow { fill: #1f7a6d; }
     .diagram-edge-label { text-anchor: start; font-size: 12px; fill: #6b6256; }
+    @media (max-width: 900px) { .export-layout { grid-template-columns: 1fr; } .export-outline { position: static; height: auto; border-right: 0; border-bottom: 1px solid #ddd4c4; padding: 22px 24px; } }
   </style>
 </head>
 <body>
-  <article class="markdown-body">
+  <main class="export-layout">
+${outline}
+    <article class="markdown-body">
 ${renderedHtml}
-  </article>
+    </article>
+  </main>
 </body>
 </html>`;
+}
+
+function buildExportOutline(renderedHtml = '') {
+  const headings = extractRenderedHeadings(renderedHtml);
+  if (!headings.length) return '    <aside class="export-outline" aria-label="文档目录"><p class="export-outline-title">目录</p></aside>';
+
+  const links = headings
+    .map((heading) => `        <a class="export-outline-link level-${heading.level}" href="#${escapeAttribute(heading.id)}">${escapeHtml(heading.text)}</a>`)
+    .join('\n');
+  return `    <aside class="export-outline" aria-label="文档目录">
+      <p class="export-outline-title">目录</p>
+      <nav class="export-outline-nav">
+${links}
+      </nav>
+    </aside>`;
+}
+
+function extractRenderedHeadings(renderedHtml = '') {
+  return [...String(renderedHtml).matchAll(/<h([1-6])\s+[^>]*id="([^"]+)"[^>]*>([\s\S]*?)<\/h\1>/g)]
+    .map((match) => ({
+      level: Number(match[1]),
+      id: match[2],
+      text: stripHtml(match[3]),
+    }));
+}
+
+function stripHtml(value = '') {
+  return String(value).replace(/<[^>]+>/g, '').trim();
 }
 
 function isBlockBoundary(lines, index) {

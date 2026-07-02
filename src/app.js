@@ -21,6 +21,7 @@ import { bindAppEvents } from './app-events.mjs';
 import { createScanSettingsController } from './app-scan-settings.mjs';
 import { createInitialDocumentState } from './app-state.mjs';
 import { toggleSidebar } from './app-sidebar.mjs';
+import { showToast } from './app-toast.mjs';
 import { createProjectMaintenanceController } from './project-maintenance.mjs';
 import { sampleMarkdown } from './sample-document.mjs';
 
@@ -68,6 +69,7 @@ const elements = {
   replaceAllButton: document.querySelector('#replaceAllButton'),
   clearDraftButton: document.querySelector('#clearDraftButton'),
   dropOverlay: document.querySelector('#dropOverlay'),
+  toast: document.querySelector('#toast'),
   loadingOverlay: document.querySelector('#loadingOverlay'),
   loadingTitle: document.querySelector('#loadingTitle'),
   loadingPercent: document.querySelector('#loadingPercent'),
@@ -1387,6 +1389,7 @@ function downloadFile(fileName, content, type) {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+  showToast(elements, '下载成功');
 }
 
 function getDocumentTitle() {

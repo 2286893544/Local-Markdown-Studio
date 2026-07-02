@@ -57,8 +57,12 @@ assert.doesNotMatch(highlightSearch('<p>Alpha beta alpha</p>', 'alpha', { caseSe
 assert.match(highlightSearch('<p>alpha alphabet alpha</p>', 'alpha', { wholeWord: true }), /<mark>alpha<\/mark> alphabet <mark>alpha<\/mark>/);
 assert.match(highlightSearch('<p>A12 B34</p>', '[A-Z]\\d+', { useRegex: true }), /<mark>A12<\/mark> <mark>B34<\/mark>/);
 
-const exported = buildExportHtml('Project Notes', '<h1>Project Notes</h1>');
+const exported = buildExportHtml('Project Notes', renderMarkdown(markdown));
 assert.match(exported, /<title>Project Notes<\/title>/);
+assert.match(exported, /<aside class="export-outline" aria-label="文档目录">/);
+assert.match(exported, /<a class="export-outline-link level-1" href="#project-notes">Project Notes<\/a>/);
+assert.match(exported, /<a class="export-outline-link level-2" href="#tasks">Tasks<\/a>/);
+assert.match(exported, /<main class="export-layout">/);
 assert.match(exported, /<article class="markdown-body">/);
 
 const flowchart = renderMarkdown(`\`\`\`
