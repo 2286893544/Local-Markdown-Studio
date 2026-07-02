@@ -31,6 +31,7 @@ assert.match(main, /webContents\.on\('found-in-page'/);
 assert.match(main, /webContents\.send\('native:found-in-page', result\)/);
 assert.match(main, /ipcMain\.handle\('native:find-in-page'/);
 assert.match(main, /findInPage\(term/);
+assert.match(main, /matchCase:\s*Boolean\(options\.matchCase\)/);
 assert.match(main, /stopFindInPage\('clearSelection'\)/);
 assert.doesNotMatch(main, /label:\s*'文件'/);
 assert.doesNotMatch(main, /label:\s*'编辑'/);

@@ -53,6 +53,9 @@ assert.deepEqual(getDocumentStats('One two\n\n# Heading'), {
 });
 
 assert.match(highlightSearch('<p>Alpha beta alpha</p>', 'alpha'), /<mark>Alpha<\/mark> beta <mark>alpha<\/mark>/);
+assert.doesNotMatch(highlightSearch('<p>Alpha beta alpha</p>', 'alpha', { caseSensitive: true }), /<mark>Alpha<\/mark>/);
+assert.match(highlightSearch('<p>alpha alphabet alpha</p>', 'alpha', { wholeWord: true }), /<mark>alpha<\/mark> alphabet <mark>alpha<\/mark>/);
+assert.match(highlightSearch('<p>A12 B34</p>', '[A-Z]\\d+', { useRegex: true }), /<mark>A12<\/mark> <mark>B34<\/mark>/);
 
 const exported = buildExportHtml('Project Notes', '<h1>Project Notes</h1>');
 assert.match(exported, /<title>Project Notes<\/title>/);

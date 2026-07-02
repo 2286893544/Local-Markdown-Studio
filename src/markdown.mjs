@@ -1,3 +1,5 @@
+import { createSearchMatcher } from './editor-search.mjs';
+
 const headingPattern = /^(#{1,6})\s+(.+?)\s*#*$/;
 
 export function renderMarkdown(markdown = '') {
@@ -123,16 +125,17 @@ export function extractHeadings(markdown = '') {
     });
 }
 
-export function highlightSearch(html = '', query = '') {
+export function highlightSearch(html = '', query = '', options = {}) {
   const term = String(query).trim();
   if (!term) return html;
 
-  const matcher = new RegExp(`(${escapeRegExp(term)})`, 'gi');
+  const matcher = createSearchMatcher(term, options);
+  if (!matcher) return html;
   return String(html)
     .split(/(<[^>]+>)/g)
     .map((part) => {
       if (part.startsWith('<')) return part;
-      return part.replace(matcher, '<mark>$1</mark>');
+      return part.replace(matcher, '<mark>$&</mark>');
     })
     .join('');
 }
@@ -578,8 +581,4 @@ function escapeHtml(value = '') {
 
 function escapeAttribute(value = '') {
   return escapeHtml(value).replace(/`/g, '&#96;');
-}
-
-function escapeRegExp(value = '') {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

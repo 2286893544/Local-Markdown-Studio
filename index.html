@@ -54,25 +54,31 @@
 
     <div class="search-panel editor-find-widget" aria-label="查找和替换">
       <div class="find-row">
-        <label class="search-box">
-          <span>查找</span>
+        <span class="find-toggle" aria-hidden="true">⌄</span>
+        <div class="find-input-shell search-box" role="group" aria-label="查找">
           <input id="searchInput" type="search" placeholder="标题、正文、代码">
-        </label>
+          <span class="find-options">
+            <button class="find-option" type="button" data-find-option="caseSensitive" title="区分大小写">Aa</button>
+            <button class="find-option" type="button" data-find-option="wholeWord" title="全字匹配">ab</button>
+            <button class="find-option" type="button" data-find-option="useRegex" title="使用正则表达式">.*</button>
+          </span>
+        </div>
         <span class="match-status" id="matchStatus" aria-live="polite">0/0</span>
         <div class="search-actions" role="group" aria-label="查找操作">
           <button class="icon-button search-action" id="searchPrevButton" type="button" title="上一个匹配" aria-label="上一个匹配">‹</button>
           <button class="icon-button search-action" id="searchNextButton" type="button" title="下一个匹配" aria-label="下一个匹配">›</button>
+          <button class="icon-button search-action" id="findInSelectionButton" type="button" title="在选定内容中查找" aria-label="在选定内容中查找">▣</button>
           <button class="icon-button find-close-button" id="closeFindButton" type="button" title="关闭查找" aria-label="关闭查找">×</button>
         </div>
       </div>
       <div class="find-row replace-row">
-        <label class="search-box replace-box">
-          <span>替换</span>
+        <span class="find-row-spacer" aria-hidden="true"></span>
+        <div class="find-input-shell search-box replace-box" role="group" aria-label="替换">
           <input id="replaceInput" type="text" placeholder="替换为">
-        </label>
+        </div>
         <div class="search-actions" role="group" aria-label="替换操作">
-          <button class="tool-button search-action" id="replaceButton" type="button" title="替换当前匹配">替换</button>
-          <button class="tool-button search-action" id="replaceAllButton" type="button" title="替换全部匹配">全部</button>
+          <button class="icon-button search-action" id="replaceButton" type="button" title="替换当前匹配" aria-label="替换当前匹配">↵</button>
+          <button class="icon-button search-action" id="replaceAllButton" type="button" title="替换全部匹配" aria-label="替换全部匹配">⇉</button>
         </div>
       </div>
     </div>

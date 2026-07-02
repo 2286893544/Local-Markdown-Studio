@@ -1,32 +1,11 @@
-import {
-  extractHeadings,
-  getDocumentStats,
-  highlightSearch,
-  renderMarkdown,
-} from './markdown.mjs';
-import {
-  collectProjectAssetsFromDirectoryHandle,
-  collectMarkdownEntriesFromDirectoryHandle,
-  getProjectLoadingPercent,
-  normalizeProjectAssets,
-  normalizeProjectFiles,
-} from './project.mjs';
+import { extractHeadings, getDocumentStats, highlightSearch, renderMarkdown } from './markdown.mjs';
+import { collectProjectAssetsFromDirectoryHandle, collectMarkdownEntriesFromDirectoryHandle, getProjectLoadingPercent, normalizeProjectAssets, normalizeProjectFiles } from './project.mjs';
 import { buildProjectKnowledge, resolveMarkdownLinkPath } from './knowledge.mjs';
-import {
-  buildImageSnippet,
-  formatMarkdownRelativePath,
-  resolveDroppedImageReference,
-  sanitizeImageFileName,
-} from './image-assets.mjs';
+import { buildImageSnippet, formatMarkdownRelativePath, resolveDroppedImageReference, sanitizeImageFileName } from './image-assets.mjs';
 import { ensureMarkdownFilePath, normalizeCreatePath } from './project-actions.mjs';
 import { collectSearchMatches } from './editor-search.mjs';
 import { buildOutlineEntries } from './outline.mjs';
-import {
-  forgetRecentItem as forgetRecentListItem,
-  readStoredList,
-  rememberRecentItem as rememberRecentListItem,
-  renderRecentItems,
-} from './recent-items.mjs';
+import { forgetRecentItem as forgetRecentListItem, readStoredList, rememberRecentItem as rememberRecentListItem, renderRecentItems } from './recent-items.mjs';
 import {
   buildDocumentRelationsHtml,
   getQuickOpenResults as getQuickOpenResultsForEntries,
@@ -34,14 +13,10 @@ import {
   renderProjectSearchResults as renderProjectSearchResultsHtml,
   renderQuickOpenResults as renderQuickOpenResultsHtml,
 } from './project-sidebar.mjs';
-import {
-  escapeHtml,
-  escapeRegExp,
-  stripExtension,
-  stripNativePath,
-} from './text-utils.mjs';
+import { escapeHtml, stripExtension, stripNativePath } from './text-utils.mjs';
 import { createDiagramController } from './diagram-controller.mjs';
 import { closeFindPanel as closeFindPanelWidget, openFindPanel as openFindPanelWidget } from './find-panel.mjs';
+import { canUseNativeFind, createDefaultSearchOptions, getSearchOptions, replaceMatches, syncSearchOptionButtons, toggleFindInSelectionState, toggleSearchOptionState } from './find-options.mjs';
 import { bindAppEvents } from './app-events.mjs';
 import { createScanSettingsController } from './app-scan-settings.mjs';
 import { createInitialDocumentState } from './app-state.mjs';
@@ -87,6 +62,7 @@ const elements = {
   searchPrevButton: document.querySelector('#searchPrevButton'),
   searchNextButton: document.querySelector('#searchNextButton'),
   closeFindButton: document.querySelector('#closeFindButton'),
+  findInSelectionButton: document.querySelector('#findInSelectionButton'),
   replaceButton: document.querySelector('#replaceButton'),
   replaceAllButton: document.querySelector('#replaceAllButton'),
   clearDraftButton: document.querySelector('#clearDraftButton'),
@@ -133,6 +109,7 @@ const elements = {
   addIgnoreDirectoryButton: document.querySelector('#addIgnoreDirectoryButton'),
   modeButtons: [...document.querySelectorAll('[data-mode]')],
   formatButtons: [...document.querySelectorAll('[data-format-action]')],
+  searchOptionButtons: [...document.querySelectorAll('[data-find-option]')],
 };
 
 const state = {
@@ -144,6 +121,8 @@ const state = {
   replaceText: '',
   searchMatchIndex: -1,
   searchMatches: [],
+  searchOptions: createDefaultSearchOptions(),
+  searchSelectionRange: null,
   nativeSearchResult: null,
   projectName: '',
   projectFiles: [],
@@ -220,6 +199,7 @@ function initialize() {
       hideDropOverlay, insertImageAssetFromFile, insertMarkdownSnippet, openFile, showDropOverlay,
       closeFindPanel, loadNativeMarkdownFile, openFindPanel, openMarkdownLink, openNativeFile, replaceAllMatches, replaceCurrentMatch, runNativeFindInPage,
       saveCurrentDocument, saveCurrentDocumentAs, setDocumentContent, setFocusMode, setMode, stepSearchMatch,
+      toggleFindInSelection, toggleSearchOption,
       closeScanSettingsDialog: scanSettings.closeScanSettingsDialog,
       openScanSettingsDialog: scanSettings.openScanSettingsDialog,
       syncEditorScrollToPreview, syncNativeTheme, syncPreviewScrollToEditor, updateActiveOutlineFromScroll,
@@ -231,9 +211,9 @@ function initialize() {
 
 function render({ scrollToSearchMatch = false, focusEditorMatch = false } = {}) {
   const rendered = renderMarkdown(state.markdown);
-  const useNativeFind = Boolean(window.markdownNative?.findInPage);
+  const useNativeFind = Boolean(window.markdownNative?.findInPage) && canUseNativeFind(state);
   refreshSearchMatches();
-  elements.preview.innerHTML = useNativeFind ? rendered : highlightSearch(rendered, state.query);
+  elements.preview.innerHTML = useNativeFind ? rendered : highlightSearch(rendered, state.query, getSearchOptions(state));
   if (!useNativeFind) highlightCurrentPreviewMatch();
   diagrams.fitDiagramsToContainers();
   renderProjectFiles();
@@ -266,7 +246,7 @@ function scrollToSearchMatchElement({ focusEditorMatch = false } = {}) {
 }
 
 function refreshSearchMatches() {
-  state.searchMatches = collectSearchMatches(state.markdown, state.query);
+  state.searchMatches = collectSearchMatches(state.markdown, state.query, getSearchOptions(state));
   if (!state.searchMatches.length) {
     state.searchMatchIndex = -1;
     return;
@@ -289,6 +269,7 @@ function renderSearchStatus() {
   const disabled = !total;
   elements.searchPrevButton.disabled = disabled; elements.searchNextButton.disabled = disabled;
   elements.replaceButton.disabled = disabled; elements.replaceAllButton.disabled = disabled;
+  syncSearchOptionButtons(elements, state);
 }
 
 function openFindPanel(options) { openFindPanelWidget({ elements, ...options }); }
@@ -329,8 +310,7 @@ function replaceAllMatches() {
   refreshSearchMatches();
   if (!state.searchMatches.length) return;
 
-  const matcher = new RegExp(escapeRegExp(state.query.trim()), 'gi');
-  state.markdown = state.markdown.replace(matcher, state.replaceText);
+  state.markdown = replaceMatches(state.markdown, state.searchMatches, state.replaceText);
   state.searchMatchIndex = 0;
   elements.editor.value = state.markdown;
   markDirty();
@@ -361,12 +341,28 @@ function scrollEditorToCharacter(characterIndex) {
 function runNativeFindInPage({ forward = true, findNext = false } = {}) {
   const term = state.query.trim();
   if (!window.markdownNative?.findInPage) return;
+  if (!canUseNativeFind(state)) {
+    window.markdownNative.stopFindInPage?.();
+    return;
+  }
   if (!term) {
     window.markdownNative.stopFindInPage?.();
     return;
   }
 
-  window.markdownNative.findInPage(term, { forward, findNext });
+  window.markdownNative.findInPage(term, { forward, findNext, matchCase: state.searchOptions.caseSensitive });
+}
+
+function toggleSearchOption(option) {
+  toggleSearchOptionState(state, option);
+  render({ scrollToSearchMatch: true });
+  runNativeFindInPage({ forward: true, findNext: false });
+}
+
+function toggleFindInSelection() {
+  toggleFindInSelectionState(state, elements.editor);
+  render({ scrollToSearchMatch: true });
+  runNativeFindInPage({ forward: true, findNext: false });
 }
 
 function renderRecentPanel() {

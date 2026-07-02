@@ -105,6 +105,10 @@ export function bindAppEvents({
   elements.searchPrevButton.addEventListener('click', () => actions.stepSearchMatch(-1));
   elements.searchNextButton.addEventListener('click', () => actions.stepSearchMatch(1));
   elements.closeFindButton.addEventListener('click', actions.closeFindPanel);
+  elements.searchOptionButtons.forEach((button) => {
+    button.addEventListener('click', () => actions.toggleSearchOption(button.dataset.findOption));
+  });
+  elements.findInSelectionButton.addEventListener('click', actions.toggleFindInSelection);
   elements.replaceButton.addEventListener('click', actions.replaceCurrentMatch);
   elements.replaceAllButton.addEventListener('click', actions.replaceAllMatches);
   elements.quickOpenInput.addEventListener('input', () => {

@@ -274,46 +274,48 @@ textarea:focus-visible {
 
 .editor-find-widget {
   position: absolute;
-  top: 142px;
-  right: 18px;
+  top: 136px;
+  right: 28px;
   z-index: 30;
-  width: min(520px, calc(100vw - 36px));
-  padding: 8px;
+  width: min(510px, calc(100vw - 56px));
+  padding: 7px 8px 8px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  box-shadow: var(--shadow);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
 }
 
 body.is-find-open .search-panel {
   display: grid;
-  gap: 7px;
+  gap: 5px;
 }
 
 .find-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: 18px minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .replace-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
 }
 
 .search-box {
   display: flex;
   align-items: center;
-  gap: 8px;
   min-width: 0;
-  padding: 0 10px;
-  min-height: 32px;
+  min-height: 28px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--surface);
   color: var(--muted);
   font-size: 12px;
+}
+
+.find-input-shell {
+  padding: 0 4px 0 8px;
 }
 
 .replace-box {
@@ -329,38 +331,81 @@ body.is-find-open .search-panel {
   color: var(--text);
 }
 
+.find-options {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  flex: 0 0 auto;
+}
+
+.find-option,
+.find-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  min-height: 22px;
+  padding: 0 4px;
+  border-radius: 4px;
+  cursor: default;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.find-option:hover,
+.find-toggle:hover {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.find-option.is-active,
+.search-action.is-active {
+  background: var(--surface-soft);
+  color: var(--accent-strong);
+}
+
+.find-toggle,
+.find-row-spacer {
+  width: 18px;
+  padding: 0;
+  text-align: center;
+}
+
 .search-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex: 0 0 auto;
 }
 
 .search-action {
-  min-height: 30px;
+  min-height: 26px;
 }
 
 .search-action.icon-button {
-  width: 30px;
-  font-size: 18px;
+  width: 26px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
   line-height: 1;
 }
 
 .find-close-button {
-  width: 30px;
-  min-height: 30px;
+  width: 26px;
+  min-height: 26px;
+  border: 0;
+  background: transparent;
   color: var(--muted);
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
 }
 
 .match-status {
   flex: 0 0 auto;
-  min-width: 44px;
+  min-width: 50px;
   color: var(--muted);
-  font-family: var(--mono);
   font-size: 12px;
-  text-align: right;
+  text-align: center;
 }
 
 .format-toolbar {

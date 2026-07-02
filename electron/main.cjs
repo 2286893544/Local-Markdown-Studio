@@ -208,7 +208,7 @@ function registerNativeHandlers() {
     return event.sender.findInPage(term, {
       forward: options.forward !== false,
       findNext: Boolean(options.findNext),
-      matchCase: false,
+      matchCase: Boolean(options.matchCase),
     });
   });
 
