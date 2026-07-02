@@ -261,32 +261,6 @@ h3 {
   font-weight: 720;
 }
 
-.capability-rail {
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-
-.capability-rail .section-inner {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding-top: 18px;
-  padding-bottom: 18px;
-}
-
-.capability-rail span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #ffffff;
-  color: #384151;
-  padding: 0 14px;
-  font-size: 14px;
-  font-weight: 700;
-}
-
 .section {
   padding: 0;
 }
@@ -611,7 +585,6 @@ code {
     object-position: top left;
   }
 
-  .capability-rail .section-inner,
   .feature-grid,
   .steps {
     grid-template-columns: 1fr;
