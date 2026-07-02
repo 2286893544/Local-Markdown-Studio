@@ -1,0 +1,70 @@
+test/project-health.test.mjs
+  s_2b3e65cfadc3db::t_45373ea4d8aac3 2-5,84-107
+  s_2b3e65cfadc3db::t_632e93cbe57d3f 108
+src/project-maintenance.mjs
+  s_2b3e65cfadc3db::t_c8f5404d799db5 7-10,13-30,117
+  s_2b3e65cfadc3db::t_9b2a7e62900cf9 1-6,11-12,31-116,118-119
+test/project-sidebar.test.mjs
+  s_2b3e65cfadc3db::t_45373ea4d8aac3 4,40-78
+website/index.html
+  s_2b3e65cfadc3db::t_037d72611d39eb 30,83,87,118-148
+test/project-fixes.test.mjs
+  s_2b3e65cfadc3db::t_45373ea4d8aac3 1-26
+src/project-fixes.mjs
+  s_2b3e65cfadc3db::t_2a0bc050dc11f9 1-7
+website/styles.css
+  s_2b3e65cfadc3db::t_037d72611d39eb 372-412,536,553-556,624-625
+  s_9b83e6f43e3f4b::t_2b76e4de2abbc1 626-627
+package.json
+  s_2b3e65cfadc3db::t_706105961ca923 17
+  s_2b3e65cfadc3db::t_45373ea4d8aac3 16
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_706105961ca923 7-8,31
+  s_2b3e65cfadc3db::t_45373ea4d8aac3 102-109,164
+README.md
+  s_2b3e65cfadc3db::t_037d72611d39eb 14,18-19
+src/project-health.mjs
+  s_2b3e65cfadc3db::t_2a0bc050dc11f9 61-88
+docs/superpowers/plans/2026-07-02-project-health-assets.md
+  s_2b3e65cfadc3db::t_c2223448e37d7b 1-2,4-20,22-24,26-30,32-34,36-50,52-54,56-60,62-64,66-78,80-82,84-86,88-91
+  s_2b3e65cfadc3db::t_693c5741d21078 3,21,25,31,35,51,55,61,65,79,83,87
+index.html
+  s_2b3e65cfadc3db::t_09a59eb668bfcb 97
+src/project-sidebar.mjs
+  s_2b3e65cfadc3db::t_2a0bc050dc11f9 96-98,104,110-118,124-160
+src/app.js
+  s_2b3e65cfadc3db::t_c8f5404d799db5 505
+  s_2b3e65cfadc3db::t_9b2a7e62900cf9 52,183-196,509,590
+  s_2b3e65cfadc3db::t_09a59eb668bfcb 122,247,506,508,589,591
+  s_2b3e65cfadc3db::t_9859e4a29cfb7f 57
+  s_2b3e65cfadc3db::t_dbd0b2c2394b87 592
+test/website-source.test.mjs
+  s_2b3e65cfadc3db::t_45373ea4d8aac3 23-26,47
+styles.css
+  s_2b3e65cfadc3db::t_ae3195cd7d4b5e 474-476,491-493,503-506,517-518,545-546,553-554,562-563,568-578,596,599,603-613,625-663
+  s_2b3e65cfadc3db::t_6d27e35cf65d87 664
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "57cb39fa381dfbc05267388823947779d318abdf",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    },
+    "s_9b83e6f43e3f4b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f20cc-50d7-7f13-ba97-b28cfb95bc82",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
