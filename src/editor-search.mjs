@@ -28,8 +28,8 @@ export function createSearchMatcher(query = '', options = {}) {
   if (!term) return null;
 
   const source = options.useRegex ? term : escapeRegExp(term);
-  const pattern = options.wholeWord ? `\\b(?:${source})\\b` : source;
-  const flags = options.caseSensitive ? 'g' : 'gi';
+  const pattern = options.wholeWord ? `(?<![\\p{L}\\p{N}_])(?:${source})(?![\\p{L}\\p{N}_])` : source;
+  const flags = `${options.caseSensitive ? 'g' : 'gi'}${options.wholeWord ? 'u' : ''}`;
 
   try {
     return new RegExp(pattern, flags);
