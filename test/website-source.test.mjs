@@ -20,6 +20,10 @@ assert.match(website, /反向链接/);
 assert.match(website, /失效链接/);
 assert.match(website, /快速打开/);
 assert.match(website, /项目健康检查/);
+assert.match(website, /一键修复/);
+assert.match(website, /绝对路径图片/);
+assert.match(website, /引用关系/);
+assert.match(website, /扫描 → 定位 → 修复 → 导出/);
 assert.match(website, /新建文档/);
 assert.match(website, /新建文件夹/);
 assert.match(website, /写作工具栏/);
@@ -40,6 +44,7 @@ assert.match(styles, /@keyframes previewFloat/);
 assert.match(styles, /@media \(max-width: 760px\)/);
 assert.match(styles, /\.hero/);
 assert.match(styles, /\.download-panel/);
+assert.match(styles, /\.workflow-panel/);
 assert.match(styles, /prefers-reduced-motion/);
 assert.doesNotMatch(styles, /letter-spacing:\s*-/);
 

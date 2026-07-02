@@ -93,22 +93,68 @@ export function buildProjectHealthHtml(health) {
     ['失效文档链接', health.unresolvedMarkdownLinks],
   ];
   const total = groups.reduce((sum, [, items]) => sum + items.length, 0);
+  const fixAbsoluteAction = health.absoluteImagePaths.length
+    ? '<button class="health-action-button" type="button" data-health-action="fix-absolute-images">修复绝对路径</button>'
+    : '';
   return `
     <div class="project-health-header">
       <strong>项目检查</strong>
       <span>${total ? `${total} 个问题` : '未发现问题'}</span>
     </div>
+    ${fixAbsoluteAction}
     ${groups.map(([label, items]) => renderHealthGroup(label, items)).join('')}
   `;
 }
 
 function renderHealthGroup(label, items) {
-  const details = items.slice(0, 4).map((item) => `<li>
-    <span>${escapeHtml(item.filePath || item.path || item.slug || item.href)}</span>
-    <small>${escapeHtml(item.resolvedPath || item.href || item.name || item.headings?.join(' / ') || '')}</small>
-  </li>`).join('');
+  const details = items.slice(0, 4).map((item) => {
+    const body = `
+      <span>${escapeHtml(item.filePath || item.path || item.slug || item.href)}</span>
+      <small>${escapeHtml(item.resolvedPath || item.href || item.name || item.headings?.join(' / ') || '')}</small>
+    `;
+    return `<li>${item.fileId
+      ? `<button class="health-issue-button" type="button" data-health-file-id="${escapeHtml(item.fileId)}">${body}</button>`
+      : body}</li>`;
+  }).join('');
   return `<section class="health-group">
     <h3>${escapeHtml(label)} <span>${items.length}</span></h3>
     ${items.length ? `<ul>${details}</ul>` : '<p class="empty-outline">无</p>'}
   </section>`;
+}
+
+export function buildProjectAssetsHtml(assets = []) {
+  if (!assets.length) {
+    return `<section>
+      <div class="project-assets-header">
+        <strong>图片资产</strong>
+        <span>0 张</span>
+      </div>
+      <p class="empty-outline">没有扫描到图片资产</p>
+    </section>`;
+  }
+
+  return `<section>
+    <div class="project-assets-header">
+      <strong>图片资产</strong>
+      <span>${assets.length} 张</span>
+    </div>
+    <div class="asset-list">
+      ${assets.slice(0, 24).map(renderAssetItem).join('')}
+    </div>
+  </section>`;
+}
+
+function renderAssetItem(asset) {
+  const references = asset.references.slice(0, 3).map((reference) => `<button class="asset-reference" type="button" data-asset-file-id="${escapeHtml(reference.fileId)}">
+    <span>${escapeHtml(reference.fileName)}</span>
+    <small>${escapeHtml(reference.filePath)}</small>
+  </button>`).join('');
+  return `<article class="asset-item${asset.unused ? ' is-unused' : ''}">
+    <div class="asset-item-main">
+      <span>${escapeHtml(asset.name || asset.path)}</span>
+      <small>${escapeHtml(asset.path)}</small>
+    </div>
+    <strong>${asset.unused ? '未引用' : `${asset.referenceCount} 处引用`}</strong>
+    ${references ? `<div class="asset-references">${references}</div>` : ''}
+  </article>`;
 }

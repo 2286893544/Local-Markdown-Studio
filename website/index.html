@@ -27,7 +27,7 @@
         <div class="hero-copy">
           <p class="eyebrow">macOS Markdown Studio</p>
           <h1>Local Markdown Studio</h1>
-          <p class="hero-lead">本地优先的 Markdown 阅读与编辑器。打开文件夹，扫描文档，保存图片资产、追踪链接关系、检查项目健康、新建文档、搜索和导出都在你的电脑上完成。</p>
+          <p class="hero-lead">本地优先的 Markdown 阅读与编辑器。打开文件夹，扫描文档，保存图片资产、追踪链接关系、检查项目健康、一键修复图片路径、搜索和导出都在你的电脑上完成。</p>
           <div class="hero-actions">
             <a class="primary-action" href="#download">选择下载版本</a>
             <a class="secondary-action" href="#install">查看安装说明</a>
@@ -80,11 +80,11 @@
           </article>
           <article class="feature-card feature-card-strong">
             <h3>图片资产管理</h3>
-            <p>拖入图片时会按当前文档位置插入真实相对路径，避免把外部图片误写成不存在的 assets 地址。</p>
+            <p>拖入图片时会按当前文档位置插入真实相对路径，资产面板会展示每张图片的引用关系，未引用图片也能被快速识别。</p>
           </article>
           <article class="feature-card feature-card-strong">
             <h3>项目健康检查</h3>
-            <p>打开项目后集中检查缺失图片、未引用图片资产、绝对路径图片、重复标题和失效文档链接，文档交付前更容易收口。</p>
+            <p>打开项目后集中检查缺失图片、未引用图片资产、绝对路径图片、重复标题和失效文档链接，支持定位问题并一键修复绝对路径图片。</p>
           </article>
           <article class="feature-card">
             <h3>新建文档和文件夹</h3>
@@ -113,6 +113,37 @@
           <article class="feature-card">
             <h3>项目级扫描</h3>
             <p>选择一个文件夹后自动整理 Markdown 文档，并可调整扫描扩展名、忽略目录和通用过滤规则。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section workflow-section" aria-label="项目修复工作流">
+      <div class="section-inner workflow-panel">
+        <div>
+          <p class="eyebrow">Project Repair</p>
+          <h2>扫描 → 定位 → 修复 → 导出</h2>
+        </div>
+        <div class="workflow-steps">
+          <article>
+            <span>01</span>
+            <h3>扫描项目</h3>
+            <p>读取本地 Markdown 和图片资产，建立文档、图片和本地链接之间的关系。</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>定位问题</h3>
+            <p>健康检查项可以直接打开对应文档，图片资产面板会列出引用关系和未引用状态。</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>修复路径</h3>
+            <p>绝对路径图片可以一键修复为相对路径，减少把本机私有路径写进交付文档的风险。</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>导出交付</h3>
+            <p>修复后继续阅读、搜索、保存和导出 HTML，保持本地文档工作流闭环。</p>
           </article>
         </div>
       </div>

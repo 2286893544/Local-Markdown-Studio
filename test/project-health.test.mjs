@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { buildProjectHealth } from '../src/project-health.mjs';
+import {
+  buildImageAssetInventory,
+  buildProjectHealth,
+} from '../src/project-health.mjs';
 
 const entries = [
   {
@@ -77,5 +80,30 @@ assert.deepEqual(buildProjectHealth({ entries, assets }), {
     },
   ],
 });
+
+assert.deepEqual(buildImageAssetInventory({ entries, assets }), [
+  {
+    path: 'assets/logo.png',
+    name: 'logo.png',
+    referenceCount: 1,
+    unused: false,
+    references: [
+      {
+        fileId: 'docs/index.md',
+        fileName: 'index.md',
+        filePath: 'docs/index.md',
+        href: '../assets/logo.png',
+        label: 'Logo',
+      },
+    ],
+  },
+  {
+    path: 'assets/orphan.png',
+    name: 'orphan.png',
+    referenceCount: 0,
+    unused: true,
+    references: [],
+  },
+]);
 
 console.log('project health tests passed');

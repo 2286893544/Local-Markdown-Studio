@@ -471,7 +471,9 @@ textarea:focus-visible {
 
 .project-search-result,
 .quick-open-result,
-.relation-link {
+.relation-link,
+.health-issue-button,
+.asset-reference {
   display: grid;
   gap: 3px;
   width: 100%;
@@ -486,7 +488,9 @@ textarea:focus-visible {
 
 .project-search-result:hover,
 .quick-open-result:hover,
-.relation-link:hover {
+.relation-link:hover,
+.health-issue-button:hover,
+.asset-reference:hover {
   border-color: var(--accent);
 }
 
@@ -496,6 +500,10 @@ textarea:focus-visible {
 .quick-open-result small,
 .relation-link span,
 .relation-link small,
+.health-issue-button span,
+.health-issue-button small,
+.asset-reference span,
+.asset-reference small,
 .relation-missing span,
 .relation-missing small {
   overflow: hidden;
@@ -506,6 +514,8 @@ textarea:focus-visible {
 .project-search-result small,
 .quick-open-result small,
 .relation-link small,
+.health-issue-button small,
+.asset-reference small,
 .relation-missing small {
   color: var(--muted);
 }
@@ -532,14 +542,16 @@ textarea:focus-visible {
   font-size: 12px;
 }
 
-.project-health {
+.project-health,
+.project-assets {
   display: grid;
   gap: 10px;
   padding: 12px;
   border-bottom: 1px solid var(--border);
 }
 
-.project-health-header {
+.project-health-header,
+.project-assets-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -547,9 +559,21 @@ textarea:focus-visible {
   font-size: 13px;
 }
 
-.project-health-header span {
+.project-health-header span,
+.project-assets-header span {
   color: var(--muted);
   font-size: 12px;
+}
+
+.health-action-button {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 700;
 }
 
 .health-group h3 {
@@ -569,12 +593,22 @@ textarea:focus-visible {
 }
 
 .health-group li {
-  display: grid;
-  gap: 2px;
+  display: block;
   border: 1px dashed var(--border);
   border-radius: 8px;
-  padding: 7px 8px;
+  padding: 0;
   font-size: 12px;
+}
+
+.health-group li > span,
+.health-group li > small {
+  display: block;
+  padding: 7px 8px;
+}
+
+.health-issue-button {
+  border: 0;
+  border-radius: 8px;
 }
 
 .health-group li span,
@@ -586,6 +620,46 @@ textarea:focus-visible {
 
 .health-group li small {
   color: var(--muted);
+}
+
+.asset-list,
+.asset-references {
+  display: grid;
+  gap: 6px;
+}
+
+.asset-item {
+  display: grid;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 78%, var(--surface-soft));
+}
+
+.asset-item.is-unused {
+  border-style: dashed;
+}
+
+.asset-item-main {
+  display: grid;
+  gap: 3px;
+}
+
+.asset-item-main span,
+.asset-item-main small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-item-main small {
+  color: var(--muted);
+}
+
+.asset-item strong {
+  color: var(--accent);
+  font-size: 12px;
 }
 
 .scan-settings-dialog {

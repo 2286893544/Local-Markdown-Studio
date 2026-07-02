@@ -58,6 +58,34 @@ export function buildProjectHealth({ entries = [], assets = [] } = {}) {
   };
 }
 
+export function buildImageAssetInventory({ entries = [], assets = [] } = {}) {
+  const assetMap = new Map(assets
+    .filter((asset) => isImageAssetPath(asset.path))
+    .map((asset) => [normalizePath(asset.path), {
+      path: normalizePath(asset.path),
+      name: asset.name,
+      referenceCount: 0,
+      unused: true,
+      references: [],
+    }]));
+
+  entries.forEach((entry) => {
+    extractMarkdownLinks(entry.content || '')
+      .filter((link) => link.isImage && !isExternalHref(link.href) && !isAbsoluteLocalPath(link.href))
+      .forEach((link) => {
+        const resolvedPath = resolveMarkdownLinkPath(entry.path, link.href);
+        const asset = assetMap.get(resolvedPath);
+        if (!asset) return;
+
+        asset.references.push(toIssue(entry, link));
+        asset.referenceCount = asset.references.length;
+        asset.unused = false;
+      });
+  });
+
+  return [...assetMap.values()];
+}
+
 export function isImageAssetPath(filePath = '') {
   return imageExtensionPattern.test(normalizePath(filePath));
 }

@@ -369,6 +369,47 @@ h3 {
   background: var(--surface);
 }
 
+.workflow-section {
+  border-top: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.workflow-panel {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.62fr) minmax(680px, 1fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: start;
+}
+
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workflow-steps article {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 18px;
+}
+
+.workflow-steps span {
+  display: inline-flex;
+  margin-bottom: 14px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.workflow-steps p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.68;
+}
+
 .split-inner {
   display: grid;
   grid-template-columns: minmax(360px, 0.72fr) minmax(520px, 0.92fr);
@@ -492,6 +533,7 @@ code {
   .hero-inner,
   .section-heading,
   .split-inner,
+  .workflow-panel,
   .download-panel {
     grid-template-columns: 1fr;
   }
@@ -505,6 +547,10 @@ code {
   }
 
   .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workflow-steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -573,6 +619,10 @@ code {
 
   .feature-card-strong {
     grid-column: auto;
+  }
+
+  .workflow-steps {
+    grid-template-columns: 1fr;
   }
 
   .section-inner {

@@ -15,7 +15,6 @@ import {
   buildProjectKnowledge,
   resolveMarkdownLinkPath,
 } from './knowledge.mjs';
-import { buildProjectHealth } from './project-health.mjs';
 import {
   buildImageSnippet,
   formatMarkdownRelativePath,
@@ -36,7 +35,6 @@ import {
 } from './recent-items.mjs';
 import {
   buildDocumentRelationsHtml,
-  buildProjectHealthHtml,
   getQuickOpenResults as getQuickOpenResultsForEntries,
   renderProjectFiles as renderProjectFilesHtml,
   renderProjectSearchResults as renderProjectSearchResultsHtml,
@@ -51,12 +49,12 @@ import {
 import { createDiagramController } from './diagram-controller.mjs';
 import { bindAppEvents } from './app-events.mjs';
 import { createScanSettingsController } from './app-scan-settings.mjs';
+import { createProjectMaintenanceController } from './project-maintenance.mjs';
 import { sampleMarkdown } from './sample-document.mjs';
 
 const draftKey = 'local-markdown-studio:draft';
 const fileNameKey = 'local-markdown-studio:file-name';
-const themeKey = 'local-markdown-studio:theme';
-const recentFilesKey = 'local-markdown-studio:recent-files';
+const themeKey = 'local-markdown-studio:theme', recentFilesKey = 'local-markdown-studio:recent-files';
 const recentProjectsKey = 'local-markdown-studio:recent-projects';
 const defaultScanExtensions = ['.md'];
 const defaultIgnoredDirectories = ['node_modules'];
@@ -121,6 +119,7 @@ const elements = {
   projectSearchInput: document.querySelector('#projectSearchInput'),
   projectSearchResults: document.querySelector('#projectSearchResults'),
   projectHealth: document.querySelector('#projectHealth'),
+  projectAssets: document.querySelector('#projectAssets'),
   documentRelations: document.querySelector('#documentRelations'),
   scanSummary: document.querySelector('#scanSummary'),
   scanSettingsButton: document.querySelector('#scanSettingsButton'),
@@ -181,6 +180,20 @@ const state = {
 
 const diagrams = createDiagramController({ elements, state });
 const scanSettings = createScanSettingsController({ elements, state });
+const maintenance = createProjectMaintenanceController({
+  elements,
+  state,
+  actions: {
+    delay,
+    getProjectKnowledgeEntries,
+    hideGlobalLoading,
+    openProjectEntry,
+    persistDraft,
+    render,
+    showGlobalLoading,
+    updateGlobalLoading,
+  },
+});
 
 initialize();
 
@@ -231,6 +244,7 @@ function render({ scrollToSearchMatch = false, focusEditorMatch = false } = {}) 
   renderQuickOpenResults();
   renderProjectSearchResults();
   renderProjectHealth();
+  renderProjectAssets();
   renderDocumentRelations();
   renderOutline();
   renderStats();
@@ -488,16 +502,11 @@ function renderDocumentRelations() {
 }
 
 function renderProjectHealth() {
-  if (!state.projectSource) {
-    elements.projectHealth.innerHTML = '';
-    return;
-  }
+  maintenance.renderProjectHealth();
+}
 
-  const health = buildProjectHealth({
-    entries: getProjectKnowledgeEntries(),
-    assets: state.projectAssets,
-  });
-  elements.projectHealth.innerHTML = buildProjectHealthHtml(health);
+function renderProjectAssets() {
+  maintenance.renderProjectAssets();
 }
 
 function getProjectKnowledgeEntries() {
@@ -575,6 +584,10 @@ async function saveCurrentDocumentAs() {
   downloadFile(suggestedName, state.markdown, 'text/markdown');
   state.dirty = false;
   render();
+}
+
+async function fixAbsoluteImagePaths() {
+  await maintenance.fixAbsoluteImagePaths();
 }
 
 function confirmDiscardChanges() {

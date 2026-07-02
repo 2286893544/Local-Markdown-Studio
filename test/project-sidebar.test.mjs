@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   buildDocumentRelationsHtml,
+  buildProjectAssetsHtml,
   buildProjectHealthHtml,
   buildProjectSearchResults,
   renderProjectFiles,
@@ -35,6 +36,45 @@ assert.match(
     unresolvedMarkdownLinks: [],
   }),
   /1 个问题/,
+);
+assert.match(
+  buildProjectHealthHtml({
+    missingImageAssets: [{ fileId: 'docs/a.md', filePath: 'docs/a.md', resolvedPath: 'assets/missing.png' }],
+    unusedImageAssets: [],
+    absoluteImagePaths: [{ fileId: 'docs/a.md', filePath: 'docs/a.md', href: '/Users/me/a.png' }],
+    duplicateHeadingSlugs: [],
+    unresolvedMarkdownLinks: [],
+  }),
+  /data-health-file-id="docs\/a\.md"/,
+);
+assert.match(
+  buildProjectHealthHtml({
+    missingImageAssets: [],
+    unusedImageAssets: [],
+    absoluteImagePaths: [{ fileId: 'docs/a.md', filePath: 'docs/a.md', href: '/Users/me/a.png' }],
+    duplicateHeadingSlugs: [],
+    unresolvedMarkdownLinks: [],
+  }),
+  /data-health-action="fix-absolute-images"/,
+);
+assert.match(
+  buildProjectAssetsHtml([
+    {
+      path: 'assets/logo.png',
+      name: 'logo.png',
+      referenceCount: 1,
+      unused: false,
+      references: [{ fileId: 'readme', fileName: 'README.md', filePath: 'README.md' }],
+    },
+    { path: 'assets/orphan.png', name: 'orphan.png', referenceCount: 0, unused: true, references: [] },
+  ]),
+  /data-asset-file-id="readme"/,
+);
+assert.match(
+  buildProjectAssetsHtml([
+    { path: 'assets/orphan.png', name: 'orphan.png', referenceCount: 0, unused: true, references: [] },
+  ]),
+  /未引用/,
 );
 
 console.log('project sidebar tests passed');
