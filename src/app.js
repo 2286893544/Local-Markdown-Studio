@@ -49,19 +49,19 @@ import {
 import { createDiagramController } from './diagram-controller.mjs';
 import { bindAppEvents } from './app-events.mjs';
 import { createScanSettingsController } from './app-scan-settings.mjs';
+import { createInitialDocumentState } from './app-state.mjs';
 import { createProjectMaintenanceController } from './project-maintenance.mjs';
 import { sampleMarkdown } from './sample-document.mjs';
 
-const draftKey = 'local-markdown-studio:draft';
-const fileNameKey = 'local-markdown-studio:file-name';
-const themeKey = 'local-markdown-studio:theme', recentFilesKey = 'local-markdown-studio:recent-files';
-const recentProjectsKey = 'local-markdown-studio:recent-projects';
+const draftKey = 'local-markdown-studio:draft', fileNameKey = 'local-markdown-studio:file-name';
+const themeKey = 'local-markdown-studio:theme', recentFilesKey = 'local-markdown-studio:recent-files', recentProjectsKey = 'local-markdown-studio:recent-projects';
 const defaultScanExtensions = ['.md'];
 const defaultIgnoredDirectories = ['node_modules'];
 const defaultScanExtensionOptions = ['.md', '.markdown'];
 const defaultIgnoredDirectoryOptions = ['node_modules', 'dist', 'build', 'coverage', 'out'];
 const defaultGeneralRuleOptions = ['.*'];
 const supportedMarkdownFilePattern = /\.(md|markdown)$/i;
+const initialDocumentState = createInitialDocumentState(localStorage, { draftKey, fileNameKey, sampleMarkdown });
 
 const elements = {
   body: document.body,
@@ -140,8 +140,8 @@ const elements = {
 };
 
 const state = {
-  fileName: localStorage.getItem(fileNameKey) || '未命名文档',
-  markdown: localStorage.getItem(draftKey) || sampleMarkdown,
+  fileName: initialDocumentState.fileName,
+  markdown: initialDocumentState.markdown,
   mode: 'split',
   theme: localStorage.getItem(themeKey) || 'light',
   query: '',
