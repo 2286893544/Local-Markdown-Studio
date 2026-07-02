@@ -1,0 +1,61 @@
+styles.css
+  s_2b3e65cfadc3db::t_e6d379af69a982 360-365
+  s_2b3e65cfadc3db::t_84ad2a6494dab1 277-278,280-281,283-285,290,295,297,302,309,311,317-320,334-359,366-372,376,381,385-389,394-397,399,405,408
+test/find-options.test.mjs
+  s_2b3e65cfadc3db::t_e14bc63595c5b3 1-40
+test/electron-source.test.mjs
+  s_2b3e65cfadc3db::t_4c43449d1deefd 34
+electron/main.cjs
+  s_2b3e65cfadc3db::t_7b0bfed5b25843 211
+src/find-options.mjs
+  s_2b3e65cfadc3db::t_145897ce0ffdad 1-20,24-48
+  s_2b3e65cfadc3db::t_26de81e2f4386b 21-23
+package.json
+  s_2b3e65cfadc3db::t_9a52717ab3f1d4 16
+  s_2b3e65cfadc3db::t_502b4b3edbf6e8 17
+test/markdown.test.mjs
+  s_2b3e65cfadc3db::t_38167ffb0147db 58
+  s_2b3e65cfadc3db::t_ab5b0a1077af6b 56-57
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_bb1a6cc0b566b0 174,179-181,260-261,264
+  s_2b3e65cfadc3db::t_87bd59ba861066 175
+  s_2b3e65cfadc3db::t_437ab485f078b3 85-88,90-91,95,176-178,262-263
+  s_2b3e65cfadc3db::t_5841020a799627 66
+  s_2b3e65cfadc3db::t_6aadc954abe47c 8,10,84,89
+  s_2b3e65cfadc3db::t_2affc8f8137c94 92
+src/editor-search.mjs
+  s_2b3e65cfadc3db::t_bda86ce099646e 1,6-10,12,14-20,25-54
+src/app.js
+  s_2b3e65cfadc3db::t_3d508f6083657d 19,124,214,249,272,344,357,363
+  s_2b3e65cfadc3db::t_a7ad7a465e34e2 65,112,125,202,313,345-347,353-356,358-362,364-365
+  s_2b3e65cfadc3db::t_ba15dab75f0210 1-2,4,8,16
+  s_2b3e65cfadc3db::t_677d321ae7afaa 216
+test/editor-search.test.mjs
+  s_2b3e65cfadc3db::t_3c17424f8ef602 10-24
+src/markdown.mjs
+  s_2b3e65cfadc3db::t_615240ad759fa3 1-2,128,132-133,138
+index.html
+  s_2b3e65cfadc3db::t_6f064e34b65851 58,60,65,76,78
+  s_2b3e65cfadc3db::t_596ced8ec5a6e2 80-81
+  s_2b3e65cfadc3db::t_5e4a9d25543700 64,70,75
+  s_2b3e65cfadc3db::t_be7fc50aa1327b 57
+  s_2b3e65cfadc3db::t_abfe610b9524b5 61-63
+src/app-events.mjs
+  s_2b3e65cfadc3db::t_43695344746051 108-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "50b6f9413a0989643a7456c3575a9350cb249c3f",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
