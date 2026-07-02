@@ -226,7 +226,7 @@ export function bindAppEvents({
   window.addEventListener('keydown', (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f') {
       event.preventDefault();
-      actions.openFindPanel({ showReplace: event.altKey || event.shiftKey });
+      actions.openFindPanel();
       return;
     }
 

@@ -298,12 +298,8 @@ body.is-find-open .search-panel {
 }
 
 .replace-row {
-  display: none;
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-body.is-replace-open .replace-row {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .search-box {

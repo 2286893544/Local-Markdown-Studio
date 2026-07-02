@@ -1,10 +1,8 @@
-export function openFindPanel({ elements, showReplace = false } = {}) {
+export function openFindPanel({ elements } = {}) {
   document.body.classList.add('is-find-open');
-  document.body.classList.toggle('is-replace-open', showReplace);
   setTimeout(() => {
-    const input = showReplace ? elements.replaceInput : elements.searchInput;
-    input.focus({ preventScroll: true });
-    input.select();
+    elements.searchInput.focus({ preventScroll: true });
+    elements.searchInput.select();
   }, 0);
 }
 
