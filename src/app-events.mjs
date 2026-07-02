@@ -49,6 +49,7 @@ export function bindAppEvents({
   });
   elements.newFileButton.addEventListener('click', actions.createProjectFile);
   elements.newFolderButton.addEventListener('click', actions.createProjectFolder);
+  elements.sidebarToggleButton.addEventListener('click', actions.toggleSidebar);
 
   elements.editor.addEventListener('input', () => {
     state.markdown = elements.editor.value;

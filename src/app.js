@@ -20,6 +20,7 @@ import { canUseNativeFind, createDefaultSearchOptions, getSearchOptions, replace
 import { bindAppEvents } from './app-events.mjs';
 import { createScanSettingsController } from './app-scan-settings.mjs';
 import { createInitialDocumentState } from './app-state.mjs';
+import { toggleSidebar } from './app-sidebar.mjs';
 import { createProjectMaintenanceController } from './project-maintenance.mjs';
 import { sampleMarkdown } from './sample-document.mjs';
 
@@ -81,6 +82,7 @@ const elements = {
   diagramZoomReset: document.querySelector('#diagramZoomReset'),
   diagramZoomLevel: document.querySelector('#diagramZoomLevel'),
   outlinePane: document.querySelector('.outline-pane'),
+  sidebarToggleButton: document.querySelector('#sidebarToggleButton'),
   projectPanel: document.querySelector('.project-panel'),
   newFileButton: document.querySelector('#newFileButton'),
   newFolderButton: document.querySelector('#newFolderButton'),
@@ -137,6 +139,7 @@ const state = {
   dirty: false,
   focusMode: false,
   activeOutlineId: '',
+  sidebarCollapsed: false,
   expandedOutlineIds: new Set(),
   collapsedOutlineIds: new Set(),
   diagramZoom: 1,
@@ -199,7 +202,7 @@ function initialize() {
       hideDropOverlay, insertImageAssetFromFile, insertMarkdownSnippet, openFile, showDropOverlay,
       closeFindPanel, loadNativeMarkdownFile, openFindPanel, openMarkdownLink, openNativeFile, replaceAllMatches, replaceCurrentMatch, runNativeFindInPage,
       saveCurrentDocument, saveCurrentDocumentAs, setDocumentContent, setFocusMode, setMode, stepSearchMatch,
-      toggleFindInSelection, toggleSearchOption,
+      toggleFindInSelection, toggleSearchOption, toggleSidebar: () => toggleSidebar({ elements, state }),
       closeScanSettingsDialog: scanSettings.closeScanSettingsDialog,
       openScanSettingsDialog: scanSettings.openScanSettingsDialog,
       syncEditorScrollToPreview, syncNativeTheme, syncPreviewScrollToEditor, updateActiveOutlineFromScroll,
