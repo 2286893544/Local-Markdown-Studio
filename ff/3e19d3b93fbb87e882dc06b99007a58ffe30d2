@@ -1,0 +1,34 @@
+package.json
+  s_2b3e65cfadc3db::t_4a6f6065384dd8 17
+src/app-toast.mjs
+  s_2b3e65cfadc3db::t_4a6f6065384dd8 1-14
+src/markdown.mjs
+  s_2b3e65cfadc3db::t_8a538c9fb96eff 160,168,170-179,195,199-201,203-204,209-235
+  s_2b3e65cfadc3db::t_5a7aab4c097c90 236
+styles.css
+  s_2b3e65cfadc3db::t_4a6f6065384dd8 1546-1569
+index.html
+  s_2b3e65cfadc3db::t_4a6f6065384dd8 141-142
+test/app-source.test.mjs
+  s_2b3e65cfadc3db::t_51a12d927f45ac 8,12,106-112
+test/markdown.test.mjs
+  s_2b3e65cfadc3db::t_83aaa65178d736 60,62-65
+src/app.js
+  s_2b3e65cfadc3db::t_4a6f6065384dd8 24,72,1392
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "ff3e19d3b93fbb87e882dc06b99007a58ffe30d2",
+  "prompts": {},
+  "sessions": {
+    "s_2b3e65cfadc3db": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1bb3-958a-7111-9ad1-42969c4141ee",
+        "model": "gpt-5.5"
+      },
+      "human_author": "许嘉航 <xujiahang0624@163.com>"
+    }
+  }
+}
